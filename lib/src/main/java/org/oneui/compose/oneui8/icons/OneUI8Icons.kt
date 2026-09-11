@@ -9,9 +9,15 @@ import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.unit.dp
 
 /**
- * Small original vector set built for this Compose fork on a 24x24 optical grid.
- * These are One UI-inspired assets, not extracted Samsung/Figma artwork.
+ * Compatibility vector surface retained for callers that require [ImageVector].
+ *
+ * New code should use `org.oneui.compose.icons.OneUiIcons`, which is backed by the resolved
+ * OneUIProject icon resources where available. Changing these properties to resource handles would
+ * break the historical public return type, so the original clean-room vectors remain intact here.
  */
+@Deprecated(
+    message = "Use org.oneui.compose.icons.OneUiIcons for the stable resource-backed icon catalog.",
+)
 object OneUI8Icons {
     val Search by lazy { stroked("Search", "M10.8,4.2 A6.6,6.6 0,1 0,10.8,17.4 A6.6,6.6 0,1 0,10.8,4.2 M15.6,15.6 L20.1,20.1") }
     val Settings by lazy { stroked("Settings", "M12,8.25 A3.75,3.75 0,1 0,12,15.75 A3.75,3.75 0,1 0,12,8.25 M12,3.4 L13.1,5.25 L15.25,5.85 L17.05,4.75 L19.25,6.95 L18.15,8.75 L18.75,10.9 L20.6,12 L18.75,13.1 L18.15,15.25 L19.25,17.05 L17.05,19.25 L15.25,18.15 L13.1,18.75 L12,20.6 L10.9,18.75 L8.75,18.15 L6.95,19.25 L4.75,17.05 L5.85,15.25 L5.25,13.1 L3.4,12 L5.25,10.9 L5.85,8.75 L4.75,6.95 L6.95,4.75 L8.75,5.85 L10.9,5.25 Z") }

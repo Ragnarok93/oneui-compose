@@ -1,8 +1,6 @@
 package org.oneui.compose.oneui8.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,68 +16,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.oneui.compose.icons.OneUiAnimatedIcons
 import org.oneui.compose.oneui8.motion.OneUI8Motion
 import org.oneui.compose.oneui8.theme.OneUI8Theme
 
+@Deprecated(
+    message = "Use OneUiAnimatedIcons.CheckMorph from the stable One UI Compose surface.",
+)
 @Composable
 fun OneUI8SelectionIndicator(
     selected: Boolean,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
-    val colors = OneUI8Theme.colors
-    val progress by animateFloatAsState(
-        targetValue = if (selected) 1f else 0f,
-        animationSpec = OneUI8Motion.selection(),
-        label = "OneUI8 selection check",
+    OneUiAnimatedIcons.CheckMorph(
+        checked = selected,
+        modifier = modifier,
+        enabled = enabled,
     )
-    val background by animateColorAsState(
-        targetValue = if (selected) colors.accent else colors.controlInactive.copy(alpha = 0.16f),
-        animationSpec = OneUI8Motion.standard(),
-        label = "OneUI8 selection background",
-    )
-    val firstStrokeEnd = OneUI8Motion.Duration.SelectionFirstStroke.toFloat() / OneUI8Motion.Duration.SelectionTotal
-    val first = (progress / firstStrokeEnd).coerceIn(0f, 1f)
-    val second = ((progress - firstStrokeEnd) / (1f - firstStrokeEnd)).coerceIn(0f, 1f)
-
-    Canvas(
-        modifier = modifier
-            .size(28.dp)
-            .background(background, RoundedCornerShape(14.dp)),
-    ) {
-        if (progress <= 0f) return@Canvas
-        val start = Offset(size.width * 0.27f, size.height * 0.52f)
-        val mid = Offset(size.width * 0.44f, size.height * 0.68f)
-        val end = Offset(size.width * 0.75f, size.height * 0.34f)
-        drawLine(
-            color = colors.onAccent,
-            start = start,
-            end = Offset(
-                x = start.x + (mid.x - start.x) * first,
-                y = start.y + (mid.y - start.y) * first,
-            ),
-            strokeWidth = size.minDimension * 0.085f,
-            cap = StrokeCap.Round,
-        )
-        if (second > 0f) {
-            drawLine(
-                color = colors.onAccent,
-                start = mid,
-                end = Offset(
-                    x = mid.x + (end.x - mid.x) * second,
-                    y = mid.y + (end.y - mid.y) * second,
-                ),
-                strokeWidth = size.minDimension * 0.085f,
-                cap = StrokeCap.Round,
-            )
-        }
-    }
 }
 
 data class OneUI8NavigationItem(
