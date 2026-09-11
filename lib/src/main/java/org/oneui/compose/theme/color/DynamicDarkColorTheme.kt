@@ -367,7 +367,7 @@ internal val DynamicDarkColorTheme: OneUIColorTheme
             color(R.color.sesl_tablayout_subtab_background_stroke_color_dark)
 
         override val seslPreferenceRelativeCardBackground =
-            Color(R.color.sesl_preference_relative_card_background_dark)
+            color(R.color.sesl_preference_relative_card_background_dark)
         override val ouiTipsCardPreferenceBackground =
             color(R.color.oui_tipscardpref_bg_color_light)
 
