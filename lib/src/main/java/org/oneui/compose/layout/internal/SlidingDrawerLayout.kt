@@ -89,7 +89,8 @@ fun SlidingDrawerLayout(
                 )
                 .anchoredDraggable(
                     state = state.draggableState,
-                    orientation = Orientation.Horizontal
+                    orientation = Orientation.Horizontal,
+                    flingBehavior = state.flingBehavior()
                 )
         ) {
             drawerContent()

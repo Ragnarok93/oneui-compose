@@ -2,6 +2,7 @@ package org.oneui.compose.layout.internal
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.animateTo
@@ -25,16 +26,14 @@ data class DrawerState(
      * State for controling the swipeable modifier
      */
     internal val draggableState = AnchoredDraggableState(
-        initialValue = initial,
-        positionalThreshold = { distance: Float ->
-            distance / 2F
-        },
-        velocityThreshold = {
-            velocityThreshold
-        },
-        animationSpec = tween(
-            durationMillis = animDuration
-        )
+        initialValue = initial
+    )
+
+    @Composable
+    internal fun flingBehavior() = AnchoredDraggableDefaults.flingBehavior(
+        state = draggableState,
+        positionalThreshold = { distance -> distance / 2F },
+        animationSpec = tween(durationMillis = animDuration)
     )
 
     fun setAnchors(
@@ -96,7 +95,10 @@ data class DrawerState(
     private suspend fun animate(
         target: SlidingDrawerOpenedState
     ) = draggableState
-        .animateTo(target)
+        .animateTo(
+            targetValue = target,
+            animationSpec = tween(durationMillis = animDuration)
+        )
 
     private suspend fun snap(
         target: SlidingDrawerOpenedState

@@ -52,7 +52,8 @@ fun BaseNavigationRail(
             .fillMaxSize()
             .anchoredDraggable(
                 state = state.draggableState,
-                orientation = Orientation.Horizontal
+                orientation = Orientation.Horizontal,
+                flingBehavior = state.flingBehavior()
             )
     ) {
         //We don't want any "overpull" and no negative offset, so we restrict it

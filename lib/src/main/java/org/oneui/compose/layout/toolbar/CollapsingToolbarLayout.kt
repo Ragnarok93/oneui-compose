@@ -3,6 +3,7 @@ package org.oneui.compose.layout.toolbar
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
@@ -21,8 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,13 +33,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.oneui.compose.base.Icon
 import org.oneui.compose.layout.internal.modifier.NestedScrollConnection
 import org.oneui.compose.theme.OneUITheme
 import org.oneui.compose.util.isEven
 import org.oneui.compose.util.mapRange
 import org.oneui.compose.widgets.box.RoundedCornerBox
-import org.oneui.compose.widgets.buttons.IconButton
 import org.oneui.compose.widgets.menu.MenuItem
 import org.oneui.compose.widgets.menu.PopupMenu
 
@@ -101,7 +98,8 @@ fun CollapsingToolbarLayout(
     val mod = if (expandable) Modifier
         .anchoredDraggable(
             state = state.draggableState,
-            orientation = Orientation.Vertical
+            orientation = Orientation.Vertical,
+            flingBehavior = state.flingBehavior()
         )
         .nestedScroll(
             state.draggableState.NestedScrollConnection
@@ -252,13 +250,13 @@ data class CollapsingToolbarState(
      * State for controlling the swipeable modifier
      */
     internal val draggableState = AnchoredDraggableState(
-        initialValue = initial,
-        positionalThreshold = { distance: Float ->
-            distance / 2F
-        },
-        velocityThreshold = {
-            velocityThreshold
-        },
+        initialValue = initial
+    )
+
+    @Composable
+    internal fun flingBehavior() = AnchoredDraggableDefaults.flingBehavior(
+        state = draggableState,
+        positionalThreshold = { distance -> distance / 2F },
         animationSpec = tween()
     )
 
@@ -309,7 +307,10 @@ data class CollapsingToolbarState(
     private suspend fun animate(
         target: CollapsingToolbarCollapsedState
     ) = draggableState
-        .animateTo(target)
+        .animateTo(
+            targetValue = target,
+            animationSpec = tween()
+        )
 
     private suspend fun snap(
         target: CollapsingToolbarCollapsedState
@@ -355,10 +356,7 @@ fun CollapsingToolbarLayoutPreview() = RoundedCornerBox {
         modifier = Modifier
             .fillMaxSize(),
         toolbarTitle = "Title",
-        toolbarSubtitle = "Subtitle",
-        appbarActions = {
-            IconButton(icon = Icon.Vector(Icons.Default.MoreVert))
-        }
+        toolbarSubtitle = "Subtitle"
     ) {
         Column(
             modifier = Modifier
