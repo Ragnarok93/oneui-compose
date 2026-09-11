@@ -2,10 +2,15 @@ Apache 2.0 Third-Party Notices:
 
 This library includes source code developed by third parties under the Apache 2.0 license:
 
-- Material3 library for jetpack compose
-
+- Material3 library for Jetpack Compose
 
 This library contains dependencies on libraries developed by third parties under the Apache 2.0 license:
 
-- androidx libraries
-- jetpack compose libraries
+- AndroidX libraries
+- Jetpack Compose libraries
+
+MIT reference notice:
+
+The One UI 8 motion layer references behavior/resource values from the MIT-licensed
+Ragnarok93/oneui-design fork (original OneUIProject work by Tribalfs, Yanndroid and BlackMesa123).
+See docs/ATTRIBUTION.md. No Samsung/Figma proprietary vector exports are bundled in this fork.
