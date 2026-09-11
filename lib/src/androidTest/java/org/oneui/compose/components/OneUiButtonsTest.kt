@@ -2,6 +2,7 @@ package org.oneui.compose.components
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -44,7 +45,7 @@ class OneUiButtonsTest {
                 OneUiButton(
                     onClick = {},
                     loading = loading.value,
-                    modifier = androidx.compose.ui.Modifier.testTag("loading-button"),
+                    modifier = Modifier.testTag("loading-button"),
                 ) {
                     Text("Save changes")
                 }
@@ -56,7 +57,7 @@ class OneUiButtonsTest {
         composeRule.waitForIdle()
         val after = composeRule.onNodeWithTag("loading-button").getUnclippedBoundsInRoot()
 
-        assertEquals(before.width, after.width, 0.5f)
-        assertEquals(before.height, after.height, 0.5f)
+        assertEquals(before.right - before.left, after.right - after.left)
+        assertEquals(before.bottom - before.top, after.bottom - after.top)
     }
 }
