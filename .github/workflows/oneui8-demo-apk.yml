@@ -29,7 +29,7 @@ jobs:
       - name: Verify library and build demo
         id: verify
         continue-on-error: true
-        run: ./gradlew :lib:testDebugUnitTest :lib:lintDebug :lib:assembleRelease :demo:assembleDebug --stacktrace
+        run: ./gradlew :lib:testDebugUnitTest :lib:compileDebugAndroidTestKotlin :lib:lintDebug :lib:assembleRelease :demo:assembleDebug --stacktrace
 
       - name: Upload verification reports
         if: always()
