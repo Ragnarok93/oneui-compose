@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,7 +55,6 @@ import java.time.LocalDate
 import java.time.Month
 import java.time.format.TextStyle
 import java.time.temporal.ChronoField
-import java.util.Locale
 
 
 /**
@@ -229,13 +229,14 @@ internal fun DatePickerWeek(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val days = DateUtil.getDayOfWeekInOrder(Locale.getDefault())
+        val locale = LocalLocale.current.platformLocale
+        val days = DateUtil.getDayOfWeekInOrder(locale)
 
         days.forEach { day ->
             Text(
                 modifier = Modifier
                     .weight(1F),
-                text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                text = day.getDisplayName(TextStyle.SHORT, locale),
                 style = with(OneUITheme.types) {
                     when (day) {
                         DayOfWeek.SATURDAY -> datePickerSaturday

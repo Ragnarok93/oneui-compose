@@ -13,9 +13,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
  */
 fun Modifier.overlay(
     onDraw: DrawScope.() -> Unit
-): Modifier = this.then(
-    drawWithContent {
-        drawContent()
-        onDraw(this)
-    }
-)
+): Modifier = drawWithContent {
+    drawContent()
+    onDraw(this)
+}

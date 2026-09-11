@@ -10,14 +10,12 @@ import kotlin.random.Random
  * Surrounds a composable with a randomly colored border
  *
  */
-fun Modifier.debugBorder() = this.then(
-    border(
-        width = 0.5.dp,
-        color = Color(
-            red = rand.nextFloat(),
-            green = rand.nextFloat(),
-            blue = rand.nextFloat()
-        )
+fun Modifier.debugBorder() = border(
+    width = 0.5.dp,
+    color = Color(
+        red = rand.nextFloat(),
+        green = rand.nextFloat(),
+        blue = rand.nextFloat()
     )
 )
 
