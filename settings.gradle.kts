@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "OneUI Compose"
 include(":lib")
+include(":demo")
