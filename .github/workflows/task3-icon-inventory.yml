@@ -1,0 +1,61 @@
+name: Task 3 icon inventory
+
+on:
+  push:
+    branches:
+      - feature/oneui8-compose-components
+
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+      - name: Resolve icon dependency and audit Task 2 motion
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/task3-inventory
+          ./gradlew :lib:dependencies --configuration debugRuntimeClasspath > build/task3-inventory/debugRuntimeClasspath.txt
+          {
+            echo '=== Task 2 motion audit ==='
+            rg -n 'delay\(|tween\([0-9]' \
+              lib/src/main/java/org/oneui/compose/oneui8 \
+              lib/src/main/java/org/oneui/compose/components || true
+          } | tee build/task3-inventory/task2-motion-audit.txt
+
+          ICON_ROOT="$HOME/.gradle/caches/modules-2/files-2.1/io.github.oneuiproject/icons/1.1.0"
+          echo "ICON_ROOT=$ICON_ROOT" | tee build/task3-inventory/icon-location.txt
+          find "$ICON_ROOT" -maxdepth 4 -type f -print | sort | tee -a build/task3-inventory/icon-location.txt
+
+          AAR="$(find "$ICON_ROOT" -type f -name '*.aar' | head -n1)"
+          test -n "$AAR"
+          echo "AAR=$AAR" | tee build/task3-inventory/icon-aar.txt
+          jar tf "$AAR" | tee -a build/task3-inventory/icon-aar.txt
+
+          TMP="$(mktemp -d)"
+          unzip -q "$AAR" -d "$TMP"
+          if [[ -f "$TMP/classes.jar" ]]; then
+            jar tf "$TMP/classes.jar" | sort | tee build/task3-inventory/icon-classes.txt
+          fi
+          if [[ -d "$TMP/res" ]]; then
+            find "$TMP/res" -type f -print | sed "s#^$TMP/##" | sort | tee build/task3-inventory/icon-resources.txt
+          fi
+
+          {
+            echo '=== Curated-name matches ==='
+            cat build/task3-inventory/icon-classes.txt build/task3-inventory/icon-resources.txt 2>/dev/null \
+              | grep -Ei 'search|more|add|delete|copy|cut|paste|share|settings|info|back|forward|expand|collapse|close|check|warning|play|pause' \
+              || true
+          } | tee build/task3-inventory/curated-name-matches.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: task3-icon-inventory
+          path: build/task3-inventory
+          if-no-files-found: error
