@@ -54,16 +54,22 @@ text = replace_once(
 )
 drawer.write_text(text)
 
-# Pass the remembered settling policy to both drawer modifiers.
-for rel, orientation in [
-    ("org/oneui/compose/layout/internal/BaseNavigationRail.kt", "Horizontal"),
-    ("org/oneui/compose/layout/internal/SlidingDrawerLayout.kt", "Horizontal"),
-]:
-    path = SRC / rel
-    text = path.read_text()
-    old = f"""                state = state.draggableState,\n                orientation = Orientation.{orientation}\n            )"""
-    new = f"""                state = state.draggableState,\n                orientation = Orientation.{orientation},\n                flingBehavior = state.flingBehavior()\n            )"""
-    text = replace_once(text, old, new, f"{path.name} anchoredDraggable")
+# Pass the remembered settling policy to both drawer modifiers. These files deliberately
+# have different indentation because one call is nested under a child Box modifier.
+modifier_patches = [
+    (
+        SRC / "org/oneui/compose/layout/internal/BaseNavigationRail.kt",
+        """            .anchoredDraggable(\n                state = state.draggableState,\n                orientation = Orientation.Horizontal\n            )""",
+        """            .anchoredDraggable(\n                state = state.draggableState,\n                orientation = Orientation.Horizontal,\n                flingBehavior = state.flingBehavior()\n            )""",
+    ),
+    (
+        SRC / "org/oneui/compose/layout/internal/SlidingDrawerLayout.kt",
+        """                .anchoredDraggable(\n                    state = state.draggableState,\n                    orientation = Orientation.Horizontal\n                )""",
+        """                .anchoredDraggable(\n                    state = state.draggableState,\n                    orientation = Orientation.Horizontal,\n                    flingBehavior = state.flingBehavior()\n                )""",
+    ),
+]
+for path, old, new in modifier_patches:
+    text = replace_once(path.read_text(), old, new, f"{path.name} anchoredDraggable")
     path.write_text(text)
 
 # Collapsing toolbar: same AnchoredDraggable migration. Remove the preview-only Material
