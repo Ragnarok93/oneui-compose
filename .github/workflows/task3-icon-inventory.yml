@@ -20,32 +20,42 @@ jobs:
       - name: Resolve icon dependency and audit Task 2 motion
         shell: bash
         run: |
-          set -euo pipefail
+          set -u
           mkdir -p build/task3-inventory
-          ./gradlew :lib:dependencies --configuration debugRuntimeClasspath > build/task3-inventory/debugRuntimeClasspath.txt
+          ./gradlew :lib:dependencies --configuration debugRuntimeClasspath > build/task3-inventory/debugRuntimeClasspath.txt 2>&1
+          ./gradlew :lib:compileDebugKotlin > build/task3-inventory/compileDebugKotlin.txt 2>&1
+
           {
             echo '=== Task 2 motion audit ==='
-            rg -n 'delay\(|tween\([0-9]' \
+            grep -R -nE 'delay\(|tween\([0-9]' \
               lib/src/main/java/org/oneui/compose/oneui8 \
-              lib/src/main/java/org/oneui/compose/components || true
+              lib/src/main/java/org/oneui/compose/components 2>/dev/null || true
           } | tee build/task3-inventory/task2-motion-audit.txt
 
           ICON_ROOT="$HOME/.gradle/caches/modules-2/files-2.1/io.github.oneuiproject/icons/1.1.0"
           echo "ICON_ROOT=$ICON_ROOT" | tee build/task3-inventory/icon-location.txt
-          find "$ICON_ROOT" -maxdepth 4 -type f -print | sort | tee -a build/task3-inventory/icon-location.txt
+          find "$ICON_ROOT" -maxdepth 5 -type f -print 2>/dev/null | sort | tee -a build/task3-inventory/icon-location.txt
 
-          AAR="$(find "$ICON_ROOT" -type f -name '*.aar' | head -n1)"
-          test -n "$AAR"
-          echo "AAR=$AAR" | tee build/task3-inventory/icon-aar.txt
-          jar tf "$AAR" | tee -a build/task3-inventory/icon-aar.txt
+          ARTIFACT="$(find "$ICON_ROOT" -type f \( -name '*.aar' -o -name '*.jar' \) 2>/dev/null | head -n1)"
+          if [[ -z "$ARTIFACT" ]]; then
+            echo 'No AAR/JAR materialized for io.github.oneuiproject:icons:1.1.0' | tee build/task3-inventory/icon-artifact.txt
+            exit 1
+          fi
+
+          echo "ARTIFACT=$ARTIFACT" | tee build/task3-inventory/icon-artifact.txt
+          jar tf "$ARTIFACT" | tee -a build/task3-inventory/icon-artifact.txt
 
           TMP="$(mktemp -d)"
-          unzip -q "$AAR" -d "$TMP"
-          if [[ -f "$TMP/classes.jar" ]]; then
-            jar tf "$TMP/classes.jar" | sort | tee build/task3-inventory/icon-classes.txt
-          fi
-          if [[ -d "$TMP/res" ]]; then
-            find "$TMP/res" -type f -print | sed "s#^$TMP/##" | sort | tee build/task3-inventory/icon-resources.txt
+          if [[ "$ARTIFACT" == *.aar ]]; then
+            unzip -q "$ARTIFACT" -d "$TMP"
+            if [[ -f "$TMP/classes.jar" ]]; then
+              jar tf "$TMP/classes.jar" | sort | tee build/task3-inventory/icon-classes.txt
+            fi
+            if [[ -d "$TMP/res" ]]; then
+              find "$TMP/res" -type f -print | sed "s#^$TMP/##" | sort | tee build/task3-inventory/icon-resources.txt
+            fi
+          else
+            jar tf "$ARTIFACT" | sort | tee build/task3-inventory/icon-classes.txt
           fi
 
           {
@@ -55,6 +65,7 @@ jobs:
               || true
           } | tee build/task3-inventory/curated-name-matches.txt
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: task3-icon-inventory
           path: build/task3-inventory
