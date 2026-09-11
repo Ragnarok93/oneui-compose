@@ -1,0 +1,38 @@
+name: Apply Compose 2026 source migration
+
+on:
+  push:
+    branches:
+      - feature/oneui8-compose-components
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Apply mechanical migration
+        run: python3 tools/modernize_compose_2026.py
+
+      - name: Validate patch
+        run: git diff --check
+
+      - name: Commit migration
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No source migration required"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/src/main/java
+          git commit -m "fix: migrate legacy compose runtime APIs"
+          git push origin HEAD:feature/oneui8-compose-components
