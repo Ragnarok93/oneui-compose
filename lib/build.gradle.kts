@@ -12,7 +12,6 @@ android {
     defaultConfig {
         minSdk = 23
         version = 1
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -28,18 +27,14 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
+    buildFeatures { compose = true }
+    composeOptions { kotlinCompilerExtensionVersion = "1.5.1" }
 }
 
-kotlin {
-    jvmToolchain(17)
-}
+kotlin { jvmToolchain(17) }
 
 dependencies {
     implementation(platform(libs.compose.bom))
@@ -60,6 +55,7 @@ dependencies {
     implementation(libs.androidx.core)
     implementation(libs.jetbrains.kotlinx.coroutines.core)
 
+    testImplementation(libs.junit)
     coreLibraryDesugaring(libs.coreLibDesugaring)
 }
 
@@ -67,10 +63,9 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("maven") {
-                groupId = "com.github.TrainerSnow"
+                groupId = "com.github.Ragnarok93"
                 artifactId = "oneui-compose"
-                version = "0.7.0"
-
+                version = "0.8.0"
                 artifact(tasks.getByName("bundleReleaseAar"))
             }
         }
