@@ -1,54 +1,56 @@
-# OneUI Library for Jetpack compose 
-This is a library for [Jetpack Compose](https://developer.android.com/jetpack/compose) which aims at enabling developers to use [Samsung's OneUI Design](https://developer.android.com/jetpack/compose).
+# OneUI Compose
 
-## Note
-While this library does aim at replicating the look of the OneUI Design, it is to note that this will never be truly achieved, due to the closed-source nature 
-of the Samsung apps. Still, by decompiling those, we can scrape core information about the apps, such as color, dimension and translation values, from the apps
-`res` folder. While this is tedious and sometimes impossible due to code obfuscation, the team at the [OneUI Library for Android XML](https://github.com/OneUIProject)
-has done a big part of this work, making a great contribution towards this project.
+Jetpack Compose components and design tokens inspired by Samsung One UI, now with an additive **One UI 8 / SESL8-style Compose layer**.
 
-## Work in Progress
-This library is still, as of October 14 2023, work in progress.
+The project keeps the existing `OneUITheme` and legacy component API while adding reusable motion, shape, interaction, navigation and icon primitives under `org.oneui.compose.oneui8`.
 
-Future aims include but are not limited to:
+## One UI 8 additions
 
-- Markup documentation for every component with preview images
-- Support for dynamic theming (OneUI-capable devices only)
-- Color Picker dialog
+- Compose-native SESL-style motion tokens, including the `0.22, 0.25, 0, 1` reference curve.
+- Shared press-scale/ripple interaction behavior.
+- One UI 8 buttons and icon buttons.
+- Switch and slider wrappers.
+- Rounded cards, sections and list rows.
+- Two-stage animated selection indicator.
+- Compact expanding navigation bar.
+- Original rounded 24×24 vector icon set.
+- Design-kit integration guidance and asset provenance rules.
+- `:demo` application that interactively demonstrates every new component.
 
-Further problems are noted as TODO-comments at the core composable of a component.
+See [One UI 8 design guidelines](docs/ONEUI8_DESIGN_GUIDELINES.md) and [attribution](docs/ATTRIBUTION.md).
+
+## Demo APK
+
+Build locally with:
+
+```bash
+./gradlew :lib:testDebugUnitTest :demo:assembleDebug
+```
+
+The APK is generated at:
+
+```text
+demo/build/outputs/apk/debug/demo-debug.apk
+```
+
+The feature branch also contains a GitHub Actions workflow that builds and uploads `oneui-compose-oneui8-demo-debug` on every push.
 
 ## Getting started
-Please refer to [getting started](GETTING_STARTED.md)
 
-## Contributing
-Please refer to the [contributing-guide](CONTRIBUTING.md)
+Existing API documentation remains in [GETTING_STARTED.md](GETTING_STARTED.md). New projects can wrap screens in `OneUI8Theme` and use components from `org.oneui.compose.oneui8.components`.
 
-## Design Library
+```kotlin
+OneUI8Theme {
+    OneUI8Button(text = "Continue", onClick = { /* ... */ })
+}
+```
 
-This library is **only** a design library, meaning only visuals, no implementation is provided. Meaning for example, the technical implementation for the preference 
-components of storing a users preferences must be implemented by each app itself. This may change in the future, although currently this is no big priority.
+## Design-library scope
+
+This remains a design/component library. Application state, persistence and business logic stay in the consuming app. The new One UI 8 APIs are intentionally additive so older consumers do not need a flag-day migration.
 
 ## Credits
-- [Samsung](https://www.samsung.com/) for their awesome OneUI Design.
-- [Yanndroid](https://github.com/Yanndroid) and [BlackMesa123](https://github.com/BlackMesa123) for their work at the [OneUI Library for Android XML](https://github.com/OneUIProject)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- Samsung for the One UI design language.
+- OneUIProject / `oneui-design` contributors for the open Android/SESL reference work.
+- Original `oneui-compose` contributors.
