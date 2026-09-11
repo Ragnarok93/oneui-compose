@@ -2,16 +2,16 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.kotlin.compose)
     id("maven-publish")
 }
 
 android {
     namespace = "org.oneui.compose"
-    compileSdk = 34
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 23
-        version = 1
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -25,16 +25,21 @@ android {
             )
         }
     }
+
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-    buildFeatures { compose = true }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.1" }
+
+    buildFeatures {
+        compose = true
+    }
 }
 
-kotlin { jvmToolchain(17) }
+kotlin {
+    jvmToolchain(21)
+}
 
 dependencies {
     implementation(platform(libs.compose.bom))
@@ -46,9 +51,6 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.preview)
     implementation(libs.compose.animation)
-    debugImplementation(libs.androidx.ui.tooling)
-
-    debugRuntimeOnly(libs.compose.ui.test.manifest)
     implementation(libs.io.github.oneuiproject.icons)
 
     implementation(libs.androidx.annotation)
@@ -56,6 +58,13 @@ dependencies {
     implementation(libs.jetbrains.kotlinx.coroutines.core)
 
     testImplementation(libs.junit)
+
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
+
     coreLibraryDesugaring(libs.coreLibDesugaring)
 }
 

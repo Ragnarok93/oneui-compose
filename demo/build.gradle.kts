@@ -2,18 +2,20 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "org.oneui.compose.demo"
-    compileSdk = 34
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "org.oneui.compose.demo"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 37
         versionCode = 1
         versionName = "0.8.0-oneui8-demo"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -28,15 +30,18 @@ android {
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
-    buildFeatures { compose = true }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.1" }
+    buildFeatures {
+        compose = true
+    }
 }
 
-kotlin { jvmToolchain(17) }
+kotlin {
+    jvmToolchain(21)
+}
 
 dependencies {
     implementation(project(":lib"))
@@ -47,6 +52,12 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.preview)
+
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
+
     coreLibraryDesugaring(libs.coreLibDesugaring)
 }

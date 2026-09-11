@@ -1,41 +1,40 @@
 [versions]
-compose-bom = "2024.04.01"
-foundation = "1.6.6"
+compose-bom = "2026.08.00"
 
-agp = "8.3.2"
-kotlin = "1.9.0"
-core-ktx = "1.13.0"
-activity-compose = "1.9.0"
+agp = "9.3.2"
+kotlin = "2.4.20"
+core-ktx = "1.18.0"
+activity-compose = "1.13.0"
 oneui-icons = "1.1.0"
-annotation = "1.7.1"
-coroutines = "1.8.0"
-ui-tooling = "1.6.6"
-windowsizeclas = "1.2.1"
-desugar_android = "2.0.4"
+annotation = "1.10.0"
+coroutines = "1.10.2"
+desugar-android = "2.1.5"
 junit = "4.13.2"
 
 [libraries]
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-compose-material3-windowsizeclas = { group = "androidx.compose.material3", name = "material3-window-size-class", version.ref = "windowsizeclas" }
+compose-material3-windowsizeclas = { group = "androidx.compose.material3", name = "material3-window-size-class" }
 compose-material = { group = "androidx.compose.material", name = "material" }
-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 compose-animation = { group = "androidx.compose.animation", name = "animation" }
+compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 androidx-core = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 jetbrains-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 io-github-oneuiproject-icons = { group = "io.github.oneuiproject", name = "icons", version.ref = "oneui-icons" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "ui-tooling" }
-coreLibDesugaring = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar_android" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+coreLibDesugaring = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar-android" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 
 [bundles]
