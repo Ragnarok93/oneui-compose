@@ -2,11 +2,11 @@ package org.oneui.compose.oneui8.components
 
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.shape.RectangleShape
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import org.oneui.compose.interaction.oneUiInteractive
 
 /** Compatibility bridge for existing OneUI8 scaffold components. */
