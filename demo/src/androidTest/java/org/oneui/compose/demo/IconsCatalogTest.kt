@@ -12,6 +12,7 @@ import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import org.junit.Rule
 import org.junit.Test
+import org.oneui.compose.demo.screens.RecyclerViewCatalogTab
 
 class IconsCatalogTest {
     @get:Rule
@@ -19,12 +20,14 @@ class IconsCatalogTest {
 
     private fun openIcons() {
         composeRule.onNodeWithContentDescription("Open navigation").performClick()
-        composeRule.onNodeWithText(CatalogDestination.Icons.label).performClick()
-        composeRule.onNodeWithTag(CatalogDestination.Icons.testTag).assertIsDisplayed()
+        composeRule.onNodeWithText(CatalogDestination.RecyclerViews.label).performClick()
+        composeRule.onNodeWithTag(CatalogDestination.RecyclerViews.testTag).assertIsDisplayed()
+        composeRule.onNodeWithText(RecyclerViewCatalogTab.Icons.label).assertIsDisplayed()
+        composeRule.onNodeWithTag(RecyclerViewCatalogTab.Icons.testTag).assertIsDisplayed()
     }
 
     @Test
-    fun iconsRouteSearchesTheReferenceDrawableNamespaceAndShowsEmptyState() {
+    fun iconsTabSearchesTheReferenceDrawableNamespaceAndShowsEmptyState() {
         openIcons()
 
         composeRule.onNodeWithTag("icons-search-field").performTextInput("wifi secure")
