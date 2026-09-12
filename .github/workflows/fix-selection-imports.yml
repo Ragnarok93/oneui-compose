@@ -1,0 +1,43 @@
+name: Fix selection imports
+
+on:
+  push:
+    branches:
+      - feature/oneui8-compose-components
+    paths:
+      - .github/workflows/fix-selection-imports.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: feature/oneui8-compose-components
+      - name: Remove stale BoxScope imports
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(
+            lib/src/main/java/org/oneui/compose/components/selection/OneUiCheckbox.kt
+            lib/src/main/java/org/oneui/compose/components/selection/OneUiRadioButton.kt
+            lib/src/main/java/org/oneui/compose/components/selection/OneUiSwitch.kt
+          )
+          before=$(grep -h '^import androidx\.compose\.foundation\.layout\.matchParentSize$' "${files[@]}" | wc -l)
+          test "$before" -eq 3
+          sed -i '/^import androidx\.compose\.foundation\.layout\.matchParentSize$/d' "${files[@]}"
+          after=$(grep -h '^import androidx\.compose\.foundation\.layout\.matchParentSize$' "${files[@]}" | wc -l || true)
+          test "$after" -eq 0
+          git diff --check
+      - name: Commit fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add lib/src/main/java/org/oneui/compose/components/selection
+          git commit -m 'fix: remove stale selection layout imports'
+          git push origin HEAD:feature/oneui8-compose-components
