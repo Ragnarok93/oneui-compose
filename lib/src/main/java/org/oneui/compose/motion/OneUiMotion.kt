@@ -3,6 +3,7 @@ package org.oneui.compose.motion
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Immutable
 
@@ -14,6 +15,7 @@ object OneUiEasing {
     /** Android platform accelerate/decelerate families used by referenced XML animations. */
     val Accelerate: Easing = CubicBezierEasing(0.4f, 0f, 1f, 1f)
     val Decelerate: Easing = CubicBezierEasing(0f, 0f, 0.2f, 1f)
+    val Linear: Easing = LinearEasing
 
     /** Preserves the existing scaffold's direct-manipulation curve as a stable semantic token. */
     val Emphasized: Easing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
@@ -40,6 +42,10 @@ object OneUiMotion {
         const val Standard = 200
         /** SeslAbsSeekBar.SliderDrawable press/release expansion. */
         const val SliderPress = 250
+        /** SeslAbsSeekBar.ThumbDrawable shrinks to zero linearly when pressed. */
+        const val SliderThumbPress = 100
+        /** SeslAbsSeekBar.ThumbDrawable restores with SINE_IN_OUT_90. */
+        const val SliderThumbRelease = 300
         const val Fab = 400
 
         const val SheetEnterTranslation = 300
@@ -70,6 +76,12 @@ object OneUiMotion {
 
     fun <T> sliderPress(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.SliderPress, easing = OneUiEasing.SeslSineInOut80)
+
+    fun <T> sliderThumbPress(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.SliderThumbPress, easing = OneUiEasing.Linear)
+
+    fun <T> sliderThumbRelease(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.SliderThumbRelease, easing = OneUiEasing.SeslSineInOut90)
 
     fun <T> fab(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.Fab, easing = OneUiEasing.SeslSineInOut80)
