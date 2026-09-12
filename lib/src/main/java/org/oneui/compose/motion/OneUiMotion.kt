@@ -38,6 +38,8 @@ object OneUiMotion {
         const val Press = 110
         const val Quick = 140
         const val Standard = 200
+        /** SeslAbsSeekBar.SliderDrawable press/release expansion. */
+        const val SliderPress = 250
         const val Fab = 400
 
         const val SheetEnterTranslation = 300
@@ -65,6 +67,9 @@ object OneUiMotion {
 
     fun <T> standard(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.Standard, easing = OneUiEasing.Standard)
+
+    fun <T> sliderPress(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.SliderPress, easing = OneUiEasing.SeslSineInOut80)
 
     fun <T> fab(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.Fab, easing = OneUiEasing.SeslSineInOut80)
