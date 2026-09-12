@@ -1,7 +1,7 @@
 package org.oneui.compose.components.slider
 
-import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -47,12 +47,26 @@ enum class OneUiSliderOrientation {
     Vertical,
 }
 
+/**
+ * SESL seekbar visual modes represented by the stable Compose slider.
+ *
+ * [Standard] keeps the 3dp track and regular thumb while pressed. [Expand] mirrors SESL
+ * MODE_EXPAND / MODE_EXPAND_VERTICAL: the track expands from 3dp to 13dp while the thumb shrinks
+ * to zero, using the exact independent track and thumb timing curves from SeslAbsSeekBar.
+ */
+enum class OneUiSliderMode {
+    Standard,
+    Expand,
+}
+
 /** Colors for [OneUiSlider]. */
 @Immutable
 data class OneUiSliderColors(
     val activeTrack: Color,
     val inactiveTrack: Color,
+    /** Inner thumb fill. SESL uses a near-white fill in light mode and near-black fill in dark. */
     val thumb: Color,
+    /** Thumb outline/tint; normally the activated/accent color. */
     val thumbStroke: Color,
     val interactionHalo: Color,
     val warning: Color,
@@ -75,8 +89,8 @@ object OneUiSliderDefaults {
     fun colors(
         activeTrack: Color = OneUiTheme.colors.accent,
         inactiveTrack: Color = OneUiTheme.colors.controlInactive.copy(alpha = 0.28f),
-        thumb: Color = OneUiTheme.colors.accent,
-        thumbStroke: Color = OneUiTheme.colors.surface,
+        thumb: Color = OneUiTheme.colors.surface,
+        thumbStroke: Color = OneUiTheme.colors.accent,
         interactionHalo: Color = OneUiTheme.colors.accent.copy(alpha = 0.16f),
         warning: Color = OneUiTheme.colors.destructive,
         disabledActiveTrack: Color = OneUiTheme.colors.controlInactive.copy(alpha = 0.35f),
@@ -96,11 +110,13 @@ object OneUiSliderDefaults {
 }
 
 /**
- * Compose-native One UI 8 slider based on SESL8 `SeslAbsSeekBar` geometry and motion.
+ * Compose-native One UI 8 slider based on SESL8 `SeslAbsSeekBar` geometry, state behavior and
+ * motion.
  *
  * The component supports tap and drag input, horizontal RTL mirroring, vertical input, discrete
- * steps, keyboard/D-pad adjustment, progress semantics and an optional warning range. The caller
- * owns [value]; all touch, key and accessibility changes are routed through [onValueChange].
+ * steps, keyboard/D-pad adjustment, progress semantics, SESL standard/expand modes and an optional
+ * warning range. The caller owns [value]; all touch, key and accessibility changes are routed
+ * through [onValueChange].
  */
 @Composable
 fun OneUiSlider(
@@ -111,6 +127,7 @@ fun OneUiSlider(
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0,
     orientation: OneUiSliderOrientation = OneUiSliderOrientation.Horizontal,
+    mode: OneUiSliderMode = OneUiSliderMode.Standard,
     warningRange: ClosedFloatingPointRange<Float>? = null,
     onValueChangeFinished: (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -131,10 +148,25 @@ fun OneUiSlider(
     val currentOnFinished by rememberUpdatedState(onValueChangeFinished)
     val pressed by interactionSource.collectIsPressedAsState()
     val reducedMotion = OneUiTheme.motion.reducedMotion
+    val expandMode = mode == OneUiSliderMode.Expand
+
     val trackThickness by animateDpAsState(
-        targetValue = if (pressed) OneUiSliderDefaults.ExpandedTrackThickness else OneUiSliderDefaults.TrackThickness,
-        animationSpec = if (reducedMotion) snap() else OneUiMotion.sliderPress(),
+        targetValue = if (expandMode && pressed) {
+            OneUiSliderDefaults.ExpandedTrackThickness
+        } else {
+            OneUiSliderDefaults.TrackThickness
+        },
+        animationSpec = if (reducedMotion || !expandMode) snap() else OneUiMotion.sliderPress(),
         label = "One UI slider track expansion",
+    )
+    val thumbRadius by animateDpAsState(
+        targetValue = if (expandMode && pressed) 0.dp else OneUiSliderDefaults.ThumbRadius,
+        animationSpec = when {
+            reducedMotion || !expandMode -> snap()
+            pressed -> OneUiMotion.sliderThumbPress()
+            else -> OneUiMotion.sliderThumbRelease()
+        },
+        label = "One UI slider expand thumb radius",
     )
 
     val rangeSpan = valueRange.endInclusive - valueRange.start
@@ -261,16 +293,17 @@ fun OneUiSlider(
         else -> colors.activeTrack
     }
     val inactiveColor = if (enabled) colors.inactiveTrack else colors.disabledInactiveTrack
-    val thumbColor = when {
+    val thumbFillColor = if (enabled) colors.thumb else colors.disabledThumb
+    val thumbOutlineColor = when {
         !enabled -> colors.disabledThumb
         inWarningRange -> colors.warning
-        else -> colors.thumb
+        else -> colors.thumbStroke
     }
 
     Canvas(modifier = modifier.then(sizing).then(input)) {
         val edge = OneUiSliderDefaults.InteractionRadius.toPx()
         val thickness = trackThickness.toPx()
-        val thumbRadius = OneUiSliderDefaults.ThumbRadius.toPx()
+        val actualThumbRadius = thumbRadius.toPx()
         val thumbStroke = OneUiSliderDefaults.ThumbStroke.toPx()
         val haloRadius = OneUiSliderDefaults.InteractionRadius.toPx()
 
@@ -327,14 +360,16 @@ fun OneUiSlider(
         if (pressed && enabled) {
             drawCircle(colors.interactionHalo, radius = haloRadius, center = center)
         }
-        drawCircle(thumbColor, radius = thumbRadius, center = center)
-        if (enabled && thumbStroke > 0f) {
-            drawCircle(
-                color = colors.thumbStroke,
-                radius = (thumbRadius - (thumbStroke / 2f)).coerceAtLeast(0f),
-                center = center,
-                style = Stroke(width = thumbStroke),
-            )
+        if (actualThumbRadius > 0f) {
+            drawCircle(thumbFillColor, radius = actualThumbRadius, center = center)
+            if (enabled && thumbStroke > 0f) {
+                drawCircle(
+                    color = thumbOutlineColor,
+                    radius = (actualThumbRadius - (thumbStroke / 2f)).coerceAtLeast(0f),
+                    center = center,
+                    style = Stroke(width = thumbStroke),
+                )
+            }
         }
     }
 }
@@ -348,6 +383,7 @@ fun OneUiVerticalSlider(
     enabled: Boolean = true,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0,
+    mode: OneUiSliderMode = OneUiSliderMode.Standard,
     warningRange: ClosedFloatingPointRange<Float>? = null,
     onValueChangeFinished: (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -360,6 +396,7 @@ fun OneUiVerticalSlider(
     valueRange = valueRange,
     steps = steps,
     orientation = OneUiSliderOrientation.Vertical,
+    mode = mode,
     warningRange = warningRange,
     onValueChangeFinished = onValueChangeFinished,
     interactionSource = interactionSource,
