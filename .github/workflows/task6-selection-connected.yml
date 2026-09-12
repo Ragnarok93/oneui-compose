@@ -1,0 +1,37 @@
+name: Task 6 selection connected tests
+
+on:
+  push:
+    branches:
+      - feature/oneui8-compose-components
+    paths:
+      - .github/workflows/task6-selection-connected.yml
+
+permissions:
+  contents: read
+
+jobs:
+  connected-selection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run selection controls on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: ./gradlew :lib:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=org.oneui.compose.components.OneUiSelectionTest --stacktrace
