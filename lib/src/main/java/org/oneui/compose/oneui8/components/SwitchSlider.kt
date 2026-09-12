@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -13,8 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -23,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import org.oneui.compose.components.slider.OneUiSlider
 import org.oneui.compose.oneui8.motion.OneUI8Motion
 import org.oneui.compose.oneui8.theme.OneUI8Theme
 
@@ -80,6 +78,16 @@ fun OneUI8Switch(
     }
 }
 
+/**
+ * Compatibility facade for the stable [OneUiSlider].
+ */
+@Deprecated(
+    message = "Use OneUiSlider from org.oneui.compose.components.slider",
+    replaceWith = ReplaceWith(
+        "OneUiSlider(value, onValueChange, modifier, enabled, valueRange, steps)",
+        "org.oneui.compose.components.slider.OneUiSlider",
+    ),
+)
 @Composable
 fun OneUI8Slider(
     value: Float,
@@ -89,22 +97,13 @@ fun OneUI8Slider(
     steps: Int = 0,
     enabled: Boolean = true,
 ) {
-    val colors = OneUI8Theme.colors
-    Slider(
-        value = normalizeOneUI8SliderValue(value, valueRange),
+    OneUiSlider(
+        value = value,
         onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         enabled = enabled,
         valueRange = valueRange,
         steps = steps,
-        colors = SliderDefaults.colors(
-            thumbColor = colors.accent,
-            activeTrackColor = colors.accent,
-            inactiveTrackColor = colors.controlInactive.copy(alpha = 0.28f),
-            disabledThumbColor = colors.controlInactive.copy(alpha = 0.45f),
-            disabledActiveTrackColor = colors.controlInactive.copy(alpha = 0.35f),
-            disabledInactiveTrackColor = colors.controlInactive.copy(alpha = 0.18f),
-        ),
     )
 }
 
