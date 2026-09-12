@@ -40,7 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.oneui.compose.icons.OneUiIcon
-import org.oneui.compose.icons.OneUiIconButton
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.interaction.oneUiInteractive
 import org.oneui.compose.motion.OneUiMotion
@@ -80,6 +79,7 @@ fun OneUiAppShell(
             .background(colors.background),
     ) {
         val expanded = maxWidth >= 840.dp
+        val compactDrawerWidth = maxWidth.coerceAtMost(328.dp)
         if (expanded) {
             Row(Modifier.fillMaxSize()) {
                 DrawerPanel(
@@ -150,7 +150,7 @@ fun OneUiAppShell(
                         },
                         headerAction = headerAction,
                         modifier = Modifier
-                            .width(maxWidth.coerceAtMost(328.dp))
+                            .width(compactDrawerWidth)
                             .fillMaxHeight(),
                     )
                 }
