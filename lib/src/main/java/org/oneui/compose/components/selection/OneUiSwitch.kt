@@ -9,7 +9,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
