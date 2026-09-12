@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/oneui8-compose-components
+      - feature/oneui8-compose-components-tdd
   workflow_dispatch:
 
 permissions:
