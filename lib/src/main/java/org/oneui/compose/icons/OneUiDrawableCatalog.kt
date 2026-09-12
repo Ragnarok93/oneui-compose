@@ -1,6 +1,7 @@
 package org.oneui.compose.icons
 
 import androidx.compose.runtime.Immutable
+import dev.oneuiproject.oneui.R as OneUiIconResources
 
 /** How a drawable exposed by the One UI reference is represented by the Compose library. */
 enum class OneUiDrawableKind {
@@ -55,45 +56,35 @@ data class OneUiDrawableEntry(
 /**
  * Searchable Compose mapping of the drawable surface exercised by the reference sample.
  *
- * The dependency-backed icon entries below are the stable public icon surface already exposed by
- * [OneUiIcons]. Reference-only drawable/state resources are mapped to the Compose API that owns
- * their behavior instead of copying XML backgrounds into the library. The exhaustive source audit
- * lives outside this Kotlin list and verifies that every reference name has an explicit mapping.
+ * The reference sample's `IconsRepo` reflects every field in `dev.oneuiproject.oneui.R.drawable`.
+ * This catalogue intentionally does the same for `io.github.oneuiproject:icons:1.1.0`, preserving
+ * the exact 883-resource dependency namespace without maintaining a second hand-curated icon list.
+ * Reference-only drawable/state resources are then appended as source-traceable Compose mappings.
  */
 object OneUiDrawableCatalog {
-    val entries: List<OneUiDrawableEntry> = listOf(
-        icon("ic_oui_add", OneUiIcons.Add),
-        icon("ic_oui_remove", OneUiIcons.Remove),
-        icon("ic_oui_search", OneUiIcons.Search),
-        icon("ic_oui_settings", OneUiIcons.Settings),
-        icon("ic_oui_more", OneUiIcons.More),
-        icon("ic_oui_back", OneUiIcons.Back),
-        icon("ic_oui_arrow_left", OneUiIcons.ArrowLeft),
-        icon("ic_oui_arrow_right", OneUiIcons.ArrowRight),
-        icon("ic_oui_arrow_up", OneUiIcons.ArrowUp),
-        icon("ic_oui_arrow_down", OneUiIcons.ArrowDown),
-        icon("ic_oui_keyboard_arrow_left", OneUiIcons.ChevronLeft),
-        icon("ic_oui_keyboard_arrow_right", OneUiIcons.ChevronRight),
-        icon("ic_oui_keyboard_arrow_up", OneUiIcons.ChevronUp),
-        icon("ic_oui_keyboard_arrow_down", OneUiIcons.ChevronDown),
-        icon("ic_oui_selected", OneUiIcons.Check),
-        icon("ic_oui_checkbox_checked", OneUiIcons.CheckboxChecked),
-        icon("ic_oui_checkbox_unchecked", OneUiIcons.CheckboxUnchecked),
-        icon("ic_oui_close", OneUiIcons.Close),
-        icon("ic_oui_copy", OneUiIcons.Copy),
-        icon("ic_oui_delete", OneUiIcons.Delete),
-        icon("ic_oui_share", OneUiIcons.Share),
-        icon("ic_oui_info", OneUiIcons.Info),
-        icon("ic_oui_error", OneUiIcons.Error),
-        icon("ic_oui_control_play", OneUiIcons.Play),
-        icon("ic_oui_control_pause", OneUiIcons.Pause),
-        icon("ic_oui_list_grid", OneUiIcons.Grid),
-        icon("ic_oui_home", OneUiIcons.Home),
-        icon("ic_oui_motion", OneUiIcons.Motion),
-        icon("ic_oui_sysbar_back", OneUiIcons.NavigationBack),
-        icon("ic_oui_sysbar_home", OneUiIcons.NavigationHome),
-        icon("ic_oui_sysbar_recent", OneUiIcons.NavigationRecents),
+    private const val IconsReference = "io.github.oneuiproject:icons:1.1.0"
+    private const val DesignReference =
+        "Ragnarok93/oneui-design@ce4f2cae8c0d712acd2f0b2926ee909fd5d8a434"
 
+    private val dependencyEntries: List<OneUiDrawableEntry> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        OneUiIconResources.drawable::class.java.declaredFields
+            .asSequence()
+            .filter { field -> field.type == Int::class.javaPrimitiveType }
+            .map { field ->
+                val resourceId = field.getInt(null)
+                OneUiDrawableEntry(
+                    name = field.name,
+                    kind = OneUiDrawableKind.Icon,
+                    source = OneUiDrawableSource.IconsDependency,
+                    rendering = OneUiDrawableRendering.Icon(OneUiIcon.Resource(resourceId)),
+                    reference = IconsReference,
+                )
+            }
+            .sortedBy(OneUiDrawableEntry::name)
+            .toList()
+    }
+
+    private val designEntries: List<OneUiDrawableEntry> = listOf(
         referenceState(
             name = "oui_des_list_item_selection_anim_selector",
             api = "OneUiAnimatedIcons.CheckMorph",
@@ -169,7 +160,14 @@ object OneUiDrawableCatalog {
             kind = OneUiDrawableKind.Shape,
             api = "OneUiQrCode scanning frame",
         ),
-    ).sortedBy(OneUiDrawableEntry::name)
+    )
+
+    /** Every dependency drawable plus each source-audited design-only mapping implemented so far. */
+    val entries: List<OneUiDrawableEntry> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        (dependencyEntries + designEntries)
+            .distinctBy(OneUiDrawableEntry::name)
+            .sortedBy(OneUiDrawableEntry::name)
+    }
 
     /** Token-based search matching all whitespace-separated terms, like the reference icon list. */
     fun search(query: String): List<OneUiDrawableEntry> {
@@ -182,14 +180,6 @@ object OneUiDrawableCatalog {
             tokens.all { token -> entry.name.contains(token, ignoreCase = true) }
         }
     }
-
-    private fun icon(name: String, icon: OneUiIcon) = OneUiDrawableEntry(
-        name = name,
-        kind = OneUiDrawableKind.Icon,
-        source = OneUiDrawableSource.IconsDependency,
-        rendering = OneUiDrawableRendering.Icon(icon),
-        reference = "io.github.oneuiproject:icons:1.1.0",
-    )
 
     private fun referenceState(
         name: String,
@@ -212,6 +202,6 @@ object OneUiDrawableCatalog {
         kind = kind,
         source = OneUiDrawableSource.OneUiDesignReference,
         rendering = OneUiDrawableRendering.Primitive(api),
-        reference = "Ragnarok93/oneui-design@ce4f2cae8c0d712acd2f0b2926ee909fd5d8a434",
+        reference = DesignReference,
     )
 }
