@@ -9,7 +9,7 @@ import androidx.compose.runtime.Immutable
 
 /** Compose equivalents of measured One UI/SESL curves used by this library. */
 object OneUiEasing {
-    /** oui_des_interpolator_22_25_0_100 from oneui-design@c9225f3. */
+    /** oui_des_interpolator_22_25_0_100 from the pinned oneui-design reference. */
     val Standard: Easing = CubicBezierEasing(0.22f, 0.25f, 0f, 1f)
 
     /** Android platform accelerate/decelerate families used by referenced XML animations. */
@@ -67,6 +67,17 @@ object OneUiMotion {
         const val SelectionUncheck = 199
     }
 
+    object Delay {
+        /** Reference selection AVD starts the first stage after a 1 ms offset. */
+        const val SelectionInitialStroke = 1
+
+        /** The second checking path begins immediately after the 110 ms first path. */
+        const val SelectionCheckSecondStroke = 110
+
+        /** The reference unchecking second path starts at 140 ms. */
+        const val SelectionUncheckSecondStroke = 140
+    }
+
     fun <T> press(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.Press, easing = OneUiEasing.Standard)
 
@@ -91,9 +102,49 @@ object OneUiMotion {
     fun <T> fab(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.Fab, easing = OneUiEasing.SeslSineInOut80)
 
+    /**
+     * First stage of `oui_des_list_item_selection_anim_checking`: 1 ms delay, 110 ms linear.
+     */
+    fun <T> selectionCheckFirstStroke(): FiniteAnimationSpec<T> = tween(
+        durationMillis = Duration.SelectionFirstStroke,
+        delayMillis = Delay.SelectionInitialStroke,
+        easing = OneUiEasing.Linear,
+    )
+
+    /**
+     * Second stage of `oui_des_list_item_selection_anim_checking`: starts at 110 ms and uses the
+     * Android platform decelerate interpolator for 180 ms.
+     */
+    fun <T> selectionCheckSecondStroke(): FiniteAnimationSpec<T> = tween(
+        durationMillis = Duration.SelectionSecondStroke,
+        delayMillis = Delay.SelectionCheckSecondStroke,
+        easing = OneUiEasing.Decelerate,
+    )
+
+    /**
+     * First stage of `oui_des_list_item_selection_anim_unchecking`: 1 ms delay, 120 ms linear.
+     */
+    fun <T> selectionUncheckFirstStroke(): FiniteAnimationSpec<T> = tween(
+        durationMillis = Duration.SelectionUncheckFirstStroke,
+        delayMillis = Delay.SelectionInitialStroke,
+        easing = OneUiEasing.Linear,
+    )
+
+    /**
+     * Second stage of `oui_des_list_item_selection_anim_unchecking`: starts at 140 ms, 59 ms using
+     * the Android platform accelerate interpolator.
+     */
+    fun <T> selectionUncheckSecondStroke(): FiniteAnimationSpec<T> = tween(
+        durationMillis = Duration.SelectionUncheckSecondStroke,
+        delayMillis = Delay.SelectionUncheckSecondStroke,
+        easing = OneUiEasing.Accelerate,
+    )
+
+    /** Envelope timing retained for callers that animate one scalar for the whole check action. */
     fun <T> selectionCheck(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.SelectionCheck, easing = OneUiEasing.Standard)
 
+    /** Envelope timing retained for callers that animate one scalar for the whole uncheck action. */
     fun <T> selectionUncheck(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.SelectionUncheck, easing = OneUiEasing.Accelerate)
 
