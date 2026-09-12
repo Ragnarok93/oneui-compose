@@ -11,51 +11,62 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
-      - name: Extract pinned reference R.drawable inventory
+      - name: Derive pinned reference drawable resources
         shell: bash
         run: |
           set -euo pipefail
           REF_SHA=ce4f2cae8c0d712acd2f0b2926ee909fd5d8a434
           git clone --quiet --filter=blob:none https://github.com/Ragnarok93/oneui-design.git reference
           git -C reference checkout --quiet "$REF_SHA"
-          APK=reference/sample-app/release/sample-app-release.apk
-          test -f "$APK"
-          DEXDUMP="$(find "$ANDROID_HOME/build-tools" -type f -name dexdump | sort -V | tail -n1)"
-          test -x "$DEXDUMP"
-          mkdir -p audit/dex
-          unzip -q "$APK" 'classes*.dex' -d audit/dex
-          : > audit/dexdump.txt
-          for dex in audit/dex/classes*.dex; do
-            echo "===== $dex =====" >> audit/dexdump.txt
-            "$DEXDUMP" -f "$dex" >> audit/dexdump.txt
-          done
+          mkdir -p audit
           python3 - <<'PY'
           from pathlib import Path
-          import re
-          text = Path('audit/dexdump.txt').read_text(errors='replace')
-          marker = "Class descriptor  : 'Ldev/oneuiproject/oneui/R$drawable;'"
-          pos = text.find(marker)
-          if pos < 0:
-              candidates = sorted(set(re.findall(r"Class descriptor\s+: '([^']*R\\$drawable;)'", text)))
-              Path('audit/r-drawable-class-candidates.txt').write_text('\n'.join(candidates) + '\n')
-              raise SystemExit('dev.oneuiproject.oneui.R$drawable not found; candidates written to audit/r-drawable-class-candidates.txt')
-          start = text.rfind('Class #', 0, pos)
-          end = text.find('\nClass #', pos)
-          if end < 0:
-              end = len(text)
-          block = text[start:end]
-          Path('audit/reference-r-drawable-block.txt').write_text(block)
-          names = re.findall(r"name\s+: '([^']+)'", block)
-          names = sorted({n for n in names if re.fullmatch(r'[a-z0-9_]+', n)})
-          non_sesl = [n for n in names if not n.startswith('sesl_')]
-          Path('audit/reference-r-drawables.txt').write_text('\n'.join(names) + '\n')
-          Path('audit/reference-r-drawables-non-sesl.txt').write_text('\n'.join(non_sesl) + '\n')
-          print(f'R.drawable fields: {len(names)}')
-          print(f'non-sesl fields: {len(non_sesl)}')
-          print('--- non-sesl inventory ---')
-          print('\n'.join(non_sesl))
+          import re, xml.etree.ElementTree as ET
+
+          root = Path('reference/lib/src/main/res')
+          names = set()
+          source_rows = []
+          for directory in sorted(root.glob('drawable*')):
+              if not directory.is_dir():
+                  continue
+              for file in sorted(directory.iterdir()):
+                  if not file.is_file():
+                      continue
+                  name = file.name
+                  name = re.sub(r'\.9\.(png|webp)$', '', name)
+                  name = re.sub(r'\.[^.]+$', '', name)
+                  if re.fullmatch(r'[a-z0-9_]+', name):
+                      names.add(name)
+                      source_rows.append((name, file.as_posix()))
+
+          # Drawable resources may also be declared from values XML.
+          for values_dir in sorted(root.glob('values*')):
+              if not values_dir.is_dir():
+                  continue
+              for file in sorted(values_dir.glob('*.xml')):
+                  try:
+                      tree = ET.parse(file)
+                  except ET.ParseError:
+                      continue
+                  for element in tree.getroot().iter():
+                      if element.tag == 'item' and element.attrib.get('type') == 'drawable':
+                          name = element.attrib.get('name', '')
+                      elif element.tag == 'drawable':
+                          name = element.attrib.get('name', '')
+                      else:
+                          continue
+                      if re.fullmatch(r'[a-z0-9_]+', name):
+                          names.add(name)
+                          source_rows.append((name, file.as_posix()))
+
+          names = sorted(names)
+          Path('audit/oneui-design-drawables.txt').write_text('\n'.join(names) + '\n')
+          Path('audit/oneui-design-drawable-sources.tsv').write_text(
+              '\n'.join(f'{name}\t{path}' for name, path in sorted(set(source_rows))) + '\n'
+          )
+          print(f'pinned oneui-design drawable resources: {len(names)}')
           PY
-      - name: Inventory oneui-icons 1.1.0 and compare coverage
+      - name: Inventory oneui-icons 1.1.0 and construct reference namespace
         shell: bash
         run: |
           set -euo pipefail
@@ -66,33 +77,36 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import zipfile, re
+
           aar = Path('audit/icons-1.1.0.aar')
           with zipfile.ZipFile(aar) as z:
-              names = set()
+              icon_names = set()
               for entry in z.namelist():
                   parts = entry.split('/')
                   if len(parts) >= 3 and parts[0] == 'res' and parts[1].startswith('drawable') and not entry.endswith('/'):
                       name = parts[-1]
                       name = re.sub(r'\.9\.(png|webp)$', '', name)
                       name = re.sub(r'\.[^.]+$', '', name)
-                      names.add(name)
-          names = sorted(names)
-          Path('audit/oneui-icons-drawables.txt').write_text('\n'.join(names) + '\n')
-          reference = [x for x in Path('audit/reference-r-drawables-non-sesl.txt').read_text().splitlines() if x]
-          provided = set(names)
-          covered = [n for n in reference if n in provided]
-          missing = [n for n in reference if n not in provided]
-          Path('audit/reference-covered-by-oneui-icons.txt').write_text('\n'.join(covered) + '\n')
-          Path('audit/reference-not-in-oneui-icons.txt').write_text('\n'.join(missing) + '\n')
-          print(f'oneui-icons drawable names: {len(names)}')
-          print(f'reference non-sesl covered exactly: {len(covered)}')
-          print(f'reference non-sesl not exact-name-covered: {len(missing)}')
-          print('--- not exact-name-covered ---')
-          print('\n'.join(missing))
+                      if re.fullmatch(r'[a-z0-9_]+', name):
+                          icon_names.add(name)
+
+          icon_names = sorted(icon_names)
+          design_names = {
+              line for line in Path('audit/oneui-design-drawables.txt').read_text().splitlines() if line
+          }
+          namespace = sorted(set(icon_names) | design_names)
+          Path('audit/oneui-icons-drawables.txt').write_text('\n'.join(icon_names) + '\n')
+          Path('audit/reference-oneui-namespace-drawables.txt').write_text('\n'.join(namespace) + '\n')
+          Path('audit/icons-only.txt').write_text('\n'.join(n for n in icon_names if n not in design_names) + '\n')
+          Path('audit/design-only.txt').write_text('\n'.join(n for n in sorted(design_names) if n not in set(icon_names)) + '\n')
+          print(f'oneui-icons drawable resources: {len(icon_names)}')
+          print(f'combined One UI namespace drawable resources: {len(namespace)}')
+          print(f'design-only drawable resources: {len(design_names - set(icon_names))}')
+          print('--- design-only inventory ---')
+          print('\n'.join(n for n in sorted(design_names) if n not in set(icon_names)))
           PY
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: task2-reference-drawable-audit
           path: audit/
-          if-no-files-found: warn
+          if-no-files-found: error
