@@ -40,6 +40,8 @@ object OneUiMotion {
         const val Press = 110
         const val Quick = 140
         const val Standard = 200
+        /** SwitchCompat above-M thumb movement; minSdk 23 means this is the library path. */
+        const val Switch = 300
         /** SeslAbsSeekBar.SliderDrawable press/release expansion. */
         const val SliderPress = 250
         /** SeslAbsSeekBar.ThumbDrawable shrinks to zero linearly when pressed. */
@@ -73,6 +75,9 @@ object OneUiMotion {
 
     fun <T> standard(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.Standard, easing = OneUiEasing.Standard)
+
+    fun <T> switch(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.Switch, easing = OneUiEasing.Standard)
 
     fun <T> sliderPress(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.SliderPress, easing = OneUiEasing.SeslSineInOut80)
