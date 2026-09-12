@@ -76,11 +76,7 @@ fun RecyclerViewsScreen(modifier: Modifier = Modifier) {
 
         when (selectedTab) {
             RecyclerViewCatalogTab.Icons -> IconsCatalogTab(Modifier.weight(1f))
-            RecyclerViewCatalogTab.Stargazers -> NestedRecyclerPlaceholder(
-                tab = selectedTab,
-                description = "Profile rows, QR/share actions, multi-selection and reference list behavior.",
-                modifier = Modifier.weight(1f),
-            )
+            RecyclerViewCatalogTab.Stargazers -> StargazersCatalogTab(Modifier.weight(1f))
             RecyclerViewCatalogTab.Apps -> NestedRecyclerPlaceholder(
                 tab = selectedTab,
                 description = "Seven app-picker list types, filtering, selection and app metadata presentation.",

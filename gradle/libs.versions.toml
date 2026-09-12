@@ -10,6 +10,7 @@ annotation = "1.10.0"
 coroutines = "1.10.2"
 desugar-android = "2.1.5"
 junit = "4.13.2"
+zxing = "3.5.3"
 
 [libraries]
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
@@ -30,6 +31,7 @@ io-github-oneuiproject-icons = { group = "io.github.oneuiproject", name = "icons
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 coreLibDesugaring = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar-android" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

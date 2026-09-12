@@ -24,3 +24,7 @@ No matching Cut or Paste drawable was found during the inventory, so the stable 
 `RadioSelected` and `RadioUnselected` use small original fallback vectors authored for this Compose library because the resolved icon artifact does not expose a matching radio-button pair.
 
 The compatibility vectors retained in `OneUI8Icons.kt` were newly authored for this repository. They are not exports of Samsung's Figma kit and are intentionally preserved only to avoid breaking the historical public `ImageVector` return type. New code should use `OneUiIcons` and `OneUiAnimatedIcons`.
+
+## QR encoding
+
+`OneUiQrCode` uses `com.google.zxing:core:3.5.3` (ZXing) for standards-compliant QR matrix encoding. ZXing is distributed under the Apache License 2.0. The QR surface and rendering code in this repository are original Compose Canvas implementation; no Samsung QR artwork or proprietary implementation is copied.

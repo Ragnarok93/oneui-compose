@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.core)
     implementation(libs.jetbrains.kotlinx.coroutines.core)
+    implementation(libs.zxing.core)
 
     testImplementation(libs.junit)
 
