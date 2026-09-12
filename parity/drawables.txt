@@ -1,0 +1,18 @@
+# One UI drawable parity map
+# reference drawable | representation | Compose mapping | status
+# This file is intentionally incomplete during implementation. --strict requires all reference entries.
+ic_oui_add|resource|OneUiIcons.Add|mapped
+ic_oui_search|resource|OneUiIcons.Search|mapped
+ic_oui_settings_outline|resource|OneUiIcons.Settings|mapped
+ic_oui_more|resource|OneUiIcons.More|mapped
+ic_oui_back|resource|OneUiIcons.Back|mapped
+ic_oui_close|resource|OneUiIcons.Close|mapped
+ic_oui_copy|resource|OneUiIcons.Copy|mapped
+ic_oui_delete_outline|resource|OneUiIcons.Delete|mapped
+ic_oui_share_outline|resource|OneUiIcons.Share|mapped
+ic_oui_info|resource|OneUiIcons.Info|mapped
+ic_oui_play|resource|OneUiIcons.Play|mapped
+ic_oui_pause|resource|OneUiIcons.Pause|mapped
+checkbox_checked|stateful|OneUiIcons.CheckboxChecked / OneUiCheckbox|mapped
+checkbox_unchecked|stateful|OneUiIcons.CheckboxUnchecked / OneUiCheckbox|mapped
+reference-all-non-sesl-drawables|audit-generated|Task 2 exhaustive source-derived map|missing

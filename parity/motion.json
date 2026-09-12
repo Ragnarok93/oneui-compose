@@ -1,0 +1,24 @@
+{
+  "referenceSha": "ce4f2cae8c0d712acd2f0b2926ee909fd5d8a434",
+  "mappings": [
+    {"id":"standard","source":"oui_des_interpolator_22_25_0_100","mapping":"OneUiEasing.Standard","status":"mapped"},
+    {"id":"sine-in-out-70","source":"SeslAnimationUtils.SINE_IN_OUT_70","mapping":"OneUiEasing.SineInOut70","status":"mapped"},
+    {"id":"sine-in-out-80","source":"SeslAnimationUtils.SINE_IN_OUT_80","mapping":"OneUiEasing.SineInOut80","status":"mapped"},
+    {"id":"sine-in-out-90","source":"SeslAnimationUtils.SINE_IN_OUT_90","mapping":"OneUiEasing.SineInOut90","status":"mapped"},
+    {"id":"selection-check","source":"SESL animated checkbox/check paths","mapping":"OneUiMotion.selectionCheck / OneUiAnimatedIcons.CheckMorph","status":"mapped"},
+    {"id":"selection-uncheck","source":"SESL animated checkbox/check paths","mapping":"OneUiMotion.selectionUncheck / OneUiAnimatedIcons.CheckMorph","status":"mapped"},
+    {"id":"seekbar-track-expand","source":"SeslAbsSeekBar 250ms SINE_IN_OUT_80","mapping":"OneUiMotion.sliderPress","status":"mapped"},
+    {"id":"seekbar-thumb-press","source":"ThumbDrawable 100ms linear","mapping":"OneUiMotion.sliderThumbPress","status":"mapped"},
+    {"id":"seekbar-thumb-release","source":"ThumbDrawable 300ms SINE_IN_OUT_90","mapping":"OneUiMotion.sliderThumbRelease","status":"mapped"},
+    {"id":"sheet-enter","source":"One UI bottom sheet resources","mapping":"OneUiMotion sheet enter 300/165ms","status":"mapped"},
+    {"id":"sheet-exit","source":"One UI bottom sheet resources","mapping":"OneUiMotion sheet exit 200/140ms","status":"mapped"},
+    {"id":"menu","source":"One UI menu resources","mapping":"OneUiMotion menu 300/150ms","status":"mapped"},
+    {"id":"fab","source":"One UI floating action resource timing","mapping":"OneUiMotion.Duration.Fab=400","status":"mapped"},
+    {"id":"app-bar-collapse","source":"reference Toolbar/NavDrawer implementation","mapping":"planned OneUiAppBar motion","status":"missing"},
+    {"id":"drawer","source":"reference NavDrawerLayout","mapping":"planned OneUiDrawer motion","status":"missing"},
+    {"id":"tabs-navigation","source":"reference tab/bottom-nav indicator motion","mapping":"planned OneUiNavigation motion","status":"missing"},
+    {"id":"progress-indeterminate","source":"SESL progress implementation","mapping":"progress source audit pending","status":"in_progress"},
+    {"id":"pickers","source":"SESL picker implementations","mapping":"picker wheel/source audit pending","status":"missing"},
+    {"id":"search-action-mode","source":"ToolbarLayout search/action mode","mapping":"planned OneUiSearchMode/OneUiActionMode","status":"missing"}
+  ]
+}
