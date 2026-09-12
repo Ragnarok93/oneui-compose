@@ -3,12 +3,12 @@ package org.oneui.compose.icons
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -23,8 +23,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.LocalContentColor
-import org.oneui.compose.motion.OneUiEasing
 import org.oneui.compose.motion.OneUiMotion
 import org.oneui.compose.theme.OneUiTheme
 
@@ -72,11 +70,12 @@ object OneUiAnimatedIcons {
     )
 
     /**
-     * Two-stroke selection check based on the pinned SESL/One UI reference timings.
+     * Two-stroke selection check based on the pinned One UI reference animator resources.
      *
-     * Checking uses 110 ms for the first stroke and 180 ms for the second, ending at 290 ms.
-     * Unchecking uses the reference 120 ms / 59 ms stages with the second stage beginning at
-     * 140 ms, ending at 199 ms. Reduced-motion and disabled states snap to their final geometry.
+     * Checking uses the exact 1 ms + 110 ms linear first stage followed by the 180 ms platform
+     * decelerate second stage beginning at 110 ms. Unchecking uses the exact 1 ms + 120 ms linear
+     * first stage and a 59 ms platform-accelerate second stage beginning at 140 ms. Reduced-motion
+     * and disabled states snap to their final geometry.
      */
     @Composable
     fun CheckMorph(
@@ -95,16 +94,8 @@ object OneUiAnimatedIcons {
             targetValue = if (checked) 1f else 0f,
             animationSpec = when {
                 shouldSnap -> snap()
-                checked -> tween(
-                    durationMillis = OneUiMotion.Duration.SelectionFirstStroke,
-                    delayMillis = InitialStrokeDelay,
-                    easing = OneUiEasing.Standard,
-                )
-                else -> tween(
-                    durationMillis = OneUiMotion.Duration.SelectionUncheckFirstStroke,
-                    delayMillis = InitialStrokeDelay,
-                    easing = OneUiEasing.Accelerate,
-                )
+                checked -> OneUiMotion.selectionCheckFirstStroke()
+                else -> OneUiMotion.selectionUncheckFirstStroke()
             },
             label = "OneUi check first stroke",
         )
@@ -112,16 +103,8 @@ object OneUiAnimatedIcons {
             targetValue = if (checked) 1f else 0f,
             animationSpec = when {
                 shouldSnap -> snap()
-                checked -> tween(
-                    durationMillis = OneUiMotion.Duration.SelectionSecondStroke,
-                    delayMillis = OneUiMotion.Duration.SelectionFirstStroke,
-                    easing = OneUiEasing.Standard,
-                )
-                else -> tween(
-                    durationMillis = OneUiMotion.Duration.SelectionUncheckSecondStroke,
-                    delayMillis = UncheckSecondStrokeDelay,
-                    easing = OneUiEasing.Accelerate,
-                )
+                checked -> OneUiMotion.selectionCheckSecondStroke()
+                else -> OneUiMotion.selectionUncheckSecondStroke()
             },
             label = "OneUi check second stroke",
         )
@@ -183,9 +166,6 @@ object OneUiAnimatedIcons {
             }
         }
     }
-
-    private const val InitialStrokeDelay = 1
-    private const val UncheckSecondStrokeDelay = 140
 }
 
 /**
