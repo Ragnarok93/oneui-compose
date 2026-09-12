@@ -22,9 +22,13 @@ jobs:
           test -f "$APK"
           DEXDUMP="$(find "$ANDROID_HOME/build-tools" -type f -name dexdump | sort -V | tail -n1)"
           test -x "$DEXDUMP"
-          mkdir -p audit
-          unzip -p "$APK" classes.dex > audit/classes.dex
-          "$DEXDUMP" -f audit/classes.dex > audit/dexdump.txt
+          mkdir -p audit/dex
+          unzip -q "$APK" 'classes*.dex' -d audit/dex
+          : > audit/dexdump.txt
+          for dex in audit/dex/classes*.dex; do
+            echo "===== $dex =====" >> audit/dexdump.txt
+            "$DEXDUMP" -f "$dex" >> audit/dexdump.txt
+          done
           python3 - <<'PY'
           from pathlib import Path
           import re
@@ -32,7 +36,9 @@ jobs:
           marker = "Class descriptor  : 'Ldev/oneuiproject/oneui/R$drawable;'"
           pos = text.find(marker)
           if pos < 0:
-              raise SystemExit('dev.oneuiproject.oneui.R$drawable not found in classes.dex')
+              candidates = sorted(set(re.findall(r"Class descriptor\s+: '([^']*R\\$drawable;)'", text)))
+              Path('audit/r-drawable-class-candidates.txt').write_text('\n'.join(candidates) + '\n')
+              raise SystemExit('dev.oneuiproject.oneui.R$drawable not found; candidates written to audit/r-drawable-class-candidates.txt')
           start = text.rfind('Class #', 0, pos)
           end = text.find('\nClass #', pos)
           if end < 0:
@@ -40,7 +46,6 @@ jobs:
           block = text[start:end]
           Path('audit/reference-r-drawable-block.txt').write_text(block)
           names = re.findall(r"name\s+: '([^']+)'", block)
-          # dexdump also emits constructor/method names in some modes; Android resource fields are valid identifiers.
           names = sorted({n for n in names if re.fullmatch(r'[a-z0-9_]+', n)})
           non_sesl = [n for n in names if not n.startswith('sesl_')]
           Path('audit/reference-r-drawables.txt').write_text('\n'.join(names) + '\n')
@@ -86,7 +91,8 @@ jobs:
           print('\n'.join(missing))
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: task2-reference-drawable-audit
           path: audit/
-          if-no-files-found: error
+          if-no-files-found: warn
