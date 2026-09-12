@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.oneui.compose.demo.screens.ParityStatusScreen
 import org.oneui.compose.demo.screens.ProgressBarsScreen
+import org.oneui.compose.demo.screens.RecyclerViewsScreen
 import org.oneui.compose.demo.screens.ReferencePlaceholderScreen
 import org.oneui.compose.demo.screens.SeekBarsScreen
 import org.oneui.compose.demo.screens.WidgetsScreen
@@ -73,11 +74,7 @@ fun CatalogApp(
                 testTag = selected.testTag,
                 referenceScope = "Rounded tabs, subtabs, icon tabs, bottom navigation, bottom tabs, navigation rail and drawer modes.",
             )
-            CatalogDestination.RecyclerViews -> ReferencePlaceholderScreen(
-                title = "RecyclerViews → Compose lists",
-                testTag = selected.testTag,
-                referenceScope = "Icons, Stargazers and Apps tabs rebuilt with LazyColumn/LazyGrid, search, selection, action mode and fast scrolling.",
-            )
+            CatalogDestination.RecyclerViews -> RecyclerViewsScreen()
             CatalogDestination.CustomAbout -> ReferencePlaceholderScreen(
                 title = "Custom About",
                 testTag = selected.testTag,
