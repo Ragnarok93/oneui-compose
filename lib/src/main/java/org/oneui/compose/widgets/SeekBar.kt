@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import org.oneui.compose.components.slider.OneUiSlider
 import org.oneui.compose.components.slider.OneUiSliderColors
 import org.oneui.compose.components.slider.OneUiSliderDefaults
+import org.oneui.compose.components.slider.OneUiSliderMode
 import org.oneui.compose.components.slider.OneUiSliderOrientation
 import org.oneui.compose.theme.OneUITheme
 
@@ -34,6 +35,7 @@ fun HorizontalSeekbar(
         onValueChange = onValueChange,
         modifier = modifier,
         enabled = enabled,
+        mode = OneUiSliderMode.Standard,
         colors = colors.asStable(),
     )
 }
@@ -59,19 +61,18 @@ fun VerticalSeekbar(
         modifier = modifier,
         enabled = enabled,
         orientation = OneUiSliderOrientation.Vertical,
+        mode = OneUiSliderMode.Standard,
         colors = colors.asStable(),
     )
 }
 
-/**
- * Compatibility name retained for the former expanding vertical seekbar. The stable engine uses
- * the SESL8 250 ms pressed-track expansion behavior.
- */
+/** Legacy compatibility facade for SESL MODE_EXPAND_VERTICAL. */
 @Deprecated(
-    message = "Use OneUiVerticalSlider from org.oneui.compose.components.slider",
+    message = "Use OneUiVerticalSlider with mode = OneUiSliderMode.Expand",
     replaceWith = ReplaceWith(
-        "OneUiVerticalSlider(value, onValueChange, modifier, enabled = enabled)",
+        "OneUiVerticalSlider(value, onValueChange, modifier, enabled = enabled, mode = OneUiSliderMode.Expand)",
         "org.oneui.compose.components.slider.OneUiVerticalSlider",
+        "org.oneui.compose.components.slider.OneUiSliderMode",
     ),
 )
 @Composable
@@ -82,21 +83,24 @@ fun VerticalSeekbarExpanding(
     colors: SeekBarColors = seekBarColors(),
     enabled: Boolean = true,
 ) {
-    VerticalSeekbar(
-        modifier = modifier,
+    OneUiSlider(
         value = value,
         onValueChange = onValueChange,
-        colors = colors,
+        modifier = modifier,
         enabled = enabled,
+        orientation = OneUiSliderOrientation.Vertical,
+        mode = OneUiSliderMode.Expand,
+        colors = colors.asStable(),
     )
 }
 
-/** Compatibility name retained for the former expanding horizontal seekbar. */
+/** Legacy compatibility facade for SESL MODE_EXPAND. */
 @Deprecated(
-    message = "Use OneUiSlider from org.oneui.compose.components.slider",
+    message = "Use OneUiSlider with mode = OneUiSliderMode.Expand",
     replaceWith = ReplaceWith(
-        "OneUiSlider(value, onValueChange, modifier, enabled = enabled)",
+        "OneUiSlider(value, onValueChange, modifier, enabled = enabled, mode = OneUiSliderMode.Expand)",
         "org.oneui.compose.components.slider.OneUiSlider",
+        "org.oneui.compose.components.slider.OneUiSliderMode",
     ),
 )
 @Composable
@@ -107,12 +111,13 @@ fun HorizontalSeekbarExpanding(
     colors: SeekBarColors = seekBarColors(),
     enabled: Boolean = true,
 ) {
-    HorizontalSeekbar(
-        modifier = modifier,
+    OneUiSlider(
         value = value,
         onValueChange = onValueChange,
-        colors = colors,
+        modifier = modifier,
         enabled = enabled,
+        mode = OneUiSliderMode.Expand,
+        colors = colors.asStable(),
     )
 }
 
@@ -137,6 +142,7 @@ fun HorizontalSeekbarWarning(
         onValueChange = onValueChange,
         modifier = modifier,
         enabled = enabled,
+        mode = OneUiSliderMode.Standard,
         warningRange = warningAt.coerceIn(0f, 1f)..1f,
         colors = colors.asStable(),
     )
