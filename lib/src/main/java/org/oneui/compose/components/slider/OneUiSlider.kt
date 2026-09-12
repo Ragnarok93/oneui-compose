@@ -5,6 +5,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -28,7 +29,6 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.pointer.awaitFirstDown
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -243,7 +243,7 @@ fun OneUiSlider(
                     awaitEachGesture {
                         val down = awaitFirstDown(requireUnconsumed = false)
                         val press = PressInteraction.Press(down.position)
-                        interactionSource.emit(press)
+                        interactionSource.tryEmit(press)
 
                         fun update(position: Offset) {
                             val fraction = when (orientation) {
@@ -272,9 +272,9 @@ fun OneUiSlider(
                             }
                         } finally {
                             if (released) {
-                                interactionSource.emit(PressInteraction.Release(press))
+                                interactionSource.tryEmit(PressInteraction.Release(press))
                             } else {
-                                interactionSource.emit(PressInteraction.Cancel(press))
+                                interactionSource.tryEmit(PressInteraction.Cancel(press))
                             }
                             currentOnFinished?.invoke()
                         }
