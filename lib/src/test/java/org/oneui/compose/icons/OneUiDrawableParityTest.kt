@@ -1,5 +1,6 @@
 package org.oneui.compose.icons
 
+import dev.oneuiproject.oneui.R as OneUiIconResources
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -12,6 +13,21 @@ class OneUiDrawableParityTest {
         assertTrue(names.contains("ic_oui_add"))
         assertTrue(names.contains("ic_oui_search"))
         assertTrue(names.contains("oui_des_list_item_selection_anim_selector"))
+    }
+
+    @Test
+    fun dependencyCatalogExactlyMatchesPinnedOneUiIconsDrawableNamespace() {
+        val dependencyNames = OneUiIconResources.drawable::class.java.declaredFields
+            .filter { field -> field.type == Int::class.javaPrimitiveType }
+            .map { field -> field.name }
+            .toSortedSet()
+        val catalogNames = OneUiDrawableCatalog.entries
+            .filter { entry -> entry.source == OneUiDrawableSource.IconsDependency }
+            .map { entry -> entry.name }
+            .toSortedSet()
+
+        assertEquals(883, dependencyNames.size)
+        assertEquals(dependencyNames, catalogNames)
     }
 
     @Test
