@@ -16,7 +16,7 @@
   ],
   "nested": [
     {"id":"icons","parent":"recycler-views","label":"Icons","publicApi":"OneUiDrawableCatalog","demoTag":"catalog-icons","status":"done"},
-    {"id":"stargazers","parent":"recycler-views","label":"Stargazers","publicApi":"OneUiProfile + OneUiSelectableList","demoTag":"catalog-stargazers","status":"missing"},
+    {"id":"stargazers","parent":"recycler-views","label":"Stargazers","publicApi":"OneUiProfile + OneUiSelectableList","demoTag":"catalog-stargazers","status":"in_progress"},
     {"id":"apps","parent":"recycler-views","label":"Apps","publicApi":"OneUiAppPicker","demoTag":"catalog-apps","status":"missing"},
     {"id":"popup-menu","parent":"app-shell","label":"Pop-up Menu","publicApi":"OneUiMenu","demoTag":"catalog-popup-menu","status":"missing"},
     {"id":"search-mode","parent":"app-shell","label":"Search mode","publicApi":"OneUiSearchMode","demoTag":"catalog-search-mode","status":"missing"},
@@ -64,7 +64,7 @@
     {"id":"widget-switch-bar-progress","route":"misc-widgets","status":"missing"},
     {"id":"widget-suggest-appbar","route":"misc-widgets","status":"missing"},
     {"id":"icons-search-selection-action-mode","route":"recycler-views","status":"done"},
-    {"id":"stargazer-list-profile-qr-share","route":"recycler-views","status":"missing"},
+    {"id":"stargazer-list-profile-qr-share","route":"recycler-views","status":"in_progress"},
     {"id":"apps-seven-list-types","route":"recycler-views","status":"missing"},
     {"id":"preferences-complete-reference-xml","route":"preferences","status":"missing"},
     {"id":"about-app-info","route":"about","status":"missing"},
