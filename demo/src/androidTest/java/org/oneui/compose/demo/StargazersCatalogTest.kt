@@ -55,15 +55,18 @@ class StargazersCatalogTest {
     }
 
     @Test
-    fun profileExposesDetailsShareAndQrSheet() {
+    fun profileExposesReferenceActionsDetailsAndQrSheet() {
         openStargazers()
 
         composeRule.onNodeWithText("Ada Lovelace").performClick()
         composeRule.onNodeWithTag("stargazer-profile").assertIsDisplayed()
         composeRule.onNodeWithTag("stargazer-profile-avatar").assertIsDisplayed()
         composeRule.onNodeWithText("London, UK").assertIsDisplayed()
-        composeRule.onNodeWithText("Share").assertIsDisplayed()
-        composeRule.onNodeWithText("QR code").performClick()
+        composeRule.onNodeWithContentDescription("Website").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Email").assertIsDisplayed()
+        composeRule.onNodeWithTag("stargazer-profile-bottom-actions").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Share").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("QR code").assertIsDisplayed().performClick()
         composeRule.onNodeWithTag("stargazer-qr-sheet").assertIsDisplayed()
         composeRule.onNodeWithText("Scan this QR code on another device to view Ada Lovelace's profile.").assertIsDisplayed()
     }
