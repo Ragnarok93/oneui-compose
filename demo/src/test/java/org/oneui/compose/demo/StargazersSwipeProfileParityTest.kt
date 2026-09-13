@@ -11,7 +11,9 @@ import org.oneui.compose.demo.screens.CatalogStargazerProfileAction
 import org.oneui.compose.demo.screens.CatalogStargazerSwipeAction
 import org.oneui.compose.demo.screens.stargazerProfileActions
 import org.oneui.compose.demo.screens.stargazerSwipeAction
+import org.oneui.compose.demo.screens.stargazerSwipeFeedback
 import org.oneui.compose.demo.screens.stargazerVCardContent
+import org.oneui.compose.demo.screens.stargazerVCardFileName
 
 class StargazersSwipeProfileParityTest {
     @Test
@@ -25,6 +27,26 @@ class StargazersSwipeProfileParityTest {
             stargazerSwipeAction(OneUiSwipeDirection.Left),
         )
         assertNull(stargazerSwipeAction(OneUiSwipeDirection.None))
+    }
+
+    @Test
+    fun swipeActionsCarryReferenceLabelsColorsAndProgressBehavior() {
+        assertEquals("Call", CatalogStargazerSwipeAction.Call.label)
+        assertEquals(0xFF11A85F.toInt(), CatalogStargazerSwipeAction.Call.containerArgb)
+        assertEquals("Message", CatalogStargazerSwipeAction.Message.label)
+        assertEquals(0xFF31A5F3.toInt(), CatalogStargazerSwipeAction.Message.containerArgb)
+
+        val call = stargazerSwipeFeedback(CatalogStargazerSwipeAction.Call, "Ada Lovelace")
+        assertEquals("Calling Ada Lovelace...", call.message)
+        assertTrue(call.indeterminate)
+        assertEquals(4_000L, call.dismissAfterMillis)
+        assertNull(call.progressStepDelayMillis)
+
+        val message = stargazerSwipeFeedback(CatalogStargazerSwipeAction.Message, "Ada Lovelace")
+        assertEquals("Sending message to Ada Lovelace...", message.message)
+        assertFalse(message.indeterminate)
+        assertNull(message.dismissAfterMillis)
+        assertEquals(50L, message.progressStepDelayMillis)
     }
 
     @Test
@@ -75,6 +97,8 @@ class StargazersSwipeProfileParityTest {
             organizationsUrl = "https://api.github.com/users/grace/orgs",
             starredRepos = setOf("oneui-compose", "oneui-design"),
         )
+
+        assertEquals("stargazer_7_Grace Hopper.vcf", stargazerVCardFileName(profile))
 
         val vCard = stargazerVCardContent(profile)
 
