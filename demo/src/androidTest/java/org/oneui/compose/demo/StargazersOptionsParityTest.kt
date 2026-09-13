@@ -4,9 +4,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.oneui.compose.components.list.OneUiFastScrollerDisplayMode
 import org.oneui.compose.demo.screens.CatalogActionModeSearch
 import org.oneui.compose.demo.screens.CatalogStargazersFetchState
 import org.oneui.compose.demo.screens.CatalogStargazersSettings
+import org.oneui.compose.demo.screens.stargazerFastScrollerDisplayMode
 import org.oneui.compose.demo.screens.stargazerNoItemText
 
 class StargazersOptionsParityTest {
@@ -17,6 +19,20 @@ class StargazersOptionsParityTest {
         assertTrue(settings.autoHideIndexScroll)
         assertFalse(settings.showCancelButton)
         assertEquals(CatalogActionModeSearch.DISMISS, settings.actionModeSearch)
+    }
+
+    @Test
+    fun indexScrollSettingsMatchPinnedReference() {
+        assertEquals(
+            OneUiFastScrollerDisplayMode.Dot,
+            stargazerFastScrollerDisplayMode(CatalogStargazersSettings()),
+        )
+        assertEquals(
+            OneUiFastScrollerDisplayMode.Text,
+            stargazerFastScrollerDisplayMode(
+                CatalogStargazersSettings(showIndexLetters = true),
+            ),
+        )
     }
 
     @Test
