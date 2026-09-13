@@ -22,9 +22,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
@@ -65,6 +68,29 @@ fun <T> oneUiIndexEntries(
 }
 
 /**
+ * Resolves caller padding into logical start/end values and reserves the fast-scroller rail on the
+ * logical end side. Keeping this pure makes RTL behavior independently testable.
+ */
+internal fun oneUiIndexedListContentPadding(
+    contentPadding: PaddingValues,
+    layoutDirection: LayoutDirection,
+    reserveRail: Boolean,
+    railWidth: Dp = 28.dp,
+): PaddingValues {
+    val left = contentPadding.calculateLeftPadding(layoutDirection)
+    val right = contentPadding.calculateRightPadding(layoutDirection)
+    val logicalStart = if (layoutDirection == LayoutDirection.Ltr) left else right
+    val logicalEnd = if (layoutDirection == LayoutDirection.Ltr) right else left
+
+    return PaddingValues(
+        start = logicalStart,
+        top = contentPadding.calculateTopPadding(),
+        end = logicalEnd + if (reserveRail) railWidth else 0.dp,
+        bottom = contentPadding.calculateBottomPadding(),
+    )
+}
+
+/**
  * Reusable One UI indexed list with an optional alphabet rail.
  *
  * The data/key/content contract is intentionally generic so this can back contacts, app pickers,
@@ -84,18 +110,17 @@ fun <T, K : Any> OneUiIndexedList(
 ) {
     val entries = oneUiIndexEntries(items, label)
     val scope = rememberCoroutineScope()
+    val layoutDirection = LocalLayoutDirection.current
     val reserveRail = showFastScroller && entries.size > 1
 
     Box(modifier = modifier) {
         LazyColumn(
             state = state,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                start = contentPadding.calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection.Ltr),
-                top = contentPadding.calculateTopPadding(),
-                end = contentPadding.calculateRightPadding(androidx.compose.ui.unit.LayoutDirection.Ltr) +
-                    if (reserveRail) 28.dp else 0.dp,
-                bottom = contentPadding.calculateBottomPadding(),
+            contentPadding = oneUiIndexedListContentPadding(
+                contentPadding = contentPadding,
+                layoutDirection = layoutDirection,
+                reserveRail = reserveRail,
             ),
         ) {
             items(

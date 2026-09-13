@@ -5,23 +5,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.items as lazyItems
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -43,6 +39,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import org.oneui.compose.components.list.OneUiFastScroller
+import org.oneui.compose.components.list.OneUiIndexedList
+import org.oneui.compose.components.list.oneUiIndexEntries
 import org.oneui.compose.components.selection.OneUiCheckbox
 import org.oneui.compose.components.selection.OneUiRadioButton
 import org.oneui.compose.components.selection.OneUiSwitch
@@ -143,7 +142,8 @@ fun <K : Any> rememberOneUiAppPickerState(
  *
  * Data and app metadata remain caller-owned. [state] holds only selection; search/filtering is also
  * deliberately hoisted so applications can use package-manager data, remote sources, or fixed
- * fixtures. List modes include an alphabet rail that behaves as a compact fast-scroll/index tip.
+ * fixtures. List modes reuse [OneUiIndexedList], while grid modes reuse [OneUiFastScroller], so
+ * indexed navigation stays consistent and accessible across the library.
  */
 @Composable
 fun <T, K : Any> OneUiAppPicker(
@@ -222,46 +222,25 @@ private fun <T, K : Any> AppPickerList(
     onItemClick: (T) -> Unit,
     onActionClick: (T) -> Unit,
 ) {
-    val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
-    val indexEntries = appPickerIndexEntries(items, label)
-
-    Box(Modifier.fillMaxSize()) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                end = if (showIndexRail && indexEntries.size > 1) 28.dp else 0.dp,
-                bottom = 12.dp,
-            ),
-        ) {
-            lazyItems(
-                items = items,
-                key = { item -> key(item) },
-            ) { item ->
-                AppPickerListRow(
-                    item = item,
-                    listType = listType,
-                    state = state,
-                    itemKey = key(item),
-                    label = label(item),
-                    subLabel = subLabel(item),
-                    leadingContent = leadingContent,
-                    onItemClick = { activateAppPickerItem(item, listType, state, key, onItemClick) },
-                    onActionClick = { onActionClick(item) },
-                )
-            }
-        }
-
-        if (showIndexRail && indexEntries.size > 1) {
-            AppPickerIndexRail(
-                entries = indexEntries,
-                modifier = Modifier.align(Alignment.CenterEnd),
-                onIndexSelected = { index ->
-                    scope.launch { listState.animateScrollToItem(index) }
-                },
-            )
-        }
+    OneUiIndexedList(
+        items = items,
+        key = key,
+        label = label,
+        modifier = Modifier.fillMaxSize(),
+        showFastScroller = showIndexRail,
+        contentPadding = PaddingValues(bottom = 12.dp),
+    ) { item ->
+        AppPickerListRow(
+            item = item,
+            listType = listType,
+            state = state,
+            itemKey = key(item),
+            label = label(item),
+            subLabel = subLabel(item),
+            leadingContent = leadingContent,
+            onItemClick = { activateAppPickerItem(item, listType, state, key, onItemClick) },
+            onActionClick = { onActionClick(item) },
+        )
     }
 }
 
@@ -279,17 +258,18 @@ private fun <T, K : Any> AppPickerGrid(
 ) {
     val gridState = rememberLazyGridState()
     val scope = rememberCoroutineScope()
-    val indexEntries = appPickerIndexEntries(items, label)
+    val indexEntries = oneUiIndexEntries(items, label)
+    val reserveRail = showIndexRail && indexEntries.size > 1
 
     Box(Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 132.dp),
             state = gridState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            contentPadding = PaddingValues(
                 start = 12.dp,
                 top = 8.dp,
-                end = if (showIndexRail && indexEntries.size > 1) 32.dp else 12.dp,
+                end = if (reserveRail) 32.dp else 12.dp,
                 bottom = 16.dp,
             ),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -312,8 +292,8 @@ private fun <T, K : Any> AppPickerGrid(
             }
         }
 
-        if (showIndexRail && indexEntries.size > 1) {
-            AppPickerIndexRail(
+        if (reserveRail) {
+            OneUiFastScroller(
                 entries = indexEntries,
                 modifier = Modifier.align(Alignment.CenterEnd),
                 onIndexSelected = { index ->
@@ -509,57 +489,6 @@ private fun DefaultAppGlyph(
             fontSize = if (size >= 56) 22.sp else 18.sp,
             fontWeight = FontWeight.Bold,
         )
-    }
-}
-
-private data class AppPickerIndexEntry(
-    val label: String,
-    val itemIndex: Int,
-)
-
-private fun <T> appPickerIndexEntries(
-    items: List<T>,
-    label: (T) -> String,
-): List<AppPickerIndexEntry> {
-    val seen = linkedSetOf<String>()
-    return buildList {
-        items.forEachIndexed { index, item ->
-            val value = label(item).trim().firstOrNull()?.uppercaseChar()?.toString() ?: "#"
-            if (seen.add(value)) add(AppPickerIndexEntry(value, index))
-        }
-    }
-}
-
-@Composable
-private fun AppPickerIndexRail(
-    entries: List<AppPickerIndexEntry>,
-    onIndexSelected: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxHeight()
-            .width(28.dp)
-            .padding(vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly,
-    ) {
-        entries.forEach { entry ->
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .clickable { onIndexSelected(entry.itemIndex) },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = entry.label,
-                    color = OneUiTheme.colors.accent,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-        }
     }
 }
 
