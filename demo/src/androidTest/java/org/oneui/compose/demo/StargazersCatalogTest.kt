@@ -1,6 +1,11 @@
 package org.oneui.compose.demo
 
+import androidx.compose.ui.test.assertDoesNotExist
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -15,6 +20,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.oneui.compose.demo.screens.RecyclerViewCatalogTab
 import org.oneui.compose.demo.screens.StargazersCatalogSamples
+import org.oneui.compose.demo.screens.StargazersOptionsTestTags
 
 class StargazersCatalogTest {
     @get:Rule
@@ -52,6 +58,49 @@ class StargazersCatalogTest {
         composeRule.onNodeWithText("1 selected").assertIsDisplayed()
         composeRule.onNodeWithText("Select all").performClick()
         composeRule.onNodeWithText("8 selected").assertIsDisplayed()
+    }
+
+    @Test
+    fun optionsDialogStagesChangesUntilApply() {
+        openStargazers()
+
+        composeRule.onNodeWithContentDescription(StargazersOptionsTestTags.TriggerDescription)
+            .assertIsDisplayed()
+            .performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.Dialog).assertIsDisplayed()
+        composeRule.onNodeWithText("Stargazers options").assertIsDisplayed()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowIndexLetters).assertIsOff()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.AutoHideIndexScroll).assertIsOn()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowCancelButton).assertIsOff()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ActionModeDismiss).assertIsSelected()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ActionModeConcurrent).assertIsNotSelected()
+
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowIndexLetters).performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.AutoHideIndexScroll).performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowCancelButton).performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ActionModeConcurrent).performClick()
+        composeRule.onNodeWithText("Cancel").performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.Dialog).assertDoesNotExist()
+
+        composeRule.onNodeWithContentDescription(StargazersOptionsTestTags.TriggerDescription).performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowIndexLetters).assertIsOff()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.AutoHideIndexScroll).assertIsOn()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowCancelButton).assertIsOff()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ActionModeDismiss).assertIsSelected()
+
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowIndexLetters).performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.AutoHideIndexScroll).performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowCancelButton).performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ActionModeConcurrent).performClick()
+        composeRule.onNodeWithText("Apply").performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.Dialog).assertDoesNotExist()
+
+        composeRule.onNodeWithContentDescription(StargazersOptionsTestTags.TriggerDescription).performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowIndexLetters).assertIsOn()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.AutoHideIndexScroll).assertIsOff()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowCancelButton).assertIsOn()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ActionModeConcurrent).assertIsSelected()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ActionModeDismiss).assertIsNotSelected()
     }
 
     @Test
