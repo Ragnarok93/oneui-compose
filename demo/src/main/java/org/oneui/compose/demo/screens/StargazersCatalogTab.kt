@@ -58,10 +58,14 @@ data class CatalogStargazer(
     val name: String,
     val login: String,
     val url: String,
-    val location: String,
-    val company: String,
-    val email: String,
-    val bio: String,
+    val location: String? = null,
+    val company: String? = null,
+    val email: String? = null,
+    val bio: String? = null,
+    val twitterUsername: String? = null,
+    val blog: String? = null,
+    val organizationsUrl: String? = null,
+    val starredRepos: Set<String> = emptySet(),
 )
 
 /** Stable local dataset keeps the catalog useful offline and deterministic under UI tests. */
@@ -365,12 +369,20 @@ private fun StargazerProfile(
             OneUiProfile(
                 name = profile.name,
                 subtitle = profile.url,
-                details = listOf(
-                    OneUiProfileDetail("Location", profile.location),
-                    OneUiProfileDetail("Company", profile.company),
-                    OneUiProfileDetail("Email", profile.email),
-                    OneUiProfileDetail("Bio", profile.bio),
-                ),
+                details = buildList {
+                    profile.location?.takeIf(String::isNotEmpty)?.let {
+                        add(OneUiProfileDetail("Location", it))
+                    }
+                    profile.company?.takeIf(String::isNotEmpty)?.let {
+                        add(OneUiProfileDetail("Company", it))
+                    }
+                    profile.email?.takeIf(String::isNotEmpty)?.let {
+                        add(OneUiProfileDetail("Email", it))
+                    }
+                    profile.bio?.takeIf(String::isNotEmpty)?.let {
+                        add(OneUiProfileDetail("Bio", it))
+                    }
+                },
                 modifier = Modifier.padding(top = 12.dp, bottom = 28.dp),
                 avatar = {
                     StargazerAvatar(
@@ -385,11 +397,13 @@ private fun StargazerProfile(
                         contentDescription = "Website",
                         onClick = { openWebsite(context, profile.url) },
                     )
-                    OneUiIconButton(
-                        icon = OneUiIcons.Email,
-                        contentDescription = "Email",
-                        onClick = { emailProfile(context, profile.email) },
-                    )
+                    profile.email?.let { email ->
+                        OneUiIconButton(
+                            icon = OneUiIcons.Email,
+                            contentDescription = "Email",
+                            onClick = { emailProfile(context, email) },
+                        )
+                    }
                 },
             )
         }

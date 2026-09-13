@@ -1,6 +1,7 @@
 package org.oneui.compose.demo.screens
 
 import org.oneui.compose.components.list.OneUiFastScrollerDisplayMode
+import org.oneui.compose.components.list.OneUiSwipeDirection
 import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.patterns.list.OneUiSelectableListState
@@ -73,6 +74,56 @@ fun <K> executeStargazerAction(
     val feedback = stargazerActionFeedback(selectionState.selectedCount, action)
     selectionState.clear()
     return feedback
+}
+
+/** Physical swipe actions used by the pinned Stargazers reference. */
+enum class CatalogStargazerSwipeAction {
+    Call,
+    Message,
+}
+
+/**
+ * The reference preserves physical gesture meaning in RTL: swipe right calls, swipe left messages.
+ */
+fun stargazerSwipeAction(direction: OneUiSwipeDirection): CatalogStargazerSwipeAction? =
+    when (direction) {
+        OneUiSwipeDirection.Right -> CatalogStargazerSwipeAction.Call
+        OneUiSwipeDirection.Left -> CatalogStargazerSwipeAction.Message
+        OneUiSwipeDirection.None -> null
+    }
+
+/** Profile header actions in the same visual order as view_stargazer_buttons.xml. */
+enum class CatalogStargazerProfileAction {
+    GitHub,
+    X,
+    Email,
+    Blog,
+}
+
+fun stargazerProfileActions(profile: CatalogStargazer): List<CatalogStargazerProfileAction> =
+    buildList {
+        add(CatalogStargazerProfileAction.GitHub)
+        if (profile.twitterUsername != null) add(CatalogStargazerProfileAction.X)
+        if (profile.email != null) add(CatalogStargazerProfileAction.Email)
+        if (!profile.blog.isNullOrEmpty()) add(CatalogStargazerProfileAction.Blog)
+    }
+
+/** Source-derived vCard payload used by the reference profile sharing flow. */
+fun stargazerVCardContent(profile: CatalogStargazer): String = buildString {
+    appendLine("BEGIN:VCARD")
+    appendLine("VERSION:2.1")
+    appendLine("FN:${profile.name}")
+    appendLine("NICKNAME:${profile.login}")
+    appendLine("URL:${profile.url}")
+    profile.email?.let { appendLine("EMAIL:$it") }
+    profile.company?.let { appendLine("ORG:$it") }
+    profile.location?.let { appendLine("ADR:$it") }
+    profile.bio?.let { appendLine("TITLE:$it") }
+    profile.blog?.let { appendLine("URL:$it") }
+    profile.organizationsUrl?.let { appendLine("URL:$it") }
+    profile.twitterUsername?.let { appendLine("X-TWITTER:https://x.com/$it") }
+    appendLine("NOTE:Starred repos: ${profile.starredRepos.joinToString(", ")}")
+    appendLine("END:VCARD")
 }
 
 data class StargazerFastScrollerConfig(
