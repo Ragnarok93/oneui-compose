@@ -36,6 +36,7 @@ jobs:
             :lib:compileDebugAndroidTestKotlin \
             :lib:lintDebug \
             :lib:assembleRelease \
+            :demo:testDebugUnitTest \
             :demo:compileDebugAndroidTestKotlin \
             :demo:assembleDebug \
             --stacktrace
@@ -49,6 +50,7 @@ jobs:
             lib/build/reports/tests/
             lib/build/reports/lint-results-debug.*
             lib/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt
+            demo/build/reports/tests/
             demo/build/reports/androidTests/
           if-no-files-found: warn
 
