@@ -28,7 +28,7 @@ class StargazersSwipeProfileParityTest {
     }
 
     @Test
-    fun profileActionsFollowReferenceFieldVisibility() {
+    fun profileActionsMatchReferenceOrderAndNullableVisibility() {
         val profile = CatalogStargazer(
             id = 42,
             name = "Ada Lovelace",
@@ -44,23 +44,23 @@ class StargazersSwipeProfileParityTest {
 
         assertEquals(
             listOf(
-                CatalogStargazerProfileAction.Website,
-                CatalogStargazerProfileAction.Email,
+                CatalogStargazerProfileAction.GitHub,
                 CatalogStargazerProfileAction.X,
+                CatalogStargazerProfileAction.Email,
                 CatalogStargazerProfileAction.Blog,
             ),
             stargazerProfileActions(profile),
         )
 
-        val sparse = profile.copy(email = "", twitterUsername = null, blog = "")
+        val sparse = profile.copy(email = null, twitterUsername = null, blog = "")
         assertEquals(
-            listOf(CatalogStargazerProfileAction.Website),
+            listOf(CatalogStargazerProfileAction.GitHub),
             stargazerProfileActions(sparse),
         )
     }
 
     @Test
-    fun vCardMatchesReferenceContactFieldsAndOmitsBlankOptionals() {
+    fun vCardMatchesReferenceContactFieldsAndOmitsNullOptionals() {
         val profile = CatalogStargazer(
             id = 7,
             name = "Grace Hopper",
@@ -93,13 +93,13 @@ class StargazersSwipeProfileParityTest {
         assertTrue(vCard.endsWith("END:VCARD\n"))
 
         val sparse = profile.copy(
-            email = "",
-            company = "",
-            location = "",
-            bio = "",
-            twitterUsername = "",
-            blog = "",
-            organizationsUrl = "",
+            email = null,
+            company = null,
+            location = null,
+            bio = null,
+            twitterUsername = null,
+            blog = null,
+            organizationsUrl = null,
             starredRepos = emptySet(),
         )
         val sparseVCard = stargazerVCardContent(sparse)
