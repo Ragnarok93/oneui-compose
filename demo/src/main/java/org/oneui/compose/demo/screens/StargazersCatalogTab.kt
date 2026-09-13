@@ -1,6 +1,7 @@
 package org.oneui.compose.demo.screens
 
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,7 +48,6 @@ import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIconButton
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.patterns.list.OneUiProfile
-import org.oneui.compose.patterns.list.OneUiProfileAction
 import org.oneui.compose.patterns.list.OneUiProfileDetail
 import org.oneui.compose.patterns.list.OneUiSelectableList
 import org.oneui.compose.patterns.list.OneUiSelectableListItem
@@ -302,59 +301,118 @@ private fun StargazerProfile(
     onShowQr: () -> Unit,
 ) {
     val context = LocalContext.current
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .testTag("stargazer-profile")
-            .verticalScroll(rememberScrollState()),
+            .testTag("stargazer-profile"),
     ) {
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .fillMaxSize()
+                .padding(bottom = 72.dp)
+                .verticalScroll(rememberScrollState()),
         ) {
-            OneUiIconButton(
-                icon = OneUiIcons.Back,
-                contentDescription = "Back to stargazers",
-                onClick = onBack,
-            )
-            Text(
-                text = "Profile",
-                modifier = Modifier.padding(start = 8.dp),
-                color = OneUiTheme.colors.primaryText,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                OneUiIconButton(
+                    icon = OneUiIcons.Back,
+                    contentDescription = "Back to stargazers",
+                    onClick = onBack,
+                )
+                Text(
+                    text = "Profile",
+                    modifier = Modifier.padding(start = 8.dp),
+                    color = OneUiTheme.colors.primaryText,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+
+            OneUiProfile(
+                name = profile.name,
+                subtitle = profile.url,
+                details = listOf(
+                    OneUiProfileDetail("Location", profile.location),
+                    OneUiProfileDetail("Company", profile.company),
+                    OneUiProfileDetail("Email", profile.email),
+                    OneUiProfileDetail("Bio", profile.bio),
+                ),
+                modifier = Modifier.padding(top = 12.dp, bottom = 28.dp),
+                avatar = {
+                    StargazerAvatar(
+                        profile = profile,
+                        modifier = Modifier.testTag("stargazer-profile-avatar"),
+                        size = 100.dp,
+                    )
+                },
+                actions = {
+                    OneUiIconButton(
+                        icon = OneUiIcons.Website,
+                        contentDescription = "Website",
+                        onClick = { openWebsite(context, profile.url) },
+                    )
+                    OneUiIconButton(
+                        icon = OneUiIcons.Email,
+                        contentDescription = "Email",
+                        onClick = { emailProfile(context, profile.email) },
+                    )
+                },
             )
         }
 
-        OneUiProfile(
-            name = profile.name,
-            subtitle = profile.url,
-            details = listOf(
-                OneUiProfileDetail("Location", profile.location),
-                OneUiProfileDetail("Company", profile.company),
-                OneUiProfileDetail("Email", profile.email),
-                OneUiProfileDetail("Bio", profile.bio),
-            ),
-            modifier = Modifier.padding(top = 12.dp, bottom = 28.dp),
-            avatar = {
-                StargazerAvatar(
-                    profile = profile,
-                    modifier = Modifier.testTag("stargazer-profile-avatar"),
-                    size = 100.dp,
-                )
-            },
-            actions = {
-                OneUiProfileAction(
-                    label = "Share",
-                    onClick = { shareProfile(context, profile) },
-                )
-                OneUiProfileAction(
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(OneUiTheme.colors.surface)
+                .testTag("stargazer-profile-bottom-actions"),
+        ) {
+            HorizontalDivider(color = OneUiTheme.colors.divider)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                StargazerBottomAction(
                     label = "QR code",
+                    icon = OneUiIcons.QrCode,
                     onClick = onShowQr,
                 )
-            },
+                StargazerBottomAction(
+                    label = "Share",
+                    icon = OneUiIcons.Share,
+                    onClick = { shareProfile(context, profile) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StargazerBottomAction(
+    label: String,
+    icon: org.oneui.compose.icons.OneUiIcon,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.width(96.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        OneUiIconButton(
+            icon = icon,
+            contentDescription = label,
+            onClick = onClick,
+        )
+        Text(
+            text = label,
+            color = OneUiTheme.colors.primaryText,
+            fontSize = 12.sp,
         )
     }
 }
@@ -409,6 +467,14 @@ private fun StargazerQrSheet(
             }
         }
     }
+}
+
+private fun openWebsite(context: android.content.Context, url: String) {
+    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+}
+
+private fun emailProfile(context: android.content.Context, email: String) {
+    context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email, null)))
 }
 
 private fun shareProfile(context: android.content.Context, profile: CatalogStargazer) {
