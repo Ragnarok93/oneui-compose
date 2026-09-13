@@ -8,6 +8,7 @@ import org.oneui.compose.components.list.OneUiFastScrollerDisplayMode
 import org.oneui.compose.demo.screens.CatalogActionModeSearch
 import org.oneui.compose.demo.screens.CatalogStargazersFetchState
 import org.oneui.compose.demo.screens.CatalogStargazersSettings
+import org.oneui.compose.demo.screens.stargazerFastScrollerConfig
 import org.oneui.compose.demo.screens.stargazerFastScrollerDisplayMode
 import org.oneui.compose.demo.screens.stargazerNoItemText
 
@@ -33,6 +34,22 @@ class StargazersOptionsParityTest {
                 CatalogStargazersSettings(showIndexLetters = true),
             ),
         )
+    }
+
+    @Test
+    fun indexScrollRenderConfigMatchesPinnedReference() {
+        val defaults = stargazerFastScrollerConfig(CatalogStargazersSettings())
+        assertEquals(OneUiFastScrollerDisplayMode.Dot, defaults.displayMode)
+        assertTrue(defaults.autoHide)
+
+        val explicit = stargazerFastScrollerConfig(
+            CatalogStargazersSettings(
+                showIndexLetters = true,
+                autoHideIndexScroll = false,
+            ),
+        )
+        assertEquals(OneUiFastScrollerDisplayMode.Text, explicit.displayMode)
+        assertFalse(explicit.autoHide)
     }
 
     @Test
