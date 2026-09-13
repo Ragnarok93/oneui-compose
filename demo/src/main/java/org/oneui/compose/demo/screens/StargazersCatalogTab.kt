@@ -79,7 +79,13 @@ val StargazersCatalogSamples: List<CatalogStargazer> = listOf(
 @Composable
 fun StargazersCatalogTab(modifier: Modifier = Modifier) {
     val selectionState = remember { OneUiSelectableListState<Long>() }
-    val settings = remember { CatalogStargazersSettings() }
+    var optionsState by remember {
+        mutableStateOf(
+            CatalogStargazersOptionsState(
+                committed = CatalogStargazersSettings(),
+            ),
+        )
+    }
     var query by rememberSaveable { mutableStateOf("") }
     var profile by remember { mutableStateOf<CatalogStargazer?>(null) }
     var qrProfile by remember { mutableStateOf<CatalogStargazer?>(null) }
@@ -109,8 +115,9 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
                 onQueryChange = { query = it },
                 profiles = visibleProfiles,
                 selectionState = selectionState,
-                settings = settings,
+                settings = optionsState.committed,
                 onOpenProfile = { profile = it },
+                onOpenOptions = { optionsState = optionsState.open() },
             )
         } else {
             StargazerProfile(
@@ -127,6 +134,11 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
             onDismiss = { qrProfile = null },
         )
     }
+
+    StargazersOptionsDialog(
+        state = optionsState,
+        onStateChange = { optionsState = it },
+    )
 }
 
 @Composable
@@ -137,47 +149,60 @@ private fun StargazerList(
     selectionState: OneUiSelectableListState<Long>,
     settings: CatalogStargazersSettings,
     onOpenProfile: (CatalogStargazer) -> Unit,
+    onOpenOptions: () -> Unit,
 ) {
     val fastScrollerConfig = remember(settings) { stargazerFastScrollerConfig(settings) }
 
     Column(Modifier.fillMaxSize()) {
-        OutlinedTextField(
-            value = query,
-            onValueChange = onQueryChange,
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp)
-                .testTag("stargazers-search-field"),
-            singleLine = true,
-            shape = RoundedCornerShape(24.dp),
-            placeholder = { Text("Search contact", color = OneUiTheme.colors.secondaryText) },
-            leadingIcon = {
-                OneUiIcon(
-                    icon = OneUiIcons.Search,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = OneUiTheme.colors.secondaryText,
-                )
-            },
-            trailingIcon = if (query.isBlank()) null else {
-                {
-                    OneUiIconButton(
-                        icon = OneUiIcons.Close,
-                        contentDescription = "Clear contact search",
-                        onClick = { onQueryChange("") },
+                .padding(start = 20.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            OutlinedTextField(
+                value = query,
+                onValueChange = onQueryChange,
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("stargazers-search-field"),
+                singleLine = true,
+                shape = RoundedCornerShape(24.dp),
+                placeholder = { Text("Search contact", color = OneUiTheme.colors.secondaryText) },
+                leadingIcon = {
+                    OneUiIcon(
+                        icon = OneUiIcons.Search,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = OneUiTheme.colors.secondaryText,
                     )
-                }
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = OneUiTheme.colors.surfaceElevated,
-                unfocusedContainerColor = OneUiTheme.colors.surfaceElevated,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                cursorColor = OneUiTheme.colors.accent,
-                focusedTextColor = OneUiTheme.colors.primaryText,
-                unfocusedTextColor = OneUiTheme.colors.primaryText,
-            ),
-        )
+                },
+                trailingIcon = if (query.isBlank()) null else {
+                    {
+                        OneUiIconButton(
+                            icon = OneUiIcons.Close,
+                            contentDescription = "Clear contact search",
+                            onClick = { onQueryChange("") },
+                        )
+                    }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = OneUiTheme.colors.surfaceElevated,
+                    unfocusedContainerColor = OneUiTheme.colors.surfaceElevated,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    cursorColor = OneUiTheme.colors.accent,
+                    focusedTextColor = OneUiTheme.colors.primaryText,
+                    unfocusedTextColor = OneUiTheme.colors.primaryText,
+                ),
+            )
+            Spacer(Modifier.width(4.dp))
+            OneUiIconButton(
+                icon = OneUiIcons.More,
+                contentDescription = StargazersOptionsTestTags.TriggerDescription,
+                onClick = onOpenOptions,
+            )
+        }
 
         if (selectionState.isSelectionMode) {
             StargazerActionModeBar(selectionState)
