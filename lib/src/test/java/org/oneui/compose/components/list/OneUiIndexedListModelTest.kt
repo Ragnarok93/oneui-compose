@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class OneUiIndexedListModelTest {
@@ -67,5 +68,26 @@ class OneUiIndexedListModelTest {
         assertEquals(7.dp, resolved.calculateRightPadding(LayoutDirection.Rtl))
         assertEquals(2.dp, resolved.calculateTopPadding())
         assertEquals(5.dp, resolved.calculateBottomPadding())
+    }
+
+    @Test
+    fun fastScrollerMapsTouchPositionToSection() {
+        assertEquals(0, oneUiFastScrollerEntryIndex(positionY = 0f, height = 100f, entryCount = 5))
+        assertEquals(2, oneUiFastScrollerEntryIndex(positionY = 50f, height = 100f, entryCount = 5))
+        assertEquals(4, oneUiFastScrollerEntryIndex(positionY = 100f, height = 100f, entryCount = 5))
+    }
+
+    @Test
+    fun fastScrollerClampsTouchOutsideRailBounds() {
+        assertEquals(0, oneUiFastScrollerEntryIndex(positionY = -25f, height = 100f, entryCount = 5))
+        assertEquals(4, oneUiFastScrollerEntryIndex(positionY = 160f, height = 100f, entryCount = 5))
+    }
+
+    @Test
+    fun fastScrollerRejectsInvalidGeometry() {
+        assertNull(oneUiFastScrollerEntryIndex(positionY = 20f, height = 100f, entryCount = 0))
+        assertNull(oneUiFastScrollerEntryIndex(positionY = 20f, height = 0f, entryCount = 5))
+        assertNull(oneUiFastScrollerEntryIndex(positionY = Float.NaN, height = 100f, entryCount = 5))
+        assertNull(oneUiFastScrollerEntryIndex(positionY = 20f, height = Float.POSITIVE_INFINITY, entryCount = 5))
     }
 }
