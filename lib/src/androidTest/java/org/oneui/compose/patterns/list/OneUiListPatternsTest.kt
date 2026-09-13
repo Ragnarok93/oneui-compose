@@ -73,6 +73,7 @@ class OneUiListPatternsTest {
                     onItemClick = {},
                     indexLabel = TestProfile::name,
                     fastScrollerDisplayMode = OneUiFastScrollerDisplayMode.Text,
+                    fastScrollerAutoHide = true,
                 ) { item, selected, selectionMode ->
                     OneUiSelectableListItem(
                         title = item.name,
