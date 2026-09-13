@@ -7,6 +7,7 @@ import org.junit.Test
 import org.oneui.compose.components.list.OneUiFastScrollerDisplayMode
 import org.oneui.compose.demo.screens.CatalogActionModeSearch
 import org.oneui.compose.demo.screens.CatalogStargazersFetchState
+import org.oneui.compose.demo.screens.CatalogStargazersOptionsState
 import org.oneui.compose.demo.screens.CatalogStargazersSettings
 import org.oneui.compose.demo.screens.stargazerFastScrollerConfig
 import org.oneui.compose.demo.screens.stargazerFastScrollerDisplayMode
@@ -50,6 +51,43 @@ class StargazersOptionsParityTest {
         )
         assertEquals(OneUiFastScrollerDisplayMode.Text, explicit.displayMode)
         assertFalse(explicit.autoHide)
+    }
+
+    @Test
+    fun optionsStageChangesUntilApplyAndCancelDiscardsDraft() {
+        val committed = CatalogStargazersSettings()
+        val opened = CatalogStargazersOptionsState(committed = committed).open()
+
+        assertTrue(opened.isOpen)
+        assertEquals(committed, opened.committed)
+        assertEquals(committed, opened.draft)
+
+        val edited = opened.updateDraft(
+            opened.draft.copy(
+                showIndexLetters = true,
+                autoHideIndexScroll = false,
+                showCancelButton = true,
+                actionModeSearch = CatalogActionModeSearch.CONCURRENT,
+            ),
+        )
+        assertEquals(committed, edited.committed)
+        assertTrue(edited.draft.showIndexLetters)
+        assertFalse(edited.draft.autoHideIndexScroll)
+        assertTrue(edited.draft.showCancelButton)
+        assertEquals(CatalogActionModeSearch.CONCURRENT, edited.draft.actionModeSearch)
+
+        val cancelled = edited.cancel()
+        assertFalse(cancelled.isOpen)
+        assertEquals(committed, cancelled.committed)
+        assertEquals(committed, cancelled.draft)
+
+        val reapplied = cancelled.open().updateDraft(
+            committed.copy(showIndexLetters = true, actionModeSearch = CatalogActionModeSearch.NO_DISMISS),
+        ).apply()
+        assertFalse(reapplied.isOpen)
+        assertEquals(reapplied.draft, reapplied.committed)
+        assertTrue(reapplied.committed.showIndexLetters)
+        assertEquals(CatalogActionModeSearch.NO_DISMISS, reapplied.committed.actionModeSearch)
     }
 
     @Test
