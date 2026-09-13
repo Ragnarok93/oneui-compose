@@ -57,4 +57,24 @@ class OneUiDrawableParityTest {
             (selection.rendering as OneUiDrawableRendering.ComposeState).api,
         )
     }
+
+    @Test
+    fun stargazersReferenceActionsUseExactDependencyGlyphs() {
+        assertEquals(
+            OneUiIcon.Resource(OneUiIconResources.drawable.ic_oui_wifi_call),
+            OneUiIcons.Call,
+        )
+        assertEquals(
+            OneUiIcon.Resource(OneUiIconResources.drawable.ic_oui_message_chat),
+            OneUiIcons.Message,
+        )
+        assertEquals(
+            OneUiIcon.Resource(OneUiIconResources.drawable.ic_oui_google_duo_outline),
+            OneUiIcons.Meet,
+        )
+        assertEquals(
+            OneUiIcon.Resource(OneUiIconResources.drawable.ic_oui_block),
+            OneUiIcons.Block,
+        )
+    }
 }
