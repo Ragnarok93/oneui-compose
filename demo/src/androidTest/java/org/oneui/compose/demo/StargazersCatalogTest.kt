@@ -32,6 +32,10 @@ class StargazersCatalogTest {
         assertEquals(8, StargazersCatalogSamples.size)
         openStargazers()
 
+        composeRule.onNodeWithContentDescription("Scroll to A").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Scroll to G").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Scroll to M").assertIsDisplayed()
+
         composeRule.onNodeWithTag("stargazers-search-field").performTextInput("Ada")
         composeRule.onNodeWithText("Ada Lovelace").assertIsDisplayed()
 
@@ -56,6 +60,7 @@ class StargazersCatalogTest {
 
         composeRule.onNodeWithText("Ada Lovelace").performClick()
         composeRule.onNodeWithTag("stargazer-profile").assertIsDisplayed()
+        composeRule.onNodeWithTag("stargazer-profile-avatar").assertIsDisplayed()
         composeRule.onNodeWithText("London, UK").assertIsDisplayed()
         composeRule.onNodeWithText("Share").assertIsDisplayed()
         composeRule.onNodeWithText("QR code").performClick()
