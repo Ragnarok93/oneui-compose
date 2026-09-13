@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.oneui.compose.components.buttons.OneUiTextButton
-import org.oneui.compose.components.list.OneUiFastScrollerDisplayMode
 import org.oneui.compose.components.qrcode.OneUiQrCode
 import org.oneui.compose.icons.OneUiAnimatedIcons
 import org.oneui.compose.icons.OneUiIcon
@@ -80,6 +79,7 @@ val StargazersCatalogSamples: List<CatalogStargazer> = listOf(
 @Composable
 fun StargazersCatalogTab(modifier: Modifier = Modifier) {
     val selectionState = remember { OneUiSelectableListState<Long>() }
+    val settings = remember { CatalogStargazersSettings() }
     var query by rememberSaveable { mutableStateOf("") }
     var profile by remember { mutableStateOf<CatalogStargazer?>(null) }
     var qrProfile by remember { mutableStateOf<CatalogStargazer?>(null) }
@@ -109,6 +109,7 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
                 onQueryChange = { query = it },
                 profiles = visibleProfiles,
                 selectionState = selectionState,
+                settings = settings,
                 onOpenProfile = { profile = it },
             )
         } else {
@@ -134,8 +135,11 @@ private fun StargazerList(
     onQueryChange: (String) -> Unit,
     profiles: List<CatalogStargazer>,
     selectionState: OneUiSelectableListState<Long>,
+    settings: CatalogStargazersSettings,
     onOpenProfile: (CatalogStargazer) -> Unit,
 ) {
+    val fastScrollerConfig = remember(settings) { stargazerFastScrollerConfig(settings) }
+
     Column(Modifier.fillMaxSize()) {
         OutlinedTextField(
             value = query,
@@ -199,7 +203,8 @@ private fun StargazerList(
                 onItemClick = onOpenProfile,
                 modifier = Modifier.fillMaxSize(),
                 indexLabel = CatalogStargazer::name,
-                fastScrollerDisplayMode = OneUiFastScrollerDisplayMode.Text,
+                fastScrollerDisplayMode = fastScrollerConfig.displayMode,
+                fastScrollerAutoHide = fastScrollerConfig.autoHide,
             ) { item, selected, selectionMode ->
                 val itemIndex = profiles.indexOfFirst { it.id == item.id }
                 val section = item.name.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
