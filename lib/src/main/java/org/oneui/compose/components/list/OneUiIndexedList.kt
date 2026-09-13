@@ -1,6 +1,8 @@
 package org.oneui.compose.components.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,13 +17,21 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -39,6 +49,12 @@ data class OneUiIndexEntry(
     val label: String,
     val itemIndex: Int,
 )
+
+/** Visual representation used by [OneUiFastScroller]. */
+enum class OneUiFastScrollerDisplayMode {
+    Text,
+    Dot,
+}
 
 /**
  * Builds stable alphabet/index entries in source order.
@@ -91,11 +107,32 @@ internal fun oneUiIndexedListContentPadding(
 }
 
 /**
+ * Maps a physical pointer Y coordinate to the nearest proportional index-bar section.
+ *
+ * SESL's index scroll reacts continuously while the pointer is dragged along the rail. Keeping the
+ * mapping pure avoids gesture-state edge cases and makes clamping/invalid geometry deterministic.
+ */
+internal fun oneUiFastScrollerEntryIndex(
+    positionY: Float,
+    height: Float,
+    entryCount: Int,
+): Int? {
+    if (entryCount <= 0 || height <= 0f || !positionY.isFinite() || !height.isFinite()) return null
+    if (entryCount == 1) return 0
+
+    val fraction = (positionY / height).coerceIn(0f, 1f)
+    return (fraction * entryCount)
+        .toInt()
+        .coerceIn(0, entryCount - 1)
+}
+
+/**
  * Reusable One UI indexed list with an optional alphabet rail.
  *
  * The data/key/content contract is intentionally generic so this can back contacts, app pickers,
- * media libraries, and other SESL-style indexed collections. Selecting a rail entry animates the
- * list to that section's first item and exposes an accessibility action target for every section.
+ * media libraries, and other SESL-style indexed collections. Selecting or dragging across a rail
+ * entry animates the list to that section's first item and exposes an accessibility action target
+ * for every section.
  */
 @Composable
 fun <T, K : Any> OneUiIndexedList(
@@ -105,6 +142,8 @@ fun <T, K : Any> OneUiIndexedList(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     showFastScroller: Boolean = true,
+    fastScrollerDisplayMode: OneUiFastScrollerDisplayMode = OneUiFastScrollerDisplayMode.Text,
+    showFastScrollerPreview: Boolean = true,
     contentPadding: PaddingValues = PaddingValues(bottom = 12.dp),
     itemContent: @Composable LazyItemScope.(T) -> Unit,
 ) {
@@ -138,48 +177,132 @@ fun <T, K : Any> OneUiIndexedList(
                     scope.launch { state.animateScrollToItem(itemIndex) }
                 },
                 modifier = Modifier.align(Alignment.CenterEnd),
+                displayMode = fastScrollerDisplayMode,
+                showPreview = showFastScrollerPreview,
             )
         }
     }
 }
 
 /**
- * Compact reusable One UI index rail.
+ * Compact reusable One UI index rail with drag selection and an optional transient section preview.
  *
- * Callers decide how an index selection maps to scrolling, allowing reuse with lazy lists, grids,
- * paged data, or non-Compose containers. Each section is independently accessible.
+ * The touch rail itself remains 28dp wide so it does not steal input from list content. The preview
+ * intentionally overlays inward from the logical end edge, matching the reference index-scroll
+ * interaction without requiring callers to reserve extra layout width. Individual sections remain
+ * independently clickable and accessible for keyboard/touch-exploration users.
  */
 @Composable
 fun OneUiFastScroller(
     entries: List<OneUiIndexEntry>,
     onIndexSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    displayMode: OneUiFastScrollerDisplayMode = OneUiFastScrollerDisplayMode.Text,
+    showPreview: Boolean = true,
 ) {
-    Column(
+    var railHeightPx by remember { mutableIntStateOf(0) }
+    var activeEntryIndex by remember(entries) { mutableStateOf<Int?>(null) }
+    val activeEntry = activeEntryIndex?.let(entries::getOrNull)
+
+    Box(
         modifier = modifier
             .fillMaxHeight()
-            .width(28.dp)
-            .padding(vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly,
+            .width(84.dp),
+        contentAlignment = Alignment.CenterEnd,
     ) {
-        entries.forEach { entry ->
+        if (showPreview && activeEntry != null) {
             Box(
                 modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .semantics {
-                        contentDescription = "Scroll to ${entry.label}"
-                    }
-                    .clickable { onIndexSelected(entry.itemIndex) },
+                    .align(Alignment.CenterStart)
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(OneUiTheme.colors.surfaceElevated),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = entry.label,
-                    color = OneUiTheme.colors.accent,
-                    fontSize = 10.sp,
+                    text = activeEntry.label,
+                    color = OneUiTheme.colors.primaryText,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                 )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(28.dp)
+                .padding(vertical = 8.dp)
+                .onSizeChanged { railHeightPx = it.height }
+                .pointerInput(entries, railHeightPx) {
+                    if (entries.isEmpty() || railHeightPx <= 0) return@pointerInput
+                    var lastDragIndex: Int? = null
+
+                    fun selectAt(positionY: Float) {
+                        val index = oneUiFastScrollerEntryIndex(
+                            positionY = positionY,
+                            height = railHeightPx.toFloat(),
+                            entryCount = entries.size,
+                        ) ?: return
+                        activeEntryIndex = index
+                        if (index != lastDragIndex) {
+                            lastDragIndex = index
+                            onIndexSelected(entries[index].itemIndex)
+                        }
+                    }
+
+                    detectVerticalDragGestures(
+                        onDragStart = { offset ->
+                            lastDragIndex = null
+                            selectAt(offset.y)
+                        },
+                        onDragEnd = {
+                            lastDragIndex = null
+                            activeEntryIndex = null
+                        },
+                        onDragCancel = {
+                            lastDragIndex = null
+                            activeEntryIndex = null
+                        },
+                        onVerticalDrag = { change, _ ->
+                            selectAt(change.position.y)
+                            change.consume()
+                        },
+                    )
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly,
+        ) {
+            entries.forEachIndexed { index, entry ->
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .semantics {
+                            contentDescription = "Scroll to ${entry.label}"
+                        }
+                        .clickable {
+                            activeEntryIndex = index
+                            onIndexSelected(entry.itemIndex)
+                            activeEntryIndex = null
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when (displayMode) {
+                        OneUiFastScrollerDisplayMode.Text -> Text(
+                            text = entry.label,
+                            color = OneUiTheme.colors.accent,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        OneUiFastScrollerDisplayMode.Dot -> Box(
+                            modifier = Modifier
+                                .size(4.dp)
+                                .clip(CircleShape)
+                                .background(OneUiTheme.colors.accent),
+                        )
+                    }
+                }
             }
         }
     }
