@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
@@ -14,6 +15,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import org.junit.Rule
 import org.junit.Test
+import org.oneui.compose.components.list.OneUiFastScrollerDisplayMode
 import org.oneui.compose.theme.OneUiTheme
 
 class OneUiListPatternsTest {
@@ -51,6 +53,39 @@ class OneUiListPatternsTest {
 
         composeRule.onNodeWithText("Ada").performTouchInput { longClick() }
         composeRule.onNodeWithText("Ada").assertIsSelected()
+    }
+
+    @Test
+    fun selectableListCanExposeReusableIndexedFastScroll() {
+        val state = OneUiSelectableListState<Long>()
+        val items = listOf(
+            TestProfile(1L, "Ada", "github.com/ada"),
+            TestProfile(2L, "Grace", "github.com/grace"),
+            TestProfile(3L, "Margaret", "github.com/margaret"),
+        )
+
+        composeRule.setContent {
+            OneUiTheme(reducedMotion = true) {
+                OneUiSelectableList(
+                    items = items,
+                    state = state,
+                    key = TestProfile::id,
+                    onItemClick = {},
+                    indexLabel = TestProfile::name,
+                    fastScrollerDisplayMode = OneUiFastScrollerDisplayMode.Text,
+                ) { item, selected, selectionMode ->
+                    OneUiSelectableListItem(
+                        title = item.name,
+                        selected = selected,
+                        selectionMode = selectionMode,
+                    )
+                }
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Scroll to A").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Scroll to G").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Scroll to M").assertIsDisplayed()
     }
 
     @Test
