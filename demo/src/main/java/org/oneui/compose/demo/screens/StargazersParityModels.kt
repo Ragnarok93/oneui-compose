@@ -3,6 +3,7 @@ package org.oneui.compose.demo.screens
 import org.oneui.compose.components.list.OneUiFastScrollerDisplayMode
 import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIcons
+import org.oneui.compose.patterns.list.OneUiSelectableListState
 
 enum class CatalogActionModeSearch {
     DISMISS,
@@ -64,6 +65,15 @@ fun stargazerActionFeedback(
     selectedCount: Int,
     action: CatalogStargazerAction,
 ): String = "$selectedCount contacts selected for ${action.label}"
+
+fun <K> executeStargazerAction(
+    selectionState: OneUiSelectableListState<K>,
+    action: CatalogStargazerAction,
+): String {
+    val feedback = stargazerActionFeedback(selectionState.selectedCount, action)
+    selectionState.clear()
+    return feedback
+}
 
 data class StargazerFastScrollerConfig(
     val displayMode: OneUiFastScrollerDisplayMode,
