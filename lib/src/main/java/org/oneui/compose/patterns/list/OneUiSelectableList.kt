@@ -45,6 +45,7 @@ fun <T, K : Any> OneUiSelectableList(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     indexLabel: ((T) -> String)? = null,
     fastScrollerDisplayMode: OneUiFastScrollerDisplayMode = OneUiFastScrollerDisplayMode.Text,
+    fastScrollerAutoHide: Boolean = false,
     itemContent: @Composable (item: T, selected: Boolean, selectionMode: Boolean) -> Unit,
 ) {
     OneUiIndexedList(
@@ -54,6 +55,7 @@ fun <T, K : Any> OneUiSelectableList(
         modifier = modifier,
         showFastScroller = indexLabel != null,
         fastScrollerDisplayMode = fastScrollerDisplayMode,
+        fastScrollerAutoHide = fastScrollerAutoHide,
         contentPadding = contentPadding,
     ) { item ->
         val itemKey = key(item)
