@@ -1,5 +1,7 @@
 package org.oneui.compose.demo.screens
 
+import org.oneui.compose.components.list.OneUiFastScrollerDisplayMode
+
 enum class CatalogActionModeSearch {
     DISMISS,
     NO_DISMISS,
@@ -20,6 +22,15 @@ data class CatalogStargazersSettings(
         const val ActionModeSearchLabel = "ActionModeSearch options"
     }
 }
+
+fun stargazerFastScrollerDisplayMode(
+    settings: CatalogStargazersSettings,
+): OneUiFastScrollerDisplayMode =
+    if (settings.showIndexLetters) {
+        OneUiFastScrollerDisplayMode.Text
+    } else {
+        OneUiFastScrollerDisplayMode.Dot
+    }
 
 enum class CatalogStargazersFetchState {
     NOT_INIT,
