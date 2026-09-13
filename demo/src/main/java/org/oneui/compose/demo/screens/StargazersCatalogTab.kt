@@ -37,9 +37,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.oneui.compose.components.buttons.OneUiTextButton
+import org.oneui.compose.components.list.OneUiFastScrollerDisplayMode
 import org.oneui.compose.components.qrcode.OneUiQrCode
 import org.oneui.compose.icons.OneUiAnimatedIcons
 import org.oneui.compose.icons.OneUiIcon
@@ -197,6 +199,8 @@ private fun StargazerList(
                 key = CatalogStargazer::id,
                 onItemClick = onOpenProfile,
                 modifier = Modifier.fillMaxSize(),
+                indexLabel = CatalogStargazer::name,
+                fastScrollerDisplayMode = OneUiFastScrollerDisplayMode.Text,
             ) { item, selected, selectionMode ->
                 val itemIndex = profiles.indexOfFirst { it.id == item.id }
                 val section = item.name.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
@@ -266,10 +270,14 @@ private fun StargazerActionModeBar(selectionState: OneUiSelectableListState<Long
 }
 
 @Composable
-private fun StargazerAvatar(profile: CatalogStargazer) {
+private fun StargazerAvatar(
+    profile: CatalogStargazer,
+    modifier: Modifier = Modifier,
+    size: Dp = 48.dp,
+) {
     Box(
-        modifier = Modifier
-            .size(48.dp)
+        modifier = modifier
+            .size(size)
             .clip(CircleShape)
             .background(OneUiTheme.colors.accent.copy(alpha = 0.14f)),
         contentAlignment = Alignment.Center,
@@ -282,7 +290,7 @@ private fun StargazerAvatar(profile: CatalogStargazer) {
                 .joinToString(""),
             color = OneUiTheme.colors.accent,
             fontWeight = FontWeight.Bold,
-            fontSize = 15.sp,
+            fontSize = if (size >= 96.dp) 28.sp else 15.sp,
         )
     }
 }
@@ -330,7 +338,13 @@ private fun StargazerProfile(
                 OneUiProfileDetail("Bio", profile.bio),
             ),
             modifier = Modifier.padding(top = 12.dp, bottom = 28.dp),
-            avatar = { StargazerAvatar(profile) },
+            avatar = {
+                StargazerAvatar(
+                    profile = profile,
+                    modifier = Modifier.testTag("stargazer-profile-avatar"),
+                    size = 100.dp,
+                )
+            },
             actions = {
                 OneUiProfileAction(
                     label = "Share",
