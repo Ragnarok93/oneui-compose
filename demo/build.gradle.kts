@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.preview)
 
+    testImplementation(libs.junit)
+
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
 
