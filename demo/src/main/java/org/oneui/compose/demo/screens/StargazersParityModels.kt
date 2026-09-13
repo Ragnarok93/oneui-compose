@@ -23,6 +23,30 @@ data class CatalogStargazersSettings(
     }
 }
 
+data class CatalogStargazersOptionsState(
+    val committed: CatalogStargazersSettings,
+    val draft: CatalogStargazersSettings = committed,
+    val isOpen: Boolean = false,
+) {
+    fun open(): CatalogStargazersOptionsState = copy(
+        draft = committed,
+        isOpen = true,
+    )
+
+    fun updateDraft(settings: CatalogStargazersSettings): CatalogStargazersOptionsState =
+        copy(draft = settings)
+
+    fun cancel(): CatalogStargazersOptionsState = copy(
+        draft = committed,
+        isOpen = false,
+    )
+
+    fun apply(): CatalogStargazersOptionsState = copy(
+        committed = draft,
+        isOpen = false,
+    )
+}
+
 data class StargazerFastScrollerConfig(
     val displayMode: OneUiFastScrollerDisplayMode,
     val autoHide: Boolean,
