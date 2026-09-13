@@ -23,6 +23,11 @@ data class CatalogStargazersSettings(
     }
 }
 
+data class StargazerFastScrollerConfig(
+    val displayMode: OneUiFastScrollerDisplayMode,
+    val autoHide: Boolean,
+)
+
 fun stargazerFastScrollerDisplayMode(
     settings: CatalogStargazersSettings,
 ): OneUiFastScrollerDisplayMode =
@@ -31,6 +36,13 @@ fun stargazerFastScrollerDisplayMode(
     } else {
         OneUiFastScrollerDisplayMode.Dot
     }
+
+fun stargazerFastScrollerConfig(
+    settings: CatalogStargazersSettings,
+): StargazerFastScrollerConfig = StargazerFastScrollerConfig(
+    displayMode = stargazerFastScrollerDisplayMode(settings),
+    autoHide = settings.autoHideIndexScroll,
+)
 
 enum class CatalogStargazersFetchState {
     NOT_INIT,
