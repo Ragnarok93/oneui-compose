@@ -65,6 +65,11 @@ object OneUiMotion {
         const val SelectionUncheckFirstStroke = 120
         const val SelectionUncheckSecondStroke = 59
         const val SelectionUncheck = 199
+
+        /** SeslIndexScrollView thumb alpha transition. */
+        const val FastScrollerFade = 150
+        /** SeslIndexScrollView thumb position animation. */
+        const val FastScrollerPosition = 300
     }
 
     object Delay {
@@ -76,6 +81,9 @@ object OneUiMotion {
 
         /** The reference unchecking second path starts at 140 ms. */
         const val SelectionUncheckSecondStroke = 140
+
+        /** SeslIndexScrollView waits this long after idle before fading the scroll affordance. */
+        const val FastScrollerAutoHide = 500
     }
 
     fun <T> press(): FiniteAnimationSpec<T> =
@@ -165,4 +173,12 @@ object OneUiMotion {
 
     fun <T> menuAlpha(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.MenuAlpha, easing = OneUiEasing.SeslSineInOut80)
+
+    /** SeslIndexScrollView fades its thumb linearly over 150 ms. */
+    fun <T> fastScrollerFade(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.FastScrollerFade, easing = OneUiEasing.Linear)
+
+    /** SeslIndexScrollView moves its thumb with SINE_OUT_70 over 300 ms. */
+    fun <T> fastScrollerPosition(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.FastScrollerPosition, easing = OneUiEasing.SeslSineOut70)
 }

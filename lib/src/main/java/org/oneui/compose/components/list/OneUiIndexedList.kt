@@ -1,5 +1,6 @@
 package org.oneui.compose.components.list
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -40,7 +42,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.oneui.compose.motion.OneUiMotion
 import org.oneui.compose.theme.OneUiTheme
 
 /** A fast-scroll section label and the first backing item that belongs to it. */
@@ -144,6 +148,7 @@ fun <T, K : Any> OneUiIndexedList(
     showFastScroller: Boolean = true,
     fastScrollerDisplayMode: OneUiFastScrollerDisplayMode = OneUiFastScrollerDisplayMode.Text,
     showFastScrollerPreview: Boolean = true,
+    fastScrollerAutoHide: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(bottom = 12.dp),
     itemContent: @Composable LazyItemScope.(T) -> Unit,
 ) {
@@ -179,6 +184,8 @@ fun <T, K : Any> OneUiIndexedList(
                 modifier = Modifier.align(Alignment.CenterEnd),
                 displayMode = fastScrollerDisplayMode,
                 showPreview = showFastScrollerPreview,
+                autoHide = fastScrollerAutoHide,
+                listScrollInProgress = state.isScrollInProgress,
             )
         }
     }
@@ -191,6 +198,10 @@ fun <T, K : Any> OneUiIndexedList(
  * intentionally overlays inward from the logical end edge, matching the reference index-scroll
  * interaction without requiring callers to reserve extra layout width. Individual sections remain
  * independently clickable and accessible for keyboard/touch-exploration users.
+ *
+ * When [autoHide] is enabled, the rail follows the SESL index-scroll timing: it remains visible
+ * while the list or rail is active, waits 500 ms after becoming idle, then fades linearly over
+ * 150 ms. Reduced-motion mode keeps the timing contract but snaps the alpha change.
  */
 @Composable
 fun OneUiFastScroller(
@@ -199,15 +210,47 @@ fun OneUiFastScroller(
     modifier: Modifier = Modifier,
     displayMode: OneUiFastScrollerDisplayMode = OneUiFastScrollerDisplayMode.Text,
     showPreview: Boolean = true,
+    autoHide: Boolean = false,
+    listScrollInProgress: Boolean = false,
 ) {
     var railHeightPx by remember { mutableIntStateOf(0) }
     var activeEntryIndex by remember(entries) { mutableStateOf<Int?>(null) }
+    var interactionGeneration by remember { mutableIntStateOf(0) }
     val activeEntry = activeEntryIndex?.let(entries::getOrNull)
+    val reducedMotion = OneUiTheme.reducedMotion
+    val railAlpha = remember(autoHide) { Animatable(1f) }
+
+    LaunchedEffect(
+        autoHide,
+        listScrollInProgress,
+        activeEntryIndex,
+        interactionGeneration,
+        reducedMotion,
+    ) {
+        if (!autoHide) {
+            railAlpha.snapTo(1f)
+            return@LaunchedEffect
+        }
+
+        railAlpha.snapTo(1f)
+        if (!listScrollInProgress && activeEntryIndex == null) {
+            delay(OneUiMotion.Delay.FastScrollerAutoHide.toLong())
+            if (reducedMotion) {
+                railAlpha.snapTo(0f)
+            } else {
+                railAlpha.animateTo(
+                    targetValue = 0f,
+                    animationSpec = OneUiMotion.fastScrollerFade(),
+                )
+            }
+        }
+    }
 
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .width(84.dp),
+            .width(84.dp)
+            .alpha(railAlpha.value),
         contentAlignment = Alignment.CenterEnd,
     ) {
         if (showPreview && activeEntry != null) {
@@ -253,14 +296,17 @@ fun OneUiFastScroller(
 
                     detectVerticalDragGestures(
                         onDragStart = { offset ->
+                            interactionGeneration++
                             lastDragIndex = null
                             selectAt(offset.y)
                         },
                         onDragEnd = {
+                            interactionGeneration++
                             lastDragIndex = null
                             activeEntryIndex = null
                         },
                         onDragCancel = {
+                            interactionGeneration++
                             lastDragIndex = null
                             activeEntryIndex = null
                         },
@@ -282,6 +328,7 @@ fun OneUiFastScroller(
                             contentDescription = "Scroll to ${entry.label}"
                         }
                         .clickable {
+                            interactionGeneration++
                             activeEntryIndex = index
                             onIndexSelected(entry.itemIndex)
                             activeEntryIndex = null
