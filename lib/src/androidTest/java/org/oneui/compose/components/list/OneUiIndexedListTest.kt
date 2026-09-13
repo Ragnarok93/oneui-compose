@@ -39,4 +39,23 @@ class OneUiIndexedListTest {
         composeRule.onNodeWithText("Alpha").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Scroll to B").assertIsDisplayed()
     }
+
+    @Test
+    fun indexedListCanEnableSeslStyleAutoHideForFastScroller() {
+        composeRule.setContent {
+            OneUiTheme(reducedMotion = true) {
+                OneUiIndexedList(
+                    items = listOf("Alpha", "Beta", "Charlie"),
+                    key = { it },
+                    label = { it },
+                    modifier = Modifier.height(220.dp),
+                    fastScrollerAutoHide = true,
+                ) { item ->
+                    Text(item)
+                }
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Scroll to A").assertExists()
+    }
 }
