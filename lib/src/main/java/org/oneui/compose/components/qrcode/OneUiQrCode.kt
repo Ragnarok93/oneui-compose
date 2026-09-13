@@ -26,6 +26,38 @@ enum class OneUiQrErrorCorrection {
 }
 
 /**
+ * Immutable QR module matrix shared by Compose rendering and platform export paths.
+ *
+ * The encoder-specific ZXing matrix type remains internal so callers only depend on a compact
+ * square boolean grid that can be rendered to Canvas, Bitmap, ImageBitmap, or other targets.
+ */
+@Immutable
+class OneUiQrMatrix internal constructor(
+    val size: Int,
+    private val cells: BooleanArray,
+) {
+    operator fun get(x: Int, y: Int): Boolean = cells[y * size + x]
+}
+
+/**
+ * Encodes [data] into the same QR matrix used by [OneUiQrCode].
+ *
+ * Empty data intentionally returns `null`, matching the composable's empty-state behavior.
+ */
+fun oneUiQrMatrix(
+    data: String,
+    errorCorrection: OneUiQrErrorCorrection = OneUiQrErrorCorrection.Medium,
+    quietZoneModules: Int = 4,
+): OneUiQrMatrix? {
+    require(quietZoneModules >= 0) { "quietZoneModules must be non-negative" }
+    return if (data.isEmpty()) {
+        null
+    } else {
+        encodeMatrix(data, errorCorrection, quietZoneModules)
+    }
+}
+
+/**
  * Compose-native, scannable QR-code surface.
  *
  * Encoding is delegated to the Apache-2.0 ZXing core library; rendering remains Compose Canvas
@@ -42,10 +74,8 @@ fun OneUiQrCode(
     quietZoneModules: Int = 4,
     contentDescription: String = "QR code",
 ) {
-    require(quietZoneModules >= 0) { "quietZoneModules must be non-negative" }
-
     val matrix = remember(data, errorCorrection, quietZoneModules) {
-        if (data.isEmpty()) null else encodeMatrix(data, errorCorrection, quietZoneModules)
+        oneUiQrMatrix(data, errorCorrection, quietZoneModules)
     }
 
     Canvas(
@@ -78,19 +108,11 @@ fun OneUiQrCode(
     }
 }
 
-@Immutable
-private class QrMatrix(
-    val size: Int,
-    private val cells: BooleanArray,
-) {
-    operator fun get(x: Int, y: Int): Boolean = cells[y * size + x]
-}
-
 private fun encodeMatrix(
     data: String,
     errorCorrection: OneUiQrErrorCorrection,
     quietZoneModules: Int,
-): QrMatrix {
+): OneUiQrMatrix {
     val level = when (errorCorrection) {
         OneUiQrErrorCorrection.Low -> ErrorCorrectionLevel.L
         OneUiQrErrorCorrection.Medium -> ErrorCorrectionLevel.M
@@ -114,5 +136,5 @@ private fun encodeMatrix(
             cells[y * side + x] = matrix[x, y]
         }
     }
-    return QrMatrix(side, cells)
+    return OneUiQrMatrix(side, cells)
 }
