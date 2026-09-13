@@ -1,5 +1,6 @@
 package org.oneui.compose.components
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -28,5 +29,34 @@ class OneUiAccessibilityTest {
         composeRule
             .onNodeWithContentDescription("Search")
             .assertHasClickAction()
+    }
+
+    @Test
+    fun profileActionIcons_areAvailableThroughStableCatalog() {
+        composeRule.setContent {
+            OneUiTheme {
+                Row {
+                    OneUiIconButton(
+                        icon = OneUiIcons.Website,
+                        contentDescription = "Website",
+                        onClick = {},
+                    )
+                    OneUiIconButton(
+                        icon = OneUiIcons.Email,
+                        contentDescription = "Email",
+                        onClick = {},
+                    )
+                    OneUiIconButton(
+                        icon = OneUiIcons.QrCode,
+                        contentDescription = "QR code",
+                        onClick = {},
+                    )
+                }
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Website").assertHasClickAction()
+        composeRule.onNodeWithContentDescription("Email").assertHasClickAction()
+        composeRule.onNodeWithContentDescription("QR code").assertHasClickAction()
     }
 }
