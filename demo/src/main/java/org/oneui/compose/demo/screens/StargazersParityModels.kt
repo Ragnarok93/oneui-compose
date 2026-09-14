@@ -137,6 +137,16 @@ fun stargazerProfileActions(profile: CatalogStargazer): List<CatalogStargazerPro
         if (!profile.blog.isNullOrEmpty()) add(CatalogStargazerProfileAction.Blog)
     }
 
+fun stargazerProfileActionTarget(
+    profile: CatalogStargazer,
+    action: CatalogStargazerProfileAction,
+): String? = when (action) {
+    CatalogStargazerProfileAction.GitHub -> profile.url
+    CatalogStargazerProfileAction.X -> profile.twitterUsername?.let { "https://x.com/$it" }
+    CatalogStargazerProfileAction.Email -> profile.email?.let { "mailto:$it" }
+    CatalogStargazerProfileAction.Blog -> profile.blog?.takeIf(String::isNotBlank)
+}
+
 fun stargazerVCardFileName(profile: CatalogStargazer): String =
     "stargazer_${profile.id}_${profile.name}.vcf"
 
