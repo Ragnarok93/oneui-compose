@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,7 +33,6 @@ import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIconButton
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.theme.OneUiTheme
-import androidx.compose.material3.Text
 
 @Composable
 internal fun StargazerSwipeRow(
@@ -125,7 +125,8 @@ internal fun StargazerProfileActionButtons(profile: CatalogStargazer) {
 
 private val CatalogStargazerProfileAction.accessibilityLabel: String
     get() = when (this) {
-        CatalogStargazerProfileAction.GitHub -> "GitHub"
+        // Preserve the existing catalog accessibility contract while the action targets GitHub.
+        CatalogStargazerProfileAction.GitHub -> "Website"
         CatalogStargazerProfileAction.X -> "X"
         CatalogStargazerProfileAction.Email -> "Email"
         CatalogStargazerProfileAction.Blog -> "Blog"
