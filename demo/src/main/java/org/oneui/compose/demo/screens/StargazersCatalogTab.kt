@@ -1,7 +1,5 @@
 package org.oneui.compose.demo.screens
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,7 +68,20 @@ data class CatalogStargazer(
 
 /** Stable local dataset keeps the catalog useful offline and deterministic under UI tests. */
 val StargazersCatalogSamples: List<CatalogStargazer> = listOf(
-    CatalogStargazer(1, "Ada Lovelace", "ada", "https://example.com/profiles/ada", "London, UK", "Analytical Engine", "ada@example.com", "Mathematics and early computing"),
+    CatalogStargazer(
+        id = 1,
+        name = "Ada Lovelace",
+        login = "ada",
+        url = "https://example.com/profiles/ada",
+        location = "London, UK",
+        company = "Analytical Engine",
+        email = "ada@example.com",
+        bio = "Mathematics and early computing",
+        twitterUsername = "ada_lovelace",
+        blog = "https://ada.example.com",
+        organizationsUrl = "https://example.com/profiles/ada/organizations",
+        starredRepos = setOf("oneui-compose", "oneui-design"),
+    ),
     CatalogStargazer(2, "Alan Turing", "alan", "https://example.com/profiles/alan", "Manchester, UK", "Computing Laboratory", "alan@example.com", "Computability and cryptanalysis"),
     CatalogStargazer(3, "Barbara Liskov", "barbara", "https://example.com/profiles/barbara", "Cambridge, MA", "Distributed Systems", "barbara@example.com", "Programming languages and abstraction"),
     CatalogStargazer(4, "Donald Knuth", "donald", "https://example.com/profiles/donald", "Stanford, CA", "Computer Science", "donald@example.com", "Algorithms and typesetting"),
@@ -93,6 +104,7 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
     var query by rememberSaveable { mutableStateOf("") }
     var profile by remember { mutableStateOf<CatalogStargazer?>(null) }
     var qrProfile by remember { mutableStateOf<CatalogStargazer?>(null) }
+    var swipeFeedback by remember { mutableStateOf<CatalogStargazerSwipeFeedback?>(null) }
 
     val visibleProfiles = remember(query) {
         val needle = query.trim()
@@ -122,6 +134,7 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
                 settings = optionsState.committed,
                 onOpenProfile = { profile = it },
                 onOpenOptions = { optionsState = optionsState.open() },
+                onSwipeFeedback = { swipeFeedback = it },
             )
         } else {
             StargazerProfile(
@@ -130,6 +143,12 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
                 onShowQr = { qrProfile = currentProfile },
             )
         }
+
+        StargazerSwipeFeedbackHost(
+            feedback = swipeFeedback,
+            onDismiss = { swipeFeedback = null },
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
     }
 
     qrProfile?.let { selected ->
@@ -154,6 +173,7 @@ private fun StargazerList(
     settings: CatalogStargazersSettings,
     onOpenProfile: (CatalogStargazer) -> Unit,
     onOpenOptions: () -> Unit,
+    onSwipeFeedback: (CatalogStargazerSwipeFeedback) -> Unit,
 ) {
     val fastScrollerConfig = remember(settings) { stargazerFastScrollerConfig(settings) }
 
@@ -253,13 +273,20 @@ private fun StargazerList(
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
-                    OneUiSelectableListItem(
-                        title = item.name,
-                        subtitle = item.url,
-                        selected = selected,
-                        selectionMode = selectionMode,
-                        leadingContent = { StargazerAvatar(item) },
-                    )
+                    StargazerSwipeRow(
+                        profile = item,
+                        enabled = !selectionMode,
+                        onFeedback = onSwipeFeedback,
+                        modifier = Modifier.testTag("stargazer-row-${item.id}"),
+                    ) {
+                        OneUiSelectableListItem(
+                            title = item.name,
+                            subtitle = item.url,
+                            selected = selected,
+                            selectionMode = selectionMode,
+                            leadingContent = { StargazerAvatar(item) },
+                        )
+                    }
                     HorizontalDivider(
                         modifier = Modifier.padding(start = 78.dp),
                         color = OneUiTheme.colors.divider,
@@ -392,18 +419,7 @@ private fun StargazerProfile(
                     )
                 },
                 actions = {
-                    OneUiIconButton(
-                        icon = OneUiIcons.Website,
-                        contentDescription = "Website",
-                        onClick = { openWebsite(context, profile.url) },
-                    )
-                    profile.email?.let { email ->
-                        OneUiIconButton(
-                            icon = OneUiIcons.Email,
-                            contentDescription = "Email",
-                            onClick = { emailProfile(context, email) },
-                        )
-                    }
+                    StargazerProfileActionButtons(profile)
                 },
             )
         }
@@ -431,7 +447,7 @@ private fun StargazerProfile(
                 StargazerBottomAction(
                     label = "Share",
                     icon = OneUiIcons.Share,
-                    onClick = { shareProfile(context, profile) },
+                    onClick = { shareStargazerVCard(context, profile) },
                 )
             }
         }
@@ -504,28 +520,11 @@ private fun StargazerQrSheet(
                 contentDescription = "QR code for ${profile.name}",
             )
             OneUiTextButton(
-                onClick = { shareProfile(context, profile) },
+                onClick = { shareStargazerVCard(context, profile) },
                 modifier = Modifier.padding(top = 12.dp, bottom = 12.dp),
             ) {
                 Text("Share profile")
             }
         }
     }
-}
-
-private fun openWebsite(context: android.content.Context, url: String) {
-    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-}
-
-private fun emailProfile(context: android.content.Context, email: String) {
-    context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email, null)))
-}
-
-private fun shareProfile(context: android.content.Context, profile: CatalogStargazer) {
-    val intent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_SUBJECT, profile.name)
-        putExtra(Intent.EXTRA_TEXT, profile.url)
-    }
-    context.startActivity(Intent.createChooser(intent, "Share profile"))
 }
