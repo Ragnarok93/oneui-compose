@@ -150,20 +150,13 @@ internal fun openStargazerProfileAction(
     profile: CatalogStargazer,
     action: CatalogStargazerProfileAction,
 ) {
-    when (action) {
-        CatalogStargazerProfileAction.GitHub -> openExternalUri(context, profile.url)
-        CatalogStargazerProfileAction.X -> profile.twitterUsername?.let {
-            openExternalUri(context, "https://x.com/$it")
-        }
-        CatalogStargazerProfileAction.Email -> profile.email?.let {
-            context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", it, null)))
-        }
-        CatalogStargazerProfileAction.Blog -> profile.blog?.let { openExternalUri(context, it) }
+    val target = stargazerProfileActionTarget(profile, action) ?: return
+    val intentAction = if (action == CatalogStargazerProfileAction.Email) {
+        Intent.ACTION_SENDTO
+    } else {
+        Intent.ACTION_VIEW
     }
-}
-
-private fun openExternalUri(context: Context, url: String) {
-    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    context.startActivity(Intent(intentAction, Uri.parse(target)))
 }
 
 internal fun shareStargazerVCard(context: Context, profile: CatalogStargazer) {
