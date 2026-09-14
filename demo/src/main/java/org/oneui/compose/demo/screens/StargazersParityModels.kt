@@ -77,9 +77,12 @@ fun <K> executeStargazerAction(
 }
 
 /** Physical swipe actions used by the pinned Stargazers reference. */
-enum class CatalogStargazerSwipeAction {
-    Call,
-    Message,
+enum class CatalogStargazerSwipeAction(
+    val label: String,
+    val containerArgb: Int,
+) {
+    Call("Call", 0xFF11A85F.toInt()),
+    Message("Message", 0xFF31A5F3.toInt()),
 }
 
 /**
@@ -91,6 +94,32 @@ fun stargazerSwipeAction(direction: OneUiSwipeDirection): CatalogStargazerSwipeA
         OneUiSwipeDirection.Left -> CatalogStargazerSwipeAction.Message
         OneUiSwipeDirection.None -> null
     }
+
+data class CatalogStargazerSwipeFeedback(
+    val message: String,
+    val indeterminate: Boolean,
+    val dismissAfterMillis: Long?,
+    val progressStepDelayMillis: Long?,
+)
+
+fun stargazerSwipeFeedback(
+    action: CatalogStargazerSwipeAction,
+    name: String,
+): CatalogStargazerSwipeFeedback = when (action) {
+    CatalogStargazerSwipeAction.Call -> CatalogStargazerSwipeFeedback(
+        message = "Calling $name...",
+        indeterminate = true,
+        dismissAfterMillis = 4_000L,
+        progressStepDelayMillis = null,
+    )
+
+    CatalogStargazerSwipeAction.Message -> CatalogStargazerSwipeFeedback(
+        message = "Sending message to $name...",
+        indeterminate = false,
+        dismissAfterMillis = null,
+        progressStepDelayMillis = 50L,
+    )
+}
 
 /** Profile header actions in the same visual order as view_stargazer_buttons.xml. */
 enum class CatalogStargazerProfileAction {
@@ -107,6 +136,9 @@ fun stargazerProfileActions(profile: CatalogStargazer): List<CatalogStargazerPro
         if (profile.email != null) add(CatalogStargazerProfileAction.Email)
         if (!profile.blog.isNullOrEmpty()) add(CatalogStargazerProfileAction.Blog)
     }
+
+fun stargazerVCardFileName(profile: CatalogStargazer): String =
+    "stargazer_${profile.id}_${profile.name}.vcf"
 
 /** Source-derived vCard payload used by the reference profile sharing flow. */
 fun stargazerVCardContent(profile: CatalogStargazer): String = buildString {
