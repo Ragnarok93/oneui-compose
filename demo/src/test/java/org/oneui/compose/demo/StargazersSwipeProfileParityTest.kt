@@ -9,6 +9,7 @@ import org.oneui.compose.components.list.OneUiSwipeDirection
 import org.oneui.compose.demo.screens.CatalogStargazer
 import org.oneui.compose.demo.screens.CatalogStargazerProfileAction
 import org.oneui.compose.demo.screens.CatalogStargazerSwipeAction
+import org.oneui.compose.demo.screens.stargazerProfileActionTarget
 import org.oneui.compose.demo.screens.stargazerProfileActions
 import org.oneui.compose.demo.screens.stargazerSwipeAction
 import org.oneui.compose.demo.screens.stargazerSwipeFeedback
@@ -74,11 +75,19 @@ class StargazersSwipeProfileParityTest {
             stargazerProfileActions(profile),
         )
 
+        assertEquals("https://github.com/ada", stargazerProfileActionTarget(profile, CatalogStargazerProfileAction.GitHub))
+        assertEquals("https://x.com/ada_lovelace", stargazerProfileActionTarget(profile, CatalogStargazerProfileAction.X))
+        assertEquals("mailto:ada@example.com", stargazerProfileActionTarget(profile, CatalogStargazerProfileAction.Email))
+        assertEquals("https://ada.example.com", stargazerProfileActionTarget(profile, CatalogStargazerProfileAction.Blog))
+
         val sparse = profile.copy(email = null, twitterUsername = null, blog = "")
         assertEquals(
             listOf(CatalogStargazerProfileAction.GitHub),
             stargazerProfileActions(sparse),
         )
+        assertNull(stargazerProfileActionTarget(sparse, CatalogStargazerProfileAction.X))
+        assertNull(stargazerProfileActionTarget(sparse, CatalogStargazerProfileAction.Email))
+        assertNull(stargazerProfileActionTarget(sparse, CatalogStargazerProfileAction.Blog))
     }
 
     @Test
