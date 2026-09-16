@@ -1,33 +1,34 @@
 package org.oneui.compose.demo
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.oneui.compose.demo.screens.RecyclerViewCatalogTab
+import org.oneui.compose.demo.screens.StargazersCatalogTab
+import org.oneui.compose.theme.OneUiTheme
 
 class StargazersSwipeUiParityTest {
     @get:Rule
-    val composeRule = createAndroidComposeRule<CatalogActivity>()
+    val composeRule = createComposeRule()
 
-    private fun openStargazers() {
-        composeRule.onNodeWithContentDescription("Open navigation").performClick()
-        composeRule.onNodeWithText(CatalogDestination.RecyclerViews.label).performClick()
-        composeRule.onNodeWithText(RecyclerViewCatalogTab.Stargazers.label).performClick()
-        composeRule.onNodeWithTag(RecyclerViewCatalogTab.Stargazers.testTag).assertIsDisplayed()
+    @Before
+    fun setUp() {
+        composeRule.setContent {
+            OneUiTheme {
+                StargazersCatalogTab()
+            }
+        }
     }
 
     @Test
     fun physicalSwipesExposeReferenceCallAndMessageFeedback() {
-        openStargazers()
-
+        composeRule.onNodeWithTag("stargazer-row-1").assertIsDisplayed()
         composeRule.onNodeWithTag("stargazer-row-1").performTouchInput { swipeRight() }
         composeRule.onNodeWithTag("stargazer-swipe-feedback").assertIsDisplayed()
         composeRule.onNodeWithText("Calling Ada Lovelace...").assertIsDisplayed()
