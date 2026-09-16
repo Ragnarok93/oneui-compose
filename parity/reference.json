@@ -8,7 +8,7 @@
     {"id":"pickers","label":"Pickers","publicApi":"OneUi picker family","demoTag":"catalog-pickers","status":"missing"},
     {"id":"qr-codes","label":"QRCodes","publicApi":"OneUiQrCode","demoTag":"catalog-qr-codes","status":"missing"},
     {"id":"navigation","label":"Navigation","publicApi":"OneUi navigation family","demoTag":"catalog-navigation","status":"missing"},
-    {"id":"recycler-views","label":"RecyclerViews","publicApi":"OneUi list patterns","demoTag":"catalog-recycler-views","status":"in_progress"},
+    {"id":"recycler-views","label":"RecyclerViews","publicApi":"OneUi list patterns","demoTag":"catalog-recycler-views","status":"done"},
     {"id":"misc-widgets","label":"Misc. Widgets","publicApi":"OneUi widget family","demoTag":"catalog-misc-widgets","status":"in_progress"},
     {"id":"custom-about","label":"Custom About","publicApi":"OneUiCustomAbout","demoTag":"catalog-custom-about","status":"missing"},
     {"id":"preferences","label":"Preferences","publicApi":"OneUi preference family","demoTag":"catalog-preferences","status":"missing"},
@@ -16,8 +16,8 @@
   ],
   "nested": [
     {"id":"icons","parent":"recycler-views","label":"Icons","publicApi":"OneUiDrawableCatalog","demoTag":"catalog-icons","status":"done"},
-    {"id":"stargazers","parent":"recycler-views","label":"Stargazers","publicApi":"OneUiProfile + OneUiSelectableList","demoTag":"catalog-stargazers","status":"in_progress"},
-    {"id":"apps","parent":"recycler-views","label":"Apps","publicApi":"OneUiAppPicker","demoTag":"catalog-apps","status":"missing"},
+    {"id":"stargazers","parent":"recycler-views","label":"Stargazers","publicApi":"OneUiProfile + OneUiSelectableList","demoTag":"catalog-stargazers","status":"done"},
+    {"id":"apps","parent":"recycler-views","label":"Apps","publicApi":"OneUiAppPicker","demoTag":"catalog-apps","status":"done"},
     {"id":"popup-menu","parent":"app-shell","label":"Pop-up Menu","publicApi":"OneUiMenu","demoTag":"catalog-popup-menu","status":"missing"},
     {"id":"search-mode","parent":"app-shell","label":"Search mode","publicApi":"OneUiSearchMode","demoTag":"catalog-search-mode","status":"missing"},
     {"id":"action-mode","parent":"app-shell","label":"Action mode","publicApi":"OneUiActionMode","demoTag":"catalog-action-mode","status":"missing"}
@@ -64,8 +64,8 @@
     {"id":"widget-switch-bar-progress","route":"misc-widgets","status":"missing"},
     {"id":"widget-suggest-appbar","route":"misc-widgets","status":"missing"},
     {"id":"icons-search-selection-action-mode","route":"recycler-views","status":"done"},
-    {"id":"stargazer-list-profile-qr-share","route":"recycler-views","status":"in_progress"},
-    {"id":"apps-seven-list-types","route":"recycler-views","status":"missing"},
+    {"id":"stargazer-list-profile-qr-share","route":"recycler-views","status":"done"},
+    {"id":"apps-seven-list-types","route":"recycler-views","status":"done"},
     {"id":"preferences-complete-reference-xml","route":"preferences","status":"missing"},
     {"id":"about-app-info","route":"about","status":"missing"},
     {"id":"custom-about-collapsing-adaptive","route":"custom-about","status":"missing"}
