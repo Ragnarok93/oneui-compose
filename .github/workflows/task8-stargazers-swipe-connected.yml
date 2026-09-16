@@ -1,0 +1,32 @@
+name: Task 8 Stargazers swipe connected test
+
+on:
+  push:
+    branches:
+      - feature/oneui8-compose-components
+  workflow_dispatch:
+
+jobs:
+  stargazers-swipe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run Stargazers swipe UI parity test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: ./gradlew :demo:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=org.oneui.compose.demo.StargazersSwipeUiParityTest --stacktrace
