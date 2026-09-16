@@ -28,12 +28,12 @@ class StargazersSwipeUiParityTest {
 
     @Test
     fun physicalSwipesExposeReferenceCallAndMessageFeedback() {
-        composeRule.onNodeWithTag("stargazer-row-1").assertIsDisplayed()
-        composeRule.onNodeWithTag("stargazer-row-1").performTouchInput { swipeRight() }
+        composeRule.onNodeWithTag("stargazer-row-1", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag("stargazer-row-1", useUnmergedTree = true).performTouchInput { swipeRight() }
         composeRule.onNodeWithTag("stargazer-swipe-feedback").assertIsDisplayed()
         composeRule.onNodeWithText("Calling Ada Lovelace...").assertIsDisplayed()
 
-        composeRule.onNodeWithTag("stargazer-row-2").performTouchInput { swipeLeft() }
+        composeRule.onNodeWithTag("stargazer-row-2", useUnmergedTree = true).performTouchInput { swipeLeft() }
         composeRule.onNodeWithTag("stargazer-swipe-feedback").assertIsDisplayed()
         composeRule.onNodeWithText("Sending message to Alan Turing...").assertIsDisplayed()
     }
