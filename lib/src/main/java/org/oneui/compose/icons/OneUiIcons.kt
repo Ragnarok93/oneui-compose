@@ -23,7 +23,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathParser
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -142,9 +144,9 @@ fun OneUiIcon(
     when (icon) {
         is OneUiIcon.Resource -> {
             val context = LocalContext.current
-            val configuration = context.resources.configuration
-            val density = context.resources.displayMetrics.density
-            val painter = remember(icon.id, configuration.densityDpi, configuration.uiMode) {
+            val configuration = LocalConfiguration.current
+            val density = LocalDensity.current.density
+            val painter = remember(icon.id, configuration.densityDpi, configuration.uiMode, density) {
                 val drawable = requireNotNull(ContextCompat.getDrawable(context, icon.id)) {
                     "Unable to resolve One UI drawable resource ${icon.id}"
                 }
