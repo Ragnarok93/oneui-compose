@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import org.oneui.compose.demo.screens.ParityStatusScreen
 import org.oneui.compose.demo.screens.PickersScreen
 import org.oneui.compose.demo.screens.ProgressBarsScreen
+import org.oneui.compose.demo.screens.QrCodesScreen
 import org.oneui.compose.demo.screens.RecyclerViewsScreen
 import org.oneui.compose.demo.screens.ReferencePlaceholderScreen
 import org.oneui.compose.demo.screens.SeekBarsScreen
@@ -61,11 +62,7 @@ fun CatalogApp(
             CatalogDestination.Widgets -> WidgetsScreen()
             CatalogDestination.ParityStatus -> ParityStatusScreen()
             CatalogDestination.Pickers -> PickersScreen()
-            CatalogDestination.QrCodes -> ReferencePlaceholderScreen(
-                title = "QRCodes",
-                testTag = selected.testTag,
-                referenceScope = "Four QR presentation variants plus QR-in-bottom-sheet/profile actions.",
-            )
+            CatalogDestination.QrCodes -> QrCodesScreen()
             CatalogDestination.Navigation -> ReferencePlaceholderScreen(
                 title = "Navigation",
                 testTag = selected.testTag,
