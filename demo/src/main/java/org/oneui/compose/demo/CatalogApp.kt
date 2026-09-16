@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import org.oneui.compose.demo.screens.NavigationScreen
 import org.oneui.compose.demo.screens.ParityStatusScreen
 import org.oneui.compose.demo.screens.PickersScreen
 import org.oneui.compose.demo.screens.ProgressBarsScreen
@@ -63,11 +64,7 @@ fun CatalogApp(
             CatalogDestination.ParityStatus -> ParityStatusScreen()
             CatalogDestination.Pickers -> PickersScreen()
             CatalogDestination.QrCodes -> QrCodesScreen()
-            CatalogDestination.Navigation -> ReferencePlaceholderScreen(
-                title = "Navigation",
-                testTag = selected.testTag,
-                referenceScope = "Rounded tabs, subtabs, icon tabs, bottom navigation, bottom tabs, navigation rail and drawer modes.",
-            )
+            CatalogDestination.Navigation -> NavigationScreen()
             CatalogDestination.RecyclerViews -> RecyclerViewsScreen()
             CatalogDestination.CustomAbout -> ReferencePlaceholderScreen(
                 title = "Custom About",
