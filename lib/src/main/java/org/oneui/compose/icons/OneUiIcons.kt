@@ -1,6 +1,7 @@
 package org.oneui.compose.icons
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -14,17 +15,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathParser
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import dev.oneuiproject.oneui.R as OneUiIconResources
+import kotlin.math.roundToInt
 import org.oneui.compose.interaction.oneUiInteractive
 import org.oneui.compose.theme.OneUiTheme
 
@@ -133,12 +140,26 @@ fun OneUiIcon(
     tint: Color = OneUiTheme.colors.primaryText,
 ) {
     when (icon) {
-        is OneUiIcon.Resource -> Icon(
-            painter = painterResource(icon.id),
-            contentDescription = contentDescription,
-            modifier = modifier,
-            tint = tint,
-        )
+        is OneUiIcon.Resource -> {
+            val context = LocalContext.current
+            val configuration = context.resources.configuration
+            val density = context.resources.displayMetrics.density
+            val painter = remember(icon.id, configuration.densityDpi, configuration.uiMode) {
+                val drawable = requireNotNull(ContextCompat.getDrawable(context, icon.id)) {
+                    "Unable to resolve One UI drawable resource ${icon.id}"
+                }
+                val fallbackSizePx = (24f * density).roundToInt().coerceAtLeast(1)
+                val width = drawable.intrinsicWidth.takeIf { it > 0 } ?: fallbackSizePx
+                val height = drawable.intrinsicHeight.takeIf { it > 0 } ?: fallbackSizePx
+                BitmapPainter(drawable.toBitmap(width, height).asImageBitmap())
+            }
+            Image(
+                painter = painter,
+                contentDescription = contentDescription,
+                modifier = modifier,
+                colorFilter = ColorFilter.tint(tint),
+            )
+        }
         is OneUiIcon.Vector -> Icon(
             imageVector = icon.imageVector,
             contentDescription = contentDescription,
