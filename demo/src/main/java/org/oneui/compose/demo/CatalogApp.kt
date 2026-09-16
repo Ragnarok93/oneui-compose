@@ -7,6 +7,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.oneui.compose.demo.screens.ParityStatusScreen
+import org.oneui.compose.demo.screens.PickersScreen
 import org.oneui.compose.demo.screens.ProgressBarsScreen
 import org.oneui.compose.demo.screens.RecyclerViewsScreen
 import org.oneui.compose.demo.screens.ReferencePlaceholderScreen
@@ -59,11 +60,7 @@ fun CatalogApp(
             CatalogDestination.SeekBars -> SeekBarsScreen()
             CatalogDestination.Widgets -> WidgetsScreen()
             CatalogDestination.ParityStatus -> ParityStatusScreen()
-            CatalogDestination.Pickers -> ReferencePlaceholderScreen(
-                title = "Pickers",
-                testTag = selected.testTag,
-                referenceScope = "Number, time, date, spinning date, sleep time, option and color pickers plus dialogs and adaptive variants.",
-            )
+            CatalogDestination.Pickers -> PickersScreen()
             CatalogDestination.QrCodes -> ReferencePlaceholderScreen(
                 title = "QRCodes",
                 testTag = selected.testTag,
