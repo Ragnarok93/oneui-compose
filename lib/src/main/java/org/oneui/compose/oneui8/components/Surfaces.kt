@@ -77,15 +77,21 @@ fun OneUI8ListItem(
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
+    val shape = RoundedCornerShape(OneUI8Theme.dimensions.nestedRadius)
     val base = modifier
         .fillMaxWidth()
         .defaultMinSize(minHeight = OneUI8Theme.dimensions.listItemMinHeight)
         .background(
             OneUI8Theme.colors.surface,
-            RoundedCornerShape(OneUI8Theme.dimensions.nestedRadius),
+            shape,
         )
     val clickable = if (onClick != null) {
-        base.oneUI8Pressable(enabled = enabled, onClick = onClick, pressedScale = 0.985f)
+        base.oneUI8Pressable(
+            enabled = enabled,
+            onClick = onClick,
+            shape = shape,
+            pressedScale = 0.985f,
+        )
     } else base
 
     Row(

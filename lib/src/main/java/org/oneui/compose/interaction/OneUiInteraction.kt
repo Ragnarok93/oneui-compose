@@ -17,8 +17,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
@@ -28,7 +28,13 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.semantics.Role
 import org.oneui.compose.motion.OneUiMotion
+import org.oneui.compose.theme.OneUiShapes
 import org.oneui.compose.theme.OneUiTheme
+
+/** One UI feedback must use the same rounded geometry as the control it decorates. */
+internal object OneUiInteractionDefaults {
+    fun shape(shapes: OneUiShapes): Shape = shapes.control
+}
 
 /**
  * Shared Compose-native interaction behavior for stable One UI controls.
@@ -42,7 +48,7 @@ internal fun Modifier.oneUiInteractive(
     onClick: () -> Unit,
     interactionSource: MutableInteractionSource,
     role: Role? = null,
-    shape: Shape = RectangleShape,
+    shape: Shape = OneUiInteractionDefaults.shape(OneUiTheme.shapes),
     pressedScale: Float = 0.965f,
     hoveredScale: Float = 1f,
     indication: Indication? = ripple(bounded = true),
@@ -69,6 +75,7 @@ internal fun Modifier.oneUiInteractive(
             scaleX = scale
             scaleY = scale
         }
+        .clip(shape)
         .then(
             if (focused && enabled) {
                 Modifier.border(

@@ -81,6 +81,7 @@ private fun RowScope.OneUI8NavigationDestination(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
+    val destinationShape = RoundedCornerShape(18.dp)
     val tint by animateColorAsState(
         targetValue = if (selected) OneUI8Theme.colors.accent else OneUI8Theme.colors.secondaryText,
         animationSpec = OneUI8Motion.standard(),
@@ -91,9 +92,14 @@ private fun RowScope.OneUI8NavigationDestination(
             .weight(1f)
             .background(
                 color = if (selected) OneUI8Theme.colors.accent.copy(alpha = 0.12f) else Color.Transparent,
-                shape = RoundedCornerShape(18.dp),
+                shape = destinationShape,
             )
-            .oneUI8Pressable(enabled = true, onClick = onClick, pressedScale = 0.94f)
+            .oneUI8Pressable(
+                enabled = true,
+                onClick = onClick,
+                shape = destinationShape,
+                pressedScale = 0.94f,
+            )
             .padding(vertical = 9.dp, horizontal = 6.dp),
         contentAlignment = Alignment.Center,
     ) {

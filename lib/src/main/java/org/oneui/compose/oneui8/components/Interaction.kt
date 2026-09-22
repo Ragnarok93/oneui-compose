@@ -6,14 +6,16 @@ import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import org.oneui.compose.interaction.oneUiInteractive
+import org.oneui.compose.theme.OneUiTheme
 
 /** Compatibility bridge for existing OneUI8 scaffold components. */
 @Composable
 internal fun Modifier.oneUI8Pressable(
     enabled: Boolean,
     onClick: () -> Unit,
+    shape: Shape = OneUiTheme.shapes.control,
     pressedScale: Float = 0.965f,
     indication: Indication? = ripple(bounded = true),
 ): Modifier {
@@ -22,7 +24,7 @@ internal fun Modifier.oneUI8Pressable(
         enabled = enabled,
         onClick = onClick,
         interactionSource = interactionSource,
-        shape = RectangleShape,
+        shape = shape,
         pressedScale = pressedScale,
         indication = indication,
     )
