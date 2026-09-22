@@ -161,4 +161,20 @@ class StargazersCatalogTest {
         composeRule.onNodeWithTag("stargazer-qr-sheet").assertIsDisplayed()
         composeRule.onNodeWithText("Scan this QR code on another device to view Ada Lovelace's profile.").assertIsDisplayed()
     }
+
+    @Test
+    fun stargazerFabShowsRepositoryTip() {
+        openStargazers()
+
+        composeRule.onNodeWithContentDescription("Star repositories")
+            .assertIsDisplayed()
+            .performClick()
+        composeRule.onNodeWithTag("oneui-tip-popup").assertIsDisplayed()
+        composeRule.onNodeWithText(
+            "Star these github repositories:\n• OneUI Design lib\n• sesl-androidx\n• sesl-material.",
+        )
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Dismiss").performClick()
+        composeRule.onNodeWithTag("oneui-tip-popup").assertDoesNotExist()
+    }
 }

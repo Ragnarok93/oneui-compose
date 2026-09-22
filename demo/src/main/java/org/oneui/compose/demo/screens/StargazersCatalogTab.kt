@@ -41,9 +41,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.oneui.compose.components.buttons.OneUiTextButton
+import org.oneui.compose.components.buttons.OneUiFloatingActionButton
 import org.oneui.compose.components.qrcode.OneUiQrCode
 import org.oneui.compose.components.progress.OneUiCircularProgress
 import org.oneui.compose.components.progress.OneUiCircularProgressSize
+import org.oneui.compose.components.feedback.OneUiTipPopup
 import org.oneui.compose.icons.OneUiAnimatedIcons
 import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIconButton
@@ -111,6 +113,7 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
     var qrProfile by remember { mutableStateOf<CatalogStargazer?>(null) }
     var swipeFeedback by remember { mutableStateOf<CatalogStargazerSwipeFeedback?>(null) }
     var actionFeedback by remember { mutableStateOf<String?>(null) }
+    var fabTipVisible by rememberSaveable { mutableStateOf(false) }
     var fetchState by remember {
         mutableStateOf(
             CatalogStargazersFetchUiState(
@@ -216,6 +219,30 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
             onDismiss = { actionFeedback = null },
             modifier = Modifier.align(Alignment.BottomCenter),
         )
+
+        if (currentProfile == null && !selectionState.isSelectionMode) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 24.dp, bottom = 24.dp),
+            ) {
+                OneUiFloatingActionButton(
+                    icon = OneUiIcons.Star,
+                    contentDescription = "Star repositories",
+                    onClick = { fabTipVisible = true },
+                )
+                OneUiTipPopup(
+                    visible = fabTipVisible,
+                    title = "Stargazers",
+                    message = "Star these github repositories:\n• OneUI Design lib\n• sesl-androidx\n• sesl-material.",
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 68.dp)
+                        .width(280.dp),
+                    onDismiss = { fabTipVisible = false },
+                )
+            }
+        }
     }
 
     qrProfile?.let { selected ->

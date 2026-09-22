@@ -182,7 +182,7 @@ private fun RowScope.OneUiBottomNavigationItem(
             .oneUiInteractive(
                 enabled = true,
                 onClick = onClick,
-                interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource(),
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                 role = Role.Tab,
                 shape = RoundedCornerShape(18.dp),
             )
