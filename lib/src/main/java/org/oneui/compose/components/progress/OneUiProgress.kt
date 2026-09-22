@@ -32,9 +32,9 @@ data class OneUiProgressColors(
 object OneUiProgressDefaults {
     @Composable
     fun colors(
-        track: Color = OneUiTheme.colors.controlInactive.copy(alpha = 0.24f),
-        progress: Color = OneUiTheme.colors.accent,
-        secondaryProgress: Color = OneUiTheme.colors.accent.copy(alpha = 0.55f),
+        track: Color = OneUiTheme.colors.progressTrack,
+        progress: Color = OneUiTheme.colors.progressActive,
+        secondaryProgress: Color = OneUiTheme.colors.progressSecondary,
     ): OneUiProgressColors = OneUiProgressColors(
         track = track,
         progress = progress,

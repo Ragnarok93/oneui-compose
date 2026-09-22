@@ -51,19 +51,7 @@ fun OneUiTheme(
             }.getOrDefault(false)
         }
 
-        val colors = OneUiColors(
-            accent = legacyColors.seslControlActivatedColor,
-            onAccent = if (dark) Color.Black else Color.White,
-            background = legacyColors.seslBackgroundColor,
-            surface = legacyColors.seslPreferenceRelativeCardBackground,
-            surfaceElevated = legacyColors.seslBackgroundFloating,
-            surfacePressed = legacyColors.seslListRippleColor,
-            primaryText = legacyColors.seslPrimaryTextColor,
-            secondaryText = legacyColors.seslSecondaryTextColor,
-            divider = legacyColors.seslListDividerColor,
-            controlInactive = legacyColors.seslControlNormalColor,
-            destructive = legacyColors.seslFunctionalRed,
-        )
+        val colors = oneUiColorsFromLegacy(legacyColors, dark)
         val typography = OneUiTypography(
             buttonLabel = legacyTypes.button,
             title = legacyTypes.appbarTitleCollapsed,
@@ -147,6 +135,49 @@ fun OneUiTheme(
         }
     }
 }
+
+/**
+ * Maps the pinned SESL semantic palette into the Compose-native token surface.
+ *
+ * Keeping this mapping pure makes the light/dark contract independently testable and prevents
+ * Material defaults or dynamic color providers from silently replacing One UI values.
+ */
+internal fun oneUiColorsFromLegacy(
+    legacyColors: org.oneui.compose.theme.color.OneUIColorTheme,
+    dark: Boolean,
+): OneUiColors = OneUiColors(
+    accent = legacyColors.seslControlActivatedColor,
+    onAccent = if (dark) Color.Black else Color.White,
+    background = legacyColors.seslBackgroundColor,
+    surface = legacyColors.seslPreferenceRelativeCardBackground,
+    surfaceElevated = legacyColors.seslBackgroundFloating,
+    surfacePressed = legacyColors.seslListRippleColor,
+    primaryText = legacyColors.seslPrimaryTextColor,
+    secondaryText = legacyColors.seslSecondaryTextColor,
+    divider = legacyColors.seslListDividerColor,
+    controlInactive = legacyColors.seslControlNormalColor,
+    destructive = legacyColors.seslFunctionalRed,
+    accentStrong = legacyColors.seslSeekbarControlColorActivated,
+    functionalPositive = legacyColors.seslFunctionalGreen,
+    functionalWarning = legacyColors.seslFunctionalOrange,
+    tooltipBackground = Color(0xff474747),
+    tooltipContent = Color(0xfffafafa),
+    tooltipActionBackground = Color(0x1a000000),
+    progressTrack = legacyColors.seslProgressControlColorBackground,
+    progressActive = legacyColors.seslProgressControlColorActivated,
+    progressSecondary = legacyColors.seslLoadingProgressColor1,
+    seekOverlapTrack = legacyColors.seslSeekbarOverlapColorDefault,
+    seekOverlapActive = legacyColors.seslSeekbarOverlapColorActivated,
+    seekDisabledActive = legacyColors.seslSeekbarDisableColorActivated,
+    navigationBackground = legacyColors.seslNavigationBarBackground,
+    navigationIcon = legacyColors.seslNavigationBarIcon,
+    navigationText = legacyColors.seslNavigationBarText,
+    navigationSelectedText = legacyColors.seslNavigationBarTextText,
+    navigationRipple = legacyColors.seslNavigationBarRipple,
+    tabIndicator = legacyColors.seslTablayoutMainTabIndicatorColor,
+    tabSubIndicator = legacyColors.seslTablayoutSubtabIndicatorBackground,
+    fabBackground = if (dark) Color(0xff3a3a3d) else Color(0xfffcfcff),
+)
 
 object OneUiTheme {
     val colors: OneUiColors

@@ -114,15 +114,26 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
     var swipeFeedback by remember { mutableStateOf<CatalogStargazerSwipeFeedback?>(null) }
     var actionFeedback by remember { mutableStateOf<String?>(null) }
     var fabTipVisible by rememberSaveable { mutableStateOf(false) }
+    var swipeTipVisible by rememberSaveable { mutableStateOf(false) }
+    var swipeTipDismissed by rememberSaveable { mutableStateOf(false) }
     var fetchState by remember {
         mutableStateOf(
             CatalogStargazersFetchUiState(
-                profiles = StargazersCatalogSamples,
-                fetchState = CatalogStargazersFetchState.INITED,
+                fetchState = CatalogStargazersFetchState.NOT_INIT,
             ),
         )
     }
     var failNextFetch by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(swipeTipDismissed) {
+        if (swipeTipDismissed) return@LaunchedEffect
+        kotlinx.coroutines.delay(1_000L)
+        swipeTipVisible = true
+    }
+
+    LaunchedEffect(Unit) {
+        fetchState = fetchState.reduce(CatalogStargazersFetchEvent.BeginInitialLoad)
+    }
 
     BackHandler(enabled = profile != null) {
         profile = null
@@ -221,6 +232,19 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
         )
 
         if (currentProfile == null && !selectionState.isSelectionMode) {
+            OneUiTipPopup(
+                visible = swipeTipVisible && !fabTipVisible,
+                title = "Stargazers",
+                message = "Swipe left to call, swipe right to message.",
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = 24.dp, vertical = 92.dp)
+                    .fillMaxWidth(0.9f),
+                onDismiss = {
+                    swipeTipVisible = false
+                    swipeTipDismissed = true
+                },
+            )
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -229,7 +253,11 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
                 OneUiFloatingActionButton(
                     icon = OneUiIcons.Star,
                     contentDescription = "Star repositories",
-                    onClick = { fabTipVisible = true },
+                    onClick = {
+                        swipeTipVisible = false
+                        swipeTipDismissed = true
+                        fabTipVisible = true
+                    },
                 )
                 OneUiTipPopup(
                     visible = fabTipVisible,
@@ -239,7 +267,10 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
                         .align(Alignment.BottomEnd)
                         .padding(bottom = 68.dp)
                         .width(280.dp),
-                    onDismiss = { fabTipVisible = false },
+                    onDismiss = {
+                        fabTipVisible = false
+                        swipeTipVisible = false
+                    },
                 )
             }
         }

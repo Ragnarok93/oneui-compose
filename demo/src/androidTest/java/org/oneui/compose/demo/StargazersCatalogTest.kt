@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -176,5 +177,15 @@ class StargazersCatalogTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText("Dismiss").performClick()
         composeRule.onNodeWithTag("oneui-tip-popup").assertDoesNotExist()
+    }
+
+    @Test
+    fun stargazerListShowsReferenceSwipeInstructionTip() {
+        openStargazers()
+
+        composeRule.waitUntil(timeoutMillis = 2_000) {
+            composeRule.onAllNodesWithTag("oneui-tip-popup").fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithText("Swipe left to call, swipe right to message.").assertIsDisplayed()
     }
 }

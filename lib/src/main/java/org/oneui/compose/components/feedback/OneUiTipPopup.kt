@@ -33,22 +33,22 @@ fun OneUiTipPopup(
     ) {
         Column(
             modifier = Modifier
-                .background(OneUiTheme.colors.surfaceElevated, RoundedCornerShape(22.dp))
+                .background(OneUiTheme.colors.tooltipBackground, RoundedCornerShape(22.dp))
                 .testTag("oneui-tip-popup")
                 .padding(18.dp),
         ) {
-            Text(title, color = OneUiTheme.colors.primaryText, style = OneUiTheme.typography.listTitle)
+            Text(title, color = OneUiTheme.colors.tooltipContent, style = OneUiTheme.typography.listTitle)
             Text(
                 message,
                 modifier = Modifier.padding(top = 6.dp),
-                color = OneUiTheme.colors.secondaryText,
+                color = OneUiTheme.colors.tooltipContent,
                 style = OneUiTheme.typography.listSummary,
             )
             if (onDismiss != null) {
                 OneUiTextButton(
                     onClick = onDismiss,
                     modifier = Modifier.padding(top = 4.dp),
-                ) { Text("Dismiss") }
+                ) { Text("Dismiss", color = OneUiTheme.colors.tooltipContent) }
             }
         }
     }

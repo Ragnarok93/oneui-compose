@@ -35,6 +35,7 @@ import androidx.core.graphics.drawable.toBitmap
 import dev.oneuiproject.oneui.R as OneUiIconResources
 import kotlin.math.roundToInt
 import org.oneui.compose.interaction.oneUiInteractive
+import org.oneui.compose.R as OneUiComposeResources
 import org.oneui.compose.theme.OneUiTheme
 
 /**
@@ -113,17 +114,17 @@ object OneUiIcons {
 
     /** Selected-state resources used by the pinned SESL8 BottomTabLayout sample. */
     fun clockAlarmTab(selected: Boolean): OneUiIcon = OneUiIcon.StatefulResource(
-        id = OneUiIconResources.drawable.ic_clock_alarm_tab,
+        id = OneUiComposeResources.drawable.ic_clock_alarm_tab,
         selected = selected,
     )
 
     fun clockTimerTab(selected: Boolean): OneUiIcon = OneUiIcon.StatefulResource(
-        id = OneUiIconResources.drawable.ic_clock_timer_tab,
+        id = OneUiComposeResources.drawable.ic_clock_timer_tab,
         selected = selected,
     )
 
     fun clockStopwatchTab(selected: Boolean): OneUiIcon = OneUiIcon.StatefulResource(
-        id = OneUiIconResources.drawable.ic_clock_stopwatch_tab,
+        id = OneUiComposeResources.drawable.ic_clock_stopwatch_tab,
         selected = selected,
     )
 

@@ -87,14 +87,14 @@ object OneUiSliderDefaults {
 
     @Composable
     fun colors(
-        activeTrack: Color = OneUiTheme.colors.accent,
-        inactiveTrack: Color = OneUiTheme.colors.controlInactive.copy(alpha = 0.28f),
+        activeTrack: Color = OneUiTheme.colors.accentStrong,
+        inactiveTrack: Color = OneUiTheme.colors.seekOverlapTrack,
         thumb: Color = OneUiTheme.colors.surface,
-        thumbStroke: Color = OneUiTheme.colors.accent,
+        thumbStroke: Color = OneUiTheme.colors.accentStrong,
         interactionHalo: Color = OneUiTheme.colors.accent.copy(alpha = 0.16f),
-        warning: Color = OneUiTheme.colors.destructive,
-        disabledActiveTrack: Color = OneUiTheme.colors.controlInactive.copy(alpha = 0.35f),
-        disabledInactiveTrack: Color = OneUiTheme.colors.controlInactive.copy(alpha = 0.18f),
+        warning: Color = OneUiTheme.colors.seekOverlapActive,
+        disabledActiveTrack: Color = OneUiTheme.colors.seekDisabledActive,
+        disabledInactiveTrack: Color = OneUiTheme.colors.seekOverlapTrack.copy(alpha = 0.45f),
         disabledThumb: Color = OneUiTheme.colors.controlInactive.copy(alpha = 0.45f),
     ): OneUiSliderColors = OneUiSliderColors(
         activeTrack = activeTrack,

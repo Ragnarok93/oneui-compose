@@ -23,6 +23,27 @@ data class OneUiColors(
     val divider: Color,
     val controlInactive: Color,
     val destructive: Color,
+    /** Strong activated blue used by progress and seekbar tracks in the SESL palette. */
+    val accentStrong: Color = Color(0xff0381fe),
+    val functionalPositive: Color = Color(0xff14a866),
+    val functionalWarning: Color = Color(0xffef5e16),
+    val tooltipBackground: Color = Color(0xff474747),
+    val tooltipContent: Color = Color(0xfffafafa),
+    val tooltipActionBackground: Color = Color(0x1a000000),
+    val progressTrack: Color = Color(0x66cacaca),
+    val progressActive: Color = Color(0xff0381fe),
+    val progressSecondary: Color = Color(0xff00d694),
+    val seekOverlapTrack: Color = Color(0x66cacaca),
+    val seekOverlapActive: Color = Color(0xffef5e16),
+    val seekDisabledActive: Color = Color(0xffd2d2d2),
+    val navigationBackground: Color = Color(0xfff2f2f2),
+    val navigationIcon: Color = Color(0xff454545),
+    val navigationText: Color = Color(0xff636363),
+    val navigationSelectedText: Color = Color(0xff0072de),
+    val navigationRipple: Color = Color(0x0d000000),
+    val tabIndicator: Color = Color(0xff252525),
+    val tabSubIndicator: Color = Color(0x0d000000),
+    val fabBackground: Color = Color(0xfffcfcfc),
 )
 
 /** Component-oriented typography translated from the existing One UI theme surface. */

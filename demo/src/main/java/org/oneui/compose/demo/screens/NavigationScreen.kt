@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.oneui.compose.icons.OneUiDrawableCatalog
 import org.oneui.compose.icons.OneUiIcon
-import org.oneui.compose.icons.OneUiDrawableRendering
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.components.navigation.OneUiBottomNavigation
 import org.oneui.compose.components.navigation.OneUiBottomTabLayout
