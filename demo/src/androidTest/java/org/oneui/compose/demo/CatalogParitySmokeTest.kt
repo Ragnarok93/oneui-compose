@@ -27,6 +27,10 @@ class CatalogParitySmokeTest {
         composeRule.onNodeWithText(CatalogDestination.CustomAbout.label).performClick()
         composeRule.onNodeWithTag("oneui-custom-about").assertIsDisplayed()
         composeRule.onNodeWithText("Yanndroid").assertIsDisplayed()
+        composeRule.onNodeWithText("Open source licenses").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("GitHub").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Telegram").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Swipe up to expand").assertIsDisplayed()
     }
 
     @Test

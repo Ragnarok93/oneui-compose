@@ -350,7 +350,24 @@ fun OneUI8CustomAbout(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     backProgress: Float = 0f,
-) = OneUiCustomAbout(appName, version, contributors, licenses, links, modifier, onBack, backProgress)
+    appIcon: org.oneui.compose.icons.OneUiIcon = org.oneui.compose.icons.OneUiIcons.Info,
+    onGithubClick: () -> Unit = {},
+    onTelegramClick: () -> Unit = {},
+    onAppInfoClick: () -> Unit = {},
+) = OneUiCustomAbout(
+    appName = appName,
+    version = version,
+    contributors = contributors,
+    licenses = licenses,
+    links = links,
+    modifier = modifier,
+    onBack = onBack,
+    backProgress = backProgress,
+    appIcon = appIcon,
+    onGithubClick = onGithubClick,
+    onTelegramClick = onTelegramClick,
+    onAppInfoClick = onAppInfoClick,
+)
 
 @Composable
 fun OneUI8QrCode(
