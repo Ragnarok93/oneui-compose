@@ -6,7 +6,7 @@ import org.junit.Test
 class OneUiSliderVariantTest {
     @Test
     fun levelBarTickMathUsesTheReferenceInclusiveRange() {
-        assertEquals(15f, snapSliderValue(14f, 10f..20f, steps = 9), 0f)
+        assertEquals(14f, snapSliderValue(14f, 10f..20f, steps = 9), 0f)
     }
 
     @Test
@@ -15,4 +15,3 @@ class OneUiSliderVariantTest {
         assertEquals(0.8f, snapSliderValue(0.8f, 0f..2f, steps = 0), 0f)
     }
 }
-
