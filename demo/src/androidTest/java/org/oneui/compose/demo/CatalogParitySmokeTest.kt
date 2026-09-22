@@ -38,10 +38,12 @@ class CatalogParitySmokeTest {
         composeRule.onNodeWithTag("bottom-nav-icons-overflow").assertIsDisplayed()
         composeRule.onNodeWithTag("bottom-nav-text").assertIsDisplayed()
         composeRule.onNodeWithTag("bottom-tabs-13-items").assertIsDisplayed()
+        composeRule.onNodeWithTag("navigation-rail-control").assertIsDisplayed()
 
         composeRule.onNodeWithContentDescription("Open navigation").performClick()
         composeRule.onNodeWithText(CatalogDestination.Widgets.label).performClick()
         composeRule.onNodeWithTag("widget-spinner").assertIsDisplayed()
+        composeRule.onNodeWithTag("widget-seven-button-styles").assertIsDisplayed()
         composeRule.onNodeWithTag("widget-search-view").assertIsDisplayed()
         composeRule.onNodeWithTag("widget-card-switch-radio-rows").assertIsDisplayed()
         composeRule.onNodeWithTag("widget-relative-links").assertIsDisplayed()
@@ -53,4 +55,3 @@ class CatalogParitySmokeTest {
         composeRule.onNodeWithTag("catalog-action-mode").assertIsDisplayed()
     }
 }
-

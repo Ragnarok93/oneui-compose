@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
@@ -67,7 +68,7 @@ fun OneUiSearchMode(
     hint: String = "Search",
     behavior: OneUiSearchModeBehavior = OneUiSearchModeBehavior.Dismiss,
     onSearch: (() -> Unit)? = null,
-    actions: @Composable Row.() -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     AnimatedVisibility(
         visible = active,
