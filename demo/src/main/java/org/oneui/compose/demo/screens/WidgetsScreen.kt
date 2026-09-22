@@ -43,9 +43,9 @@ import org.oneui.compose.components.menu.OneUiMenu
 import org.oneui.compose.components.menu.OneUiMenuItem
 import org.oneui.compose.components.preference.OneUiPreferenceCategory
 import org.oneui.compose.components.progress.OneUiLinearProgress
-import org.oneui.compose.components.selection.OneUiCheckbox
-import org.oneui.compose.components.selection.OneUiRadioButton
-import org.oneui.compose.components.selection.OneUiSwitch
+import org.oneui.compose.components.selection.OneUiCheckboxRow
+import org.oneui.compose.components.selection.OneUiRadioButtonRow
+import org.oneui.compose.components.selection.OneUiSwitchRow
 import org.oneui.compose.demo.CatalogSection
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.patterns.appbar.OneUiActionMode
@@ -88,28 +88,32 @@ fun WidgetsScreen(modifier: Modifier = Modifier) {
         item {
             CatalogSection(
                 title = "Compound buttons",
-                subtitle = "Stable Compose-native SESL8 switch, checkbox and radio controls.",
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    OneUiSwitch(
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    OneUiSwitchRow(
+                        label = "Switch",
                         checked = switchChecked,
                         onCheckedChange = { switchChecked = it },
                     )
-                    OneUiCheckbox(
+                    OneUiCheckboxRow(
+                        label = "CheckBox",
                         checked = checkboxChecked,
                         onCheckedChange = { checkboxChecked = it },
                     )
-                    OneUiRadioButton(
-                        selected = radioSelected == 0,
-                        onClick = { radioSelected = 0 },
-                    )
-                    OneUiRadioButton(
-                        selected = radioSelected == 1,
-                        onClick = { radioSelected = 1 },
-                    )
+                    Row(Modifier.fillMaxWidth()) {
+                        OneUiRadioButtonRow(
+                            label = "RadioButton",
+                            selected = radioSelected == 0,
+                            onClick = { radioSelected = 0 },
+                            modifier = Modifier.weight(1f),
+                        )
+                        OneUiRadioButtonRow(
+                            label = "RadioButton",
+                            selected = radioSelected == 1,
+                            onClick = { radioSelected = 1 },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
             }
         }
