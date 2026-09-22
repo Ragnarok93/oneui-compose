@@ -80,6 +80,7 @@ object OneUiIcons {
     val RadioUnselected = OneUiIcon.Vector(radioVector(selected = false))
 
     val Close = resource(OneUiIconResources.drawable.ic_oui_close)
+    val Refresh = resource(OneUiIconResources.drawable.ic_oui_refresh)
     val Copy = resource(OneUiIconResources.drawable.ic_oui_copy)
     val Delete = resource(OneUiIconResources.drawable.ic_oui_delete)
     val Share = resource(OneUiIconResources.drawable.ic_oui_share)
@@ -91,6 +92,7 @@ object OneUiIcons {
     val Website = resource(OneUiIconResources.drawable.ic_oui_internet_website)
     val QrCode = resource(OneUiIconResources.drawable.ic_oui_qr_code)
     val Info = resource(OneUiIconResources.drawable.ic_oui_info)
+    val Star = resource(OneUiIconResources.drawable.ic_oui_star)
     val Error = resource(OneUiIconResources.drawable.ic_oui_error)
     val Play = resource(OneUiIconResources.drawable.ic_oui_control_play)
     val Pause = resource(OneUiIconResources.drawable.ic_oui_control_pause)

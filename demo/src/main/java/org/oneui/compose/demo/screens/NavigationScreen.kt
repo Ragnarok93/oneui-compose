@@ -33,6 +33,10 @@ import androidx.compose.ui.unit.sp
 import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIconButton
 import org.oneui.compose.icons.OneUiIcons
+import org.oneui.compose.components.navigation.OneUiBottomNavigation
+import org.oneui.compose.components.navigation.OneUiNavigationItem
+import org.oneui.compose.components.navigation.OneUiNavigationRail
+import org.oneui.compose.components.navigation.OneUiTabs
 import org.oneui.compose.navigation.CustomTabItem
 import org.oneui.compose.navigation.SubTabItem
 import org.oneui.compose.navigation.TabItem
@@ -47,6 +51,7 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
     var bottomIconSelected by rememberSaveable { mutableIntStateOf(0) }
     var bottomTextSelected by rememberSaveable { mutableIntStateOf(0) }
     var manySelected by rememberSaveable { mutableIntStateOf(0) }
+    var railSelected by rememberSaveable { mutableIntStateOf(0) }
 
     LazyColumn(
         modifier = modifier
@@ -61,16 +66,11 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                 subtitle = "Primary rounded tab treatment",
                 testTag = "tabs-rounded-text",
             ) {
-                Tabs(Modifier.fillMaxWidth()) {
-                    listOf("Overview", "Details", "Activity").forEachIndexed { index, label ->
-                        SubTabItem(
-                            modifier = Modifier.weight(1f),
-                            onClick = { roundedSelected = index },
-                            text = label,
-                            selected = roundedSelected == index,
-                        )
-                    }
-                }
+                OneUiTabs(
+                    items = listOf("Tab 1", "Tab 2").map { OneUiNavigationItem(it, it) },
+                    selectedIndex = roundedSelected.coerceAtMost(1),
+                    onSelected = { roundedSelected = it },
+                )
             }
         }
 
@@ -80,18 +80,12 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                 subtitle = "Secondary navigation remains reachable in compact widths",
                 testTag = "tabs-sub-scrollable",
             ) {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    contentPadding = PaddingValues(horizontal = 2.dp),
-                ) {
-                    itemsIndexed(listOf("All", "Recent", "Favorites", "Shared", "Archived", "Downloads")) { index, label ->
-                        SubTabItem(
-                            onClick = { subSelected = index },
-                            text = label,
-                            selected = subSelected == index,
-                        )
-                    }
-                }
+                OneUiTabs(
+                    items = (1..8).map { OneUiNavigationItem("subtab-$it", "Subtab $it") },
+                    selectedIndex = subSelected.coerceAtMost(7),
+                    onSelected = { subSelected = it },
+                    scrollable = true,
+                )
             }
         }
 
@@ -101,33 +95,16 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                 subtitle = "Auto-weighted icon destinations",
                 testTag = "tabs-main-icon-auto-weight",
             ) {
-                val icons = listOf(OneUiIcons.Home, OneUiIcons.Search, OneUiIcons.Share, OneUiIcons.Settings)
-                Tabs(Modifier.fillMaxWidth()) {
-                    icons.forEachIndexed { index, icon ->
-                        CustomTabItem(
-                            modifier = Modifier.weight(1f),
-                            onClick = { iconSelected = index },
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(18.dp))
-                                    .background(
-                                        if (iconSelected == index) OneUiTheme.colors.accent.copy(alpha = 0.16f)
-                                        else OneUiTheme.colors.surface,
-                                    )
-                                    .padding(horizontal = 22.dp, vertical = 8.dp),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                OneUiIcon(
-                                    icon = icon,
-                                    contentDescription = "Icon tab ${index + 1}",
-                                    modifier = Modifier.size(24.dp),
-                                    tint = if (iconSelected == index) OneUiTheme.colors.accent else OneUiTheme.colors.secondaryText,
-                                )
-                            }
-                        }
-                    }
-                }
+                OneUiTabs(
+                    items = listOf(
+                        OneUiNavigationItem("alarm", "Main tab 1", OneUiIcons.Home),
+                        OneUiNavigationItem("timer", "Main tab 2", OneUiIcons.Search),
+                        OneUiNavigationItem("stopwatch", "Main tab 3", OneUiIcons.Settings),
+                    ),
+                    selectedIndex = iconSelected.coerceAtMost(2),
+                    onSelected = { iconSelected = it },
+                    showIcons = true,
+                )
             }
         }
 
@@ -137,34 +114,13 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                 subtitle = "Four icon destinations plus More",
                 testTag = "bottom-nav-icons-overflow",
             ) {
-                val icons = listOf(
-                    OneUiIcons.Home,
-                    OneUiIcons.Search,
-                    OneUiIcons.Share,
-                    OneUiIcons.Settings,
-                    OneUiIcons.More,
+                OneUiBottomNavigation(
+                    items = (1..6).map { index ->
+                        OneUiNavigationItem("item-$index", "Item $index", OneUiIcons.Home)
+                    },
+                    selectedIndex = bottomIconSelected.coerceAtMost(5),
+                    onSelected = { bottomIconSelected = it },
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    icons.forEachIndexed { index, icon ->
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            OneUiIconButton(
-                                icon = icon,
-                                contentDescription = if (index == 4) "More" else "Destination ${index + 1}",
-                                onClick = { bottomIconSelected = index },
-                                tint = if (bottomIconSelected == index) OneUiTheme.colors.accent else OneUiTheme.colors.secondaryText,
-                            )
-                            Text(
-                                text = if (index == 4) "More" else "Item ${index + 1}",
-                                color = if (bottomIconSelected == index) OneUiTheme.colors.accent else OneUiTheme.colors.secondaryText,
-                                fontSize = 11.sp,
-                            )
-                        }
-                    }
-                }
             }
         }
 
@@ -174,16 +130,11 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                 subtitle = "Text-only navigation destinations",
                 testTag = "bottom-nav-text",
             ) {
-                Tabs(Modifier.fillMaxWidth()) {
-                    listOf("Home", "Library", "Discover", "Profile").forEachIndexed { index, label ->
-                        SubTabItem(
-                            modifier = Modifier.weight(1f),
-                            onClick = { bottomTextSelected = index },
-                            text = label,
-                            selected = bottomTextSelected == index,
-                        )
-                    }
-                }
+                OneUiTabs(
+                    items = (1..3).map { OneUiNavigationItem("item-$it", "Item $it") },
+                    selectedIndex = bottomTextSelected.coerceAtMost(2),
+                    onSelected = { bottomTextSelected = it },
+                )
             }
         }
 
@@ -193,18 +144,31 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                 subtitle = "Large destination set in a horizontally scrollable strip",
                 testTag = "bottom-tabs-13-items",
             ) {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    contentPadding = PaddingValues(horizontal = 2.dp),
-                ) {
-                    itemsIndexed((1..13).map { "Tab $it" }) { index, label ->
-                        SubTabItem(
-                            onClick = { manySelected = index },
-                            text = label,
-                            selected = manySelected == index,
-                        )
-                    }
-                }
+                OneUiTabs(
+                    items = (1..13).map { OneUiNavigationItem("nav-$it", "Nav item $it") },
+                    selectedIndex = manySelected,
+                    onSelected = { manySelected = it },
+                    scrollable = true,
+                )
+            }
+        }
+
+        item {
+            NavigationSample(
+                title = "Navigation rail",
+                subtitle = "Collapsed icon destinations used by the adaptive shell",
+                testTag = "navigation-rail",
+            ) {
+                OneUiNavigationRail(
+                    items = listOf(
+                        OneUiNavigationItem("home", "Home", OneUiIcons.Home),
+                        OneUiNavigationItem("search", "Search", OneUiIcons.Search),
+                        OneUiNavigationItem("settings", "Settings", OneUiIcons.Settings),
+                    ),
+                    selectedIndex = railSelected,
+                    onSelected = { railSelected = it },
+                    modifier = Modifier.testTag("navigation-rail-control"),
+                )
             }
         }
     }

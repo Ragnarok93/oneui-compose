@@ -27,12 +27,15 @@ import org.oneui.compose.theme.OneUiTheme
 
 @Composable
 fun ProgressBarsScreen(modifier: Modifier = Modifier) {
-    var progress by remember { mutableFloatStateOf(0.01f) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            for (step in 1..100) {
-                progress = step / 100f
-                delay(80)
+    val reducedMotion = OneUiTheme.reducedMotion
+    var progress by remember(reducedMotion) { mutableFloatStateOf(if (reducedMotion) 0.5f else 0.01f) }
+    if (!reducedMotion) {
+        LaunchedEffect(Unit) {
+            while (true) {
+                for (step in 1..100) {
+                    progress = step / 100f
+                    delay(80)
+                }
             }
         }
     }

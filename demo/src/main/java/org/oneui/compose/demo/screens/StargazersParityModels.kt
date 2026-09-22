@@ -51,6 +51,98 @@ data class CatalogStargazersOptionsState(
     )
 }
 
+/** State transitions exposed by the reference Stargazers repository and refresh UI. */
+sealed interface CatalogStargazersFetchEvent {
+    data object BeginInitialLoad : CatalogStargazersFetchEvent
+    data object BeginRefresh : CatalogStargazersFetchEvent
+    data object Retry : CatalogStargazersFetchEvent
+    data class Succeeded(val profiles: List<CatalogStargazer>) : CatalogStargazersFetchEvent
+    data class Failed(val message: String) : CatalogStargazersFetchEvent
+}
+
+data class CatalogStargazersFetchUiState(
+    val profiles: List<CatalogStargazer> = emptyList(),
+    val fetchState: CatalogStargazersFetchState = CatalogStargazersFetchState.NOT_INIT,
+    val errorMessage: String? = null,
+) {
+    val isLoading: Boolean
+        get() = fetchState == CatalogStargazersFetchState.INITING ||
+            fetchState == CatalogStargazersFetchState.REFRESHING
+
+    val canRetry: Boolean
+        get() = fetchState == CatalogStargazersFetchState.INIT_ERROR ||
+            fetchState == CatalogStargazersFetchState.REFRESH_ERROR
+
+    fun reduce(event: CatalogStargazersFetchEvent): CatalogStargazersFetchUiState = when (event) {
+        CatalogStargazersFetchEvent.BeginInitialLoad -> {
+            if (fetchState == CatalogStargazersFetchState.NOT_INIT ||
+                fetchState == CatalogStargazersFetchState.INIT_ERROR
+            ) {
+                copy(
+                    fetchState = CatalogStargazersFetchState.INITING,
+                    errorMessage = null,
+                )
+            } else {
+                this
+            }
+        }
+
+        CatalogStargazersFetchEvent.BeginRefresh -> {
+            if (profiles.isNotEmpty() && fetchState in setOf(
+                    CatalogStargazersFetchState.INITED,
+                    CatalogStargazersFetchState.REFRESH_ERROR,
+                    CatalogStargazersFetchState.REFRESHED,
+                )
+            ) {
+                copy(
+                    fetchState = CatalogStargazersFetchState.REFRESHING,
+                    errorMessage = null,
+                )
+            } else {
+                this
+            }
+        }
+
+        CatalogStargazersFetchEvent.Retry -> {
+            if (profiles.isEmpty() || fetchState == CatalogStargazersFetchState.INIT_ERROR) {
+                reduce(CatalogStargazersFetchEvent.BeginInitialLoad)
+            } else {
+                reduce(CatalogStargazersFetchEvent.BeginRefresh)
+            }
+        }
+
+        is CatalogStargazersFetchEvent.Succeeded -> when (fetchState) {
+            CatalogStargazersFetchState.INITING -> copy(
+                profiles = event.profiles,
+                fetchState = CatalogStargazersFetchState.INITED,
+                errorMessage = null,
+            )
+
+            CatalogStargazersFetchState.REFRESHING -> copy(
+                profiles = event.profiles,
+                fetchState = CatalogStargazersFetchState.REFRESHED,
+                errorMessage = null,
+            )
+
+            else -> this
+        }
+
+        is CatalogStargazersFetchEvent.Failed -> when (fetchState) {
+            CatalogStargazersFetchState.INITING -> copy(
+                fetchState = CatalogStargazersFetchState.INIT_ERROR,
+                errorMessage = event.message,
+            )
+
+            CatalogStargazersFetchState.REFRESHING -> copy(
+                fetchState = CatalogStargazersFetchState.REFRESH_ERROR,
+                errorMessage = event.message,
+            )
+
+            else -> this
+        }
+    }
+}
+
 enum class CatalogStargazerAction(
     val label: String,
     val icon: OneUiIcon,
@@ -132,18 +224,22 @@ enum class CatalogStargazerProfileAction {
 fun stargazerProfileActions(profile: CatalogStargazer): List<CatalogStargazerProfileAction> =
     buildList {
         add(CatalogStargazerProfileAction.GitHub)
-        if (profile.twitterUsername != null) add(CatalogStargazerProfileAction.X)
-        if (profile.email != null) add(CatalogStargazerProfileAction.Email)
-        if (!profile.blog.isNullOrEmpty()) add(CatalogStargazerProfileAction.Blog)
+        if (!profile.twitterUsername.isNullOrBlank()) add(CatalogStargazerProfileAction.X)
+        if (!profile.email.isNullOrBlank()) add(CatalogStargazerProfileAction.Email)
+        if (!profile.blog.isNullOrBlank()) add(CatalogStargazerProfileAction.Blog)
     }
 
 fun stargazerProfileActionTarget(
     profile: CatalogStargazer,
     action: CatalogStargazerProfileAction,
 ): String? = when (action) {
-    CatalogStargazerProfileAction.GitHub -> profile.url
-    CatalogStargazerProfileAction.X -> profile.twitterUsername?.let { "https://x.com/$it" }
-    CatalogStargazerProfileAction.Email -> profile.email?.let { "mailto:$it" }
+    CatalogStargazerProfileAction.GitHub -> profile.url.takeIf(String::isNotBlank)
+    CatalogStargazerProfileAction.X -> profile.twitterUsername
+        ?.takeIf(String::isNotBlank)
+        ?.let { "https://x.com/$it" }
+    CatalogStargazerProfileAction.Email -> profile.email
+        ?.takeIf(String::isNotBlank)
+        ?.let { "mailto:$it" }
     CatalogStargazerProfileAction.Blog -> profile.blog?.takeIf(String::isNotBlank)
 }
 
@@ -164,6 +260,9 @@ fun stargazerVCardContent(profile: CatalogStargazer): String = buildString {
     profile.blog?.let { appendLine("URL:$it") }
     profile.organizationsUrl?.let { appendLine("URL:$it") }
     profile.twitterUsername?.let { appendLine("X-TWITTER:https://x.com/$it") }
+    profile.avatarBase64?.takeIf(String::isNotBlank)?.let {
+        appendLine("PHOTO;ENCODING=BASE64;TYPE=PNG:$it")
+    }
     appendLine("NOTE:Starred repos: ${profile.starredRepos.joinToString(", ")}")
     appendLine("END:VCARD")
 }
@@ -188,6 +287,15 @@ fun stargazerFastScrollerConfig(
     displayMode = stargazerFastScrollerDisplayMode(settings),
     autoHide = settings.autoHideIndexScroll,
 )
+
+fun stargazerActionModeSearchFieldVisible(
+    selectionMode: Boolean,
+    searchMode: CatalogActionModeSearch,
+): Boolean = !selectionMode || searchMode != CatalogActionModeSearch.DISMISS
+
+fun stargazerActionModeSelectableKeys(
+    profiles: List<CatalogStargazer>,
+): List<Long> = profiles.map(CatalogStargazer::id)
 
 enum class CatalogStargazersFetchState {
     NOT_INIT,

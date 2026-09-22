@@ -20,6 +20,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.oneui.compose.components.slider.OneUiSlider
+import org.oneui.compose.components.slider.OneUiLevelSlider
+import org.oneui.compose.components.slider.OneUiSeekBarPlus
 import org.oneui.compose.components.slider.OneUiSliderMode
 import org.oneui.compose.components.slider.OneUiSliderOrientation
 import org.oneui.compose.demo.CatalogSection
@@ -69,24 +71,25 @@ fun SeekBarsScreen(modifier: Modifier = Modifier) {
                     )
                 }
                 LabeledSlider("Level bar · 10…20", level) {
-                    OneUiSlider(
+                    OneUiLevelSlider(
                         value = level,
                         onValueChange = { level = it },
                         modifier = Modifier.fillMaxWidth(),
                         valueRange = 10f..20f,
-                        steps = 9,
+                        showTickMark = true,
                     )
                 }
                 LabeledSlider("Level bar · seamless 0…7", seamlessLevel) {
-                    OneUiSlider(
+                    OneUiLevelSlider(
                         value = seamlessLevel,
                         onValueChange = { seamlessLevel = it },
                         modifier = Modifier.fillMaxWidth(),
                         valueRange = 0f..7f,
+                        seamless = true,
                     )
                 }
                 LabeledSlider("SeekBarPlus · seamless 0…20", plusSeamless) {
-                    OneUiSlider(
+                    OneUiSeekBarPlus(
                         value = plusSeamless,
                         onValueChange = { plusSeamless = it },
                         modifier = Modifier.fillMaxWidth(),
@@ -94,12 +97,12 @@ fun SeekBarsScreen(modifier: Modifier = Modifier) {
                     )
                 }
                 LabeledSlider("SeekBarPlus · stepped 0…2", plusStepped) {
-                    OneUiSlider(
+                    OneUiSeekBarPlus(
                         value = plusStepped,
                         onValueChange = { plusStepped = it },
                         modifier = Modifier.fillMaxWidth(),
                         valueRange = 0f..2f,
-                        steps = 1,
+                        seamless = false,
                     )
                 }
             }

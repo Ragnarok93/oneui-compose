@@ -7,12 +7,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.oneui.compose.demo.screens.NavigationScreen
+import org.oneui.compose.demo.screens.AboutScreen
+import org.oneui.compose.demo.screens.CustomAboutScreen
 import org.oneui.compose.demo.screens.ParityStatusScreen
 import org.oneui.compose.demo.screens.PickersScreen
+import org.oneui.compose.demo.screens.PreferencesScreen
 import org.oneui.compose.demo.screens.ProgressBarsScreen
 import org.oneui.compose.demo.screens.QrCodesScreen
 import org.oneui.compose.demo.screens.RecyclerViewsScreen
-import org.oneui.compose.demo.screens.ReferencePlaceholderScreen
 import org.oneui.compose.demo.screens.SeekBarsScreen
 import org.oneui.compose.demo.screens.WidgetsScreen
 import org.oneui.compose.icons.OneUiIconButton
@@ -66,21 +68,11 @@ fun CatalogApp(
             CatalogDestination.QrCodes -> QrCodesScreen()
             CatalogDestination.Navigation -> NavigationScreen()
             CatalogDestination.RecyclerViews -> RecyclerViewsScreen()
-            CatalogDestination.CustomAbout -> ReferencePlaceholderScreen(
-                title = "Custom About",
-                testTag = selected.testTag,
-                referenceScope = "Adaptive collapsing identity header, contributors, licenses, related links and predictive-back behavior.",
+            CatalogDestination.CustomAbout -> CustomAboutScreen()
+            CatalogDestination.Preferences -> PreferencesScreen(
+                onOpenAbout = { selectedName = CatalogDestination.About.name },
             )
-            CatalogDestination.Preferences -> ReferencePlaceholderScreen(
-                title = "Preferences",
-                testTag = selected.testTag,
-                referenceScope = "Complete app_preferences.xml parity including cards, switch/radio/check/list/color/seekbar variants and dependencies.",
-            )
-            CatalogDestination.About -> ReferencePlaceholderScreen(
-                title = "About",
-                testTag = selected.testTag,
-                referenceScope = "Compose-native AppInfo layout with status and project actions.",
-            )
+            CatalogDestination.About -> AboutScreen()
             CatalogDestination.LegacyShowcase -> Unit
         }
     }

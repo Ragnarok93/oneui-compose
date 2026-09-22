@@ -5,7 +5,9 @@ import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.fetchSemanticsNodes
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -57,6 +59,49 @@ class StargazersCatalogTest {
         composeRule.onNodeWithText("1 selected").assertIsDisplayed()
         composeRule.onNodeWithText("Select all").performClick()
         composeRule.onNodeWithText("8 selected").assertIsDisplayed()
+    }
+
+    @Test
+    fun actionModeActionsReportReferenceFeedbackAndExitSelection() {
+        openStargazers()
+
+        composeRule.onNodeWithText("Ada Lovelace").performTouchInput { longClick() }
+        composeRule.onNodeWithTag("stargazer-action-message").assertIsDisplayed().performClick()
+        composeRule.onNodeWithText("1 contacts selected for Message").assertIsDisplayed()
+        composeRule.onNodeWithTag("stargazer-action-mode").assertDoesNotExist()
+    }
+
+    @Test
+    fun configuredCancelButtonExitsActionModeWithoutExecutingAnAction() {
+        openStargazers()
+
+        composeRule.onNodeWithContentDescription(StargazersOptionsTestTags.TriggerDescription).performClick()
+        composeRule.onNodeWithTag(StargazersOptionsTestTags.ShowCancelButton).performClick()
+        composeRule.onNodeWithText("Apply").performClick()
+
+        composeRule.onNodeWithText("Ada Lovelace").performTouchInput { longClick() }
+        composeRule.onNodeWithTag("stargazer-action-mode-cancel").assertIsDisplayed().performClick()
+        composeRule.onNodeWithTag("stargazer-action-mode").assertDoesNotExist()
+    }
+
+    @Test
+    fun refreshFailureRetainsRowsAndRetryRecovers() {
+        openStargazers()
+
+        composeRule.onNodeWithTag("stargazers-simulate-error").performClick()
+        composeRule.waitUntil(timeoutMillis = 2_000) {
+            composeRule.onAllNodesWithTag("stargazers-refresh-error")
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+        composeRule.onNodeWithText("Ada Lovelace").assertIsDisplayed()
+        composeRule.onNodeWithText("Retry").performClick()
+        composeRule.waitUntil(timeoutMillis = 2_000) {
+            composeRule.onAllNodesWithTag("stargazers-refresh-error")
+                .fetchSemanticsNodes()
+                .isEmpty()
+        }
+        composeRule.onNodeWithText("Ada Lovelace").assertIsDisplayed()
     }
 
     @Test

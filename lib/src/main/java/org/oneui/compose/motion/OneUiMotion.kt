@@ -58,6 +58,20 @@ object OneUiMotion {
         const val MenuTranslation = 300
         const val MenuAlpha = 150
 
+        /** Collapsing app-bar title/identity transition from the reference custom-about page. */
+        const val AppBarCollapse = 300
+        /** Drawer expansion and scrim transition used by the adaptive shell. */
+        const val Drawer = 300
+        /** Tab/bottom-navigation indicator and selected tint transition. */
+        const val NavigationIndicator = 250
+        /** Search/action-mode enter and exit envelope. */
+        const val SearchMode = 200
+        const val ActionMode = 200
+        /** Wheel picker settling motion. */
+        const val PickerWheel = 220
+        const val Snackbar = 140
+        const val TipPopup = 300
+
         const val SelectionFirstStroke = 110
         const val SelectionSecondStroke = 180
         const val SelectionCheck = 290
@@ -173,6 +187,30 @@ object OneUiMotion {
 
     fun <T> menuAlpha(): FiniteAnimationSpec<T> =
         tween(durationMillis = Duration.MenuAlpha, easing = OneUiEasing.SeslSineInOut80)
+
+    fun <T> appBarCollapse(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.AppBarCollapse, easing = OneUiEasing.Standard)
+
+    fun <T> drawer(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.Drawer, easing = OneUiEasing.Standard)
+
+    fun <T> navigationIndicator(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.NavigationIndicator, easing = OneUiEasing.SeslSineInOut80)
+
+    fun <T> searchMode(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.SearchMode, easing = OneUiEasing.Standard)
+
+    fun <T> actionMode(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.ActionMode, easing = OneUiEasing.Standard)
+
+    fun <T> pickerWheel(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.PickerWheel, easing = OneUiEasing.SeslSineInOut80)
+
+    fun <T> snackbar(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.Snackbar, easing = OneUiEasing.Standard)
+
+    fun <T> tipPopup(): FiniteAnimationSpec<T> =
+        tween(durationMillis = Duration.TipPopup, easing = OneUiEasing.SeslSineInOut80)
 
     /** SeslIndexScrollView fades its thumb linearly over 150 ms. */
     fun <T> fastScrollerFade(): FiniteAnimationSpec<T> =

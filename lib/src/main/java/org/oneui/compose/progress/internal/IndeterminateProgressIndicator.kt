@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import org.oneui.compose.progress.ProgressIndicatorColors
 import org.oneui.compose.progress.internal.IndeterminateProgressIndicatorDefaults.toConf
 import org.oneui.compose.progress.progressIndicatorColors
+import org.oneui.compose.theme.OneUiTheme
 import org.oneui.compose.util.OneUIPreview
 
 /**
@@ -31,6 +32,21 @@ internal fun IndeterminateProgressIndicator(
     modifier: Modifier = Modifier,
     colors: ProgressIndicatorColors = progressIndicatorColors()
 ) {
+    if (OneUiTheme.reducedMotion) {
+        Canvas(modifier = modifier.fillMaxWidth()) {
+            drawTrack(
+                color = colors.neutral,
+                strokeWidth = IndeterminateProgressIndicatorDefaults.height.toPx(),
+            )
+            drawProgressBit(
+                color = colors.progress,
+                strokeWidth = IndeterminateProgressIndicatorDefaults.height.toPx(),
+                start = 0f,
+                end = size.width * 0.28f,
+            )
+        }
+        return
+    }
     val transition = rememberInfiniteTransition(
         label = "IndeterminateProgressIndicator"
     )

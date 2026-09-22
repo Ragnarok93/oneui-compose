@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import org.oneui.compose.progress.CircularProgressIndicatorSize
 import org.oneui.compose.progress.ProgressIndicatorColors
 import org.oneui.compose.progress.progressIndicatorColors
+import org.oneui.compose.theme.OneUiTheme
 import org.oneui.compose.util.OneUIPreview
 
 /**
@@ -38,6 +39,27 @@ internal fun CircularIndeterminateProgressIndicator(
     size: CircularProgressIndicatorSize = CircularProgressIndicatorSize.Companion.Medium,
     colors: ProgressIndicatorColors = progressIndicatorColors()
 ) {
+    if (OneUiTheme.reducedMotion) {
+        Canvas(modifier = Modifier.size(size.size)) {
+            circle(
+                pos = CircularIndeterminateProgressIndicatorDefaults.c1to,
+                color = colors.progress,
+            )
+            circle(
+                pos = CircularIndeterminateProgressIndicatorDefaults.c2to,
+                color = colors.progress,
+            )
+            circle(
+                pos = CircularIndeterminateProgressIndicatorDefaults.c3to,
+                color = colors.progress,
+            )
+            circle(
+                pos = CircularIndeterminateProgressIndicatorDefaults.c4to,
+                color = colors.secondaryProgress,
+            )
+        }
+        return
+    }
     val rotationEasing = CubicBezierEasing(0F, 0F, 0F, 0F)
     val transition = rememberInfiniteTransition(
         label = "CircularIndeterminateProgressIndicator"

@@ -15,5 +15,11 @@ class OneUiMotionTest {
         assertEquals(150, OneUiMotion.Duration.MenuAlpha)
         assertEquals(290, OneUiMotion.Duration.SelectionCheck)
         assertEquals(199, OneUiMotion.Duration.SelectionUncheck)
+        assertEquals(300, OneUiMotion.Duration.AppBarCollapse)
+        assertEquals(300, OneUiMotion.Duration.Drawer)
+        assertEquals(250, OneUiMotion.Duration.NavigationIndicator)
+        assertEquals(200, OneUiMotion.Duration.SearchMode)
+        assertEquals(200, OneUiMotion.Duration.ActionMode)
+        assertEquals(220, OneUiMotion.Duration.PickerWheel)
     }
 }

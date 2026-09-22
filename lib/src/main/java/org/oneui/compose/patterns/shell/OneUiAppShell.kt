@@ -35,10 +35,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.LayoutDirection
 import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.interaction.oneUiInteractive
@@ -72,6 +74,8 @@ fun OneUiAppShell(
     require(destinations.isNotEmpty()) { "OneUiAppShell requires at least one destination" }
     var compactDrawerOpen by rememberSaveable { mutableStateOf(false) }
     val colors = OneUiTheme.colors
+    val layoutDirection = LocalLayoutDirection.current
+    val isRtl = layoutDirection == LayoutDirection.Rtl
 
     BoxWithConstraints(
         modifier = modifier
@@ -132,14 +136,14 @@ fun OneUiAppShell(
                 AnimatedVisibility(
                     visible = compactDrawerOpen,
                     enter = slideInHorizontally(
-                        initialOffsetX = { -it },
+                        initialOffsetX = { if (isRtl) it else -it },
                         animationSpec = OneUiMotion.standard(),
                     ),
                     exit = slideOutHorizontally(
-                        targetOffsetX = { -it },
+                        targetOffsetX = { if (isRtl) it else -it },
                         animationSpec = OneUiMotion.standard(),
                     ),
-                    modifier = Modifier.align(Alignment.CenterStart),
+                    modifier = Modifier.align(if (isRtl) Alignment.CenterEnd else Alignment.CenterStart),
                 ) {
                     DrawerPanel(
                         destinations = destinations,

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -107,6 +109,40 @@ internal fun StargazerSwipeFeedbackHost(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp),
+        )
+    }
+}
+
+@Composable
+internal fun StargazerMessageHost(
+    message: String?,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (message == null) return
+
+    LaunchedEffect(message) {
+        delay(2_500L)
+        onDismiss()
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Text(
+            text = message,
+            modifier = Modifier
+                .background(
+                    color = OneUiTheme.colors.surfaceElevated,
+                    shape = RoundedCornerShape(18.dp),
+                )
+                .testTag("stargazer-action-feedback")
+                .padding(horizontal = 18.dp, vertical = 14.dp),
+            color = OneUiTheme.colors.primaryText,
+            style = OneUiTheme.typography.listTitle,
         )
     }
 }

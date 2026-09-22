@@ -21,6 +21,12 @@ object OneUI8Motion {
         const val SheetEnterTranslation = OneUiMotion.Duration.SheetEnterTranslation
         const val SheetExitAlpha = OneUiMotion.Duration.SheetExitAlpha
         const val SheetExitTranslation = OneUiMotion.Duration.SheetExitTranslation
+        const val AppBarCollapse = OneUiMotion.Duration.AppBarCollapse
+        const val Drawer = OneUiMotion.Duration.Drawer
+        const val NavigationIndicator = OneUiMotion.Duration.NavigationIndicator
+        const val SearchMode = OneUiMotion.Duration.SearchMode
+        const val ActionMode = OneUiMotion.Duration.ActionMode
+        const val PickerWheel = OneUiMotion.Duration.PickerWheel
     }
 
     fun <T> press(): FiniteAnimationSpec<T> = OneUiMotion.press()
@@ -29,4 +35,10 @@ object OneUI8Motion {
     fun <T> standard(): FiniteAnimationSpec<T> = OneUiMotion.standard()
     fun <T> sheetEnter(): FiniteAnimationSpec<T> = OneUiMotion.sheetEnterTranslation()
     fun <T> sheetExit(): FiniteAnimationSpec<T> = OneUiMotion.sheetExitTranslation()
+    fun <T> appBarCollapse(): FiniteAnimationSpec<T> = OneUiMotion.appBarCollapse()
+    fun <T> drawer(): FiniteAnimationSpec<T> = OneUiMotion.drawer()
+    fun <T> navigationIndicator(): FiniteAnimationSpec<T> = OneUiMotion.navigationIndicator()
+    fun <T> searchMode(): FiniteAnimationSpec<T> = OneUiMotion.searchMode()
+    fun <T> actionMode(): FiniteAnimationSpec<T> = OneUiMotion.actionMode()
+    fun <T> pickerWheel(): FiniteAnimationSpec<T> = OneUiMotion.pickerWheel()
 }

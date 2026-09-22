@@ -2,6 +2,7 @@ package org.oneui.compose.components.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,9 +20,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -88,13 +96,48 @@ fun OneUiSwipeActionRow(
 
     Box(
         modifier = modifier
+            .focusable(enabled = enabled)
             .fillMaxWidth()
+            .onPreviewKeyEvent { event ->
+                if (!enabled || event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                when (event.key) {
+                    Key.DirectionLeft -> {
+                        onSwipeLeft()
+                        true
+                    }
+
+                    Key.DirectionRight -> {
+                        onSwipeRight()
+                        true
+                    }
+
+                    else -> false
+                }
+            }
             .semantics {
                 contentDescription = when (activeDirection) {
                     OneUiSwipeDirection.Left -> leftAction.label
                     OneUiSwipeDirection.Right -> rightAction.label
                     OneUiSwipeDirection.None -> ""
                 }
+                customActions = listOf(
+                    CustomAccessibilityAction(leftAction.label) {
+                        if (enabled) {
+                            onSwipeLeft()
+                            true
+                        } else {
+                            false
+                        }
+                    },
+                    CustomAccessibilityAction(rightAction.label) {
+                        if (enabled) {
+                            onSwipeRight()
+                            true
+                        } else {
+                            false
+                        }
+                    },
+                )
             },
     ) {
         when {

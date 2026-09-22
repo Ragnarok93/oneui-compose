@@ -22,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.oneui.compose.components.buttons.OneUiTextButton
 import org.oneui.compose.components.qrcode.OneUiQrCode
+import org.oneui.compose.components.progress.OneUiCircularProgress
+import org.oneui.compose.components.progress.OneUiCircularProgressSize
 import org.oneui.compose.icons.OneUiAnimatedIcons
 import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIconButton
@@ -64,6 +67,7 @@ data class CatalogStargazer(
     val blog: String? = null,
     val organizationsUrl: String? = null,
     val starredRepos: Set<String> = emptySet(),
+    val avatarBase64: String? = null,
 )
 
 /** Stable local dataset keeps the catalog useful offline and deterministic under UI tests. */
@@ -105,13 +109,43 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
     var profile by remember { mutableStateOf<CatalogStargazer?>(null) }
     var qrProfile by remember { mutableStateOf<CatalogStargazer?>(null) }
     var swipeFeedback by remember { mutableStateOf<CatalogStargazerSwipeFeedback?>(null) }
+    var actionFeedback by remember { mutableStateOf<String?>(null) }
+    var fetchState by remember {
+        mutableStateOf(
+            CatalogStargazersFetchUiState(
+                profiles = StargazersCatalogSamples,
+                fetchState = CatalogStargazersFetchState.INITED,
+            ),
+        )
+    }
+    var failNextFetch by rememberSaveable { mutableStateOf(false) }
 
-    val visibleProfiles = remember(query) {
+    LaunchedEffect(fetchState.fetchState) {
+        if (!fetchState.isLoading) return@LaunchedEffect
+        kotlinx.coroutines.delay(250L)
+        val next = if (failNextFetch) {
+            failNextFetch = false
+            fetchState.reduce(CatalogStargazersFetchEvent.Failed("Unable to reach the stargazers service."))
+        } else {
+            fetchState.reduce(CatalogStargazersFetchEvent.Succeeded(StargazersCatalogSamples))
+        }
+        fetchState = next
+    }
+
+    LaunchedEffect(selectionState.isSelectionMode, optionsState.committed.actionModeSearch) {
+        if (selectionState.isSelectionMode &&
+            optionsState.committed.actionModeSearch == CatalogActionModeSearch.DISMISS
+        ) {
+            query = ""
+        }
+    }
+
+    val visibleProfiles = remember(query, fetchState.profiles) {
         val needle = query.trim()
         if (needle.isEmpty()) {
-            StargazersCatalogSamples
+            fetchState.profiles
         } else {
-            StargazersCatalogSamples.filter { item ->
+            fetchState.profiles.filter { item ->
                 item.name.contains(needle, ignoreCase = true) ||
                     item.login.contains(needle, ignoreCase = true) ||
                     item.url.contains(needle, ignoreCase = true)
@@ -132,9 +166,24 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
                 profiles = visibleProfiles,
                 selectionState = selectionState,
                 settings = optionsState.committed,
+                fetchState = fetchState,
                 onOpenProfile = { profile = it },
                 onOpenOptions = { optionsState = optionsState.open() },
                 onSwipeFeedback = { swipeFeedback = it },
+                onActionFeedback = { actionFeedback = it },
+                onRefresh = {
+                    fetchState = fetchState.reduce(
+                        if (fetchState.profiles.isEmpty()) {
+                            CatalogStargazersFetchEvent.BeginInitialLoad
+                        } else {
+                            CatalogStargazersFetchEvent.BeginRefresh
+                        },
+                    )
+                },
+                onSimulateFetchError = {
+                    failNextFetch = true
+                    fetchState = fetchState.reduce(CatalogStargazersFetchEvent.BeginRefresh)
+                },
             )
         } else {
             StargazerProfile(
@@ -147,6 +196,12 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
         StargazerSwipeFeedbackHost(
             feedback = swipeFeedback,
             onDismiss = { swipeFeedback = null },
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+
+        StargazerMessageHost(
+            message = actionFeedback,
+            onDismiss = { actionFeedback = null },
             modifier = Modifier.align(Alignment.BottomCenter),
         )
     }
@@ -171,9 +226,13 @@ private fun StargazerList(
     profiles: List<CatalogStargazer>,
     selectionState: OneUiSelectableListState<Long>,
     settings: CatalogStargazersSettings,
+    fetchState: CatalogStargazersFetchUiState,
     onOpenProfile: (CatalogStargazer) -> Unit,
     onOpenOptions: () -> Unit,
     onSwipeFeedback: (CatalogStargazerSwipeFeedback) -> Unit,
+    onActionFeedback: (String) -> Unit,
+    onRefresh: () -> Unit,
+    onSimulateFetchError: () -> Unit,
 ) {
     val fastScrollerConfig = remember(settings) { stargazerFastScrollerConfig(settings) }
 
@@ -184,52 +243,80 @@ private fun StargazerList(
                 .padding(start = 20.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            OutlinedTextField(
-                value = query,
-                onValueChange = onQueryChange,
-                modifier = Modifier
-                    .weight(1f)
-                    .testTag("stargazers-search-field"),
-                singleLine = true,
-                shape = RoundedCornerShape(24.dp),
-                placeholder = { Text("Search contact", color = OneUiTheme.colors.secondaryText) },
-                leadingIcon = {
-                    OneUiIcon(
-                        icon = OneUiIcons.Search,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = OneUiTheme.colors.secondaryText,
-                    )
-                },
-                trailingIcon = if (query.isBlank()) null else {
-                    {
-                        OneUiIconButton(
-                            icon = OneUiIcons.Close,
-                            contentDescription = "Clear contact search",
-                            onClick = { onQueryChange("") },
+            if (stargazerActionModeSearchFieldVisible(
+                    selectionMode = selectionState.isSelectionMode,
+                    searchMode = settings.actionModeSearch,
+                )
+            ) {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = onQueryChange,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("stargazers-search-field"),
+                    singleLine = true,
+                    shape = RoundedCornerShape(24.dp),
+                    placeholder = { Text("Search contact", color = OneUiTheme.colors.secondaryText) },
+                    leadingIcon = {
+                        OneUiIcon(
+                            icon = OneUiIcons.Search,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = OneUiTheme.colors.secondaryText,
                         )
-                    }
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = OneUiTheme.colors.surfaceElevated,
-                    unfocusedContainerColor = OneUiTheme.colors.surfaceElevated,
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    cursorColor = OneUiTheme.colors.accent,
-                    focusedTextColor = OneUiTheme.colors.primaryText,
-                    unfocusedTextColor = OneUiTheme.colors.primaryText,
-                ),
-            )
-            Spacer(Modifier.width(4.dp))
+                    },
+                    trailingIcon = if (query.isBlank()) null else {
+                        {
+                            OneUiIconButton(
+                                icon = OneUiIcons.Close,
+                                contentDescription = "Clear contact search",
+                                onClick = { onQueryChange("") },
+                            )
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = OneUiTheme.colors.surfaceElevated,
+                        unfocusedContainerColor = OneUiTheme.colors.surfaceElevated,
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                        cursorColor = OneUiTheme.colors.accent,
+                        focusedTextColor = OneUiTheme.colors.primaryText,
+                        unfocusedTextColor = OneUiTheme.colors.primaryText,
+                    ),
+                )
+                Spacer(Modifier.width(4.dp))
+            }
             OneUiIconButton(
                 icon = OneUiIcons.More,
                 contentDescription = StargazersOptionsTestTags.TriggerDescription,
                 onClick = onOpenOptions,
             )
+            OneUiIconButton(
+                icon = OneUiIcons.Refresh,
+                contentDescription = "Refresh stargazers",
+                onClick = onRefresh,
+                modifier = Modifier.testTag("stargazers-refresh"),
+            )
+            OneUiIconButton(
+                icon = OneUiIcons.Error,
+                contentDescription = "Simulate fetch error",
+                onClick = onSimulateFetchError,
+                modifier = Modifier.testTag("stargazers-simulate-error"),
+            )
         }
 
+        StargazerFetchStatus(
+            state = fetchState,
+            onRetry = onRefresh,
+        )
+
         if (selectionState.isSelectionMode) {
-            StargazerActionModeBar(selectionState)
+            StargazerActionModeBar(
+                selectionState = selectionState,
+                visibleProfiles = profiles,
+                settings = settings,
+                onFeedback = onActionFeedback,
+            )
         }
 
         if (profiles.isEmpty()) {
@@ -239,10 +326,36 @@ private fun StargazerList(
                     .padding(32.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = if (query.isBlank()) "No stargazers yet." else "No results found.",
-                    color = OneUiTheme.colors.secondaryText,
-                )
+                if (fetchState.isLoading) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        OneUiCircularProgress(
+                            progress = null,
+                            size = OneUiCircularProgressSize.Medium,
+                            modifier = Modifier.size(42.dp),
+                        )
+                        Text(
+                            text = stargazerNoItemText(fetchState.fetchState, query),
+                            modifier = Modifier.padding(top = 12.dp),
+                            color = OneUiTheme.colors.secondaryText,
+                        )
+                    }
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = fetchState.errorMessage
+                                ?: stargazerNoItemText(fetchState.fetchState, query),
+                            color = OneUiTheme.colors.secondaryText,
+                        )
+                        if (fetchState.canRetry) {
+                            OneUiTextButton(
+                                onClick = onRefresh,
+                                modifier = Modifier.testTag("stargazers-retry"),
+                            ) {
+                                Text("Retry")
+                            }
+                        }
+                    }
+                }
             }
         } else {
             OneUiSelectableList(
@@ -298,33 +411,115 @@ private fun StargazerList(
 }
 
 @Composable
-private fun StargazerActionModeBar(selectionState: OneUiSelectableListState<Long>) {
-    val allKeys = remember { StargazersCatalogSamples.map(CatalogStargazer::id) }
+private fun StargazerFetchStatus(
+    state: CatalogStargazersFetchUiState,
+    onRetry: () -> Unit,
+) {
+    when {
+        state.fetchState == CatalogStargazersFetchState.REFRESHING -> {
+            androidx.compose.foundation.layout.Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("stargazers-refresh-progress")
+                    .padding(horizontal = 20.dp, vertical = 4.dp),
+            ) {
+                Text(
+                    text = "Refreshing stargazers...",
+                    color = OneUiTheme.colors.secondaryText,
+                    fontSize = 12.sp,
+                )
+                org.oneui.compose.components.progress.OneUiLinearProgress(
+                    progress = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                )
+            }
+        }
+
+        state.fetchState == CatalogStargazersFetchState.REFRESH_ERROR -> {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("stargazers-refresh-error")
+                    .padding(start = 20.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = state.errorMessage ?: "Unable to refresh stargazers.",
+                    modifier = Modifier.weight(1f),
+                    color = OneUiTheme.colors.secondaryText,
+                    fontSize = 12.sp,
+                )
+                OneUiTextButton(onClick = onRetry) {
+                    Text("Retry")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StargazerActionModeBar(
+    selectionState: OneUiSelectableListState<Long>,
+    visibleProfiles: List<CatalogStargazer>,
+    settings: CatalogStargazersSettings,
+    onFeedback: (String) -> Unit,
+) {
+    val allKeys = remember(visibleProfiles) { stargazerActionModeSelectableKeys(visibleProfiles) }
     val allSelected = selectionState.allSelected(allKeys)
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .testTag("stargazer-action-mode")
+            .padding(horizontal = 12.dp, vertical = 4.dp),
     ) {
-        OneUiAnimatedIcons.CheckMorph(
-            checked = true,
-            modifier = Modifier.size(24.dp),
-        )
-        Spacer(Modifier.width(10.dp))
-        Text(
-            text = "${selectionState.selectedCount} selected",
-            modifier = Modifier.weight(1f),
-            color = OneUiTheme.colors.primaryText,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp,
-        )
-        OneUiTextButton(
-            onClick = {
-                if (allSelected) selectionState.clear() else selectionState.selectAll(allKeys)
-            },
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(if (allSelected) "Clear all" else "Select all")
+            OneUiAnimatedIcons.CheckMorph(
+                checked = true,
+                modifier = Modifier.size(24.dp),
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = "${selectionState.selectedCount} selected",
+                modifier = Modifier.weight(1f),
+                color = OneUiTheme.colors.primaryText,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+            )
+            OneUiTextButton(
+                onClick = {
+                    if (allSelected) selectionState.clear() else selectionState.selectAll(allKeys)
+                },
+            ) {
+                Text(if (allSelected) "Clear all" else "Select all")
+            }
+            if (settings.showCancelButton) {
+                OneUiTextButton(
+                    onClick = selectionState::clear,
+                    modifier = Modifier.testTag("stargazer-action-mode-cancel"),
+                ) {
+                    Text("Cancel")
+                }
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            CatalogStargazerAction.entries.forEach { action ->
+                OneUiIconButton(
+                    icon = action.icon,
+                    contentDescription = action.label,
+                    onClick = {
+                        onFeedback(executeStargazerAction(selectionState, action))
+                    },
+                    modifier = Modifier.testTag("stargazer-action-${action.name.lowercase()}"),
+                )
+            }
         }
     }
 }
