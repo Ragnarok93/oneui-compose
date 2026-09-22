@@ -48,7 +48,7 @@ internal fun CatalogSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = OneUiTheme.colors.surface,
+                    color = OneUiTheme.colors.surfaceElevated,
                     shape = RoundedCornerShape(OneUiTheme.dimensions.cardRadius),
                 )
                 .padding(20.dp),

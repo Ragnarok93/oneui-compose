@@ -21,7 +21,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -103,7 +105,7 @@ fun OneUiAppShell(
                         subtitle = subtitle,
                         actions = actions,
                     )
-                    Box(Modifier.fillMaxSize()) { content() }
+                    Box(Modifier.fillMaxSize().navigationBarsPadding()) { content() }
                 }
             }
         } else {
@@ -117,7 +119,7 @@ fun OneUiAppShell(
                         onNavigationClick = { compactDrawerOpen = true },
                         actions = actions,
                     )
-                    Box(Modifier.fillMaxSize()) { content() }
+                    Box(Modifier.fillMaxSize().navigationBarsPadding()) { content() }
                 }
 
                 AnimatedVisibility(
@@ -178,6 +180,7 @@ private fun DrawerPanel(
     Column(
         modifier = modifier
             .background(colors.surfaceElevated)
+            .statusBarsPadding()
             .padding(horizontal = 12.dp, vertical = 18.dp),
     ) {
         Row(

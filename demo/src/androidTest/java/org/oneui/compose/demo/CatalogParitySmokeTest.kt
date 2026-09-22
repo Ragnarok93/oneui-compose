@@ -14,6 +14,12 @@ class CatalogParitySmokeTest {
     val composeRule = createAndroidComposeRule<CatalogActivity>()
 
     @Test
+    fun progressRouteKeepsTheReferenceTwoGroupPresentation() {
+        composeRule.onNodeWithTag("progress-indeterminate-group").assertIsDisplayed()
+        composeRule.onNodeWithTag("progress-determinate-group").assertIsDisplayed()
+    }
+
+    @Test
     fun preferenceAboutAndCustomAboutRoutesAreRealComposeSurfaces() {
         composeRule.onNodeWithContentDescription("Preferences").performClick()
         composeRule.onNodeWithTag("catalog-preferences").assertIsDisplayed()
@@ -86,12 +92,22 @@ class CatalogParitySmokeTest {
         composeRule.onNodeWithContentDescription("Open navigation").performClick()
         composeRule.onNodeWithText(CatalogDestination.Pickers.label).performClick()
         composeRule.onNodeWithTag("picker-number-triple").assertIsDisplayed()
-        composeRule.onNodeWithTag("picker-time-inline-dialog").assertIsDisplayed()
-        composeRule.onNodeWithTag("picker-date-inline-dialog").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("oneui-spinner").performClick()
+        composeRule.onNodeWithText("TimePicker").performClick()
+        composeRule.onNodeWithTag("picker-time-inline").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("oneui-spinner").performClick()
+        composeRule.onNodeWithText("DatePicker").performClick()
+        composeRule.onNodeWithTag("picker-date-inline").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("oneui-spinner").performClick()
+        composeRule.onNodeWithText("SpinningDatePicker").performClick()
         composeRule.onNodeWithTag("picker-spinning-date").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("oneui-spinner").performClick()
+        composeRule.onNodeWithText("SleepTimePicker").performClick()
         composeRule.onNodeWithTag("picker-sleep-time").assertIsDisplayed()
-        composeRule.onNodeWithTag("picker-start-end-time").assertIsDisplayed()
-        composeRule.onNodeWithTag("picker-color").assertIsDisplayed()
 
         composeRule.onNodeWithContentDescription("Open navigation").performClick()
         composeRule.onNodeWithText(CatalogDestination.About.label).performClick()

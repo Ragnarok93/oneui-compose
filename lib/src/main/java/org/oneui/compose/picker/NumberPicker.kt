@@ -46,6 +46,11 @@ fun NumberPicker(
     textStyle: TextStyle = OneUITheme.types.numberPicker
 ) {
     val scope = rememberCoroutineScope()
+    val wheelSurface = if (colors.surface == Color.Unspecified) {
+        OneUITheme.colors.seslBackgroundFloating
+    } else {
+        colors.surface
+    }
 
     val lengthOfMax = values.max().toString().length
     fun String.addZerosUntil(length: Int): String {
@@ -122,7 +127,8 @@ fun NumberPicker(
                 state.currentIndex = index
             },
             item = item,
-            activeItem = activeItem
+            activeItem = activeItem,
+            maskColor = wheelSurface,
         )
     } else {
         val state = remember {
@@ -179,7 +185,8 @@ fun NumberPicker(
                 state.currentIndex = index
             },
             item = item,
-            activeItem = activeItem
+            activeItem = activeItem,
+            maskColor = wheelSurface,
         )
     }
 }
@@ -191,7 +198,10 @@ data class NumberPickerColors(
 
     val textScrolling: Color,
 
-    val text: Color
+    val text: Color,
+
+    /** Surface that the adjacent wheel values fade into. */
+    val surface: Color = Color.Unspecified,
 
 )
 
@@ -203,9 +213,17 @@ data class NumberPickerColors(
  */
 @Composable
 fun numberPickerColors(
-    textScrolling: Color = OneUITheme.colors.seslNumberPickerTextHighlightColor,
-    text: Color = OneUITheme.colors.seslNumberPickerTextColor
-): NumberPickerColors = NumberPickerColors(
-    textScrolling = textScrolling,
-    text = text
-)
+    textScrolling: Color = Color.Unspecified,
+    text: Color = Color.Unspecified,
+): NumberPickerColors {
+    val visuals = PickerVisuals.from(
+        primaryText = OneUITheme.colors.seslPrimaryTextColor,
+        secondaryText = OneUITheme.colors.seslSecondaryTextColor,
+        surface = OneUITheme.colors.seslBackgroundFloating,
+    )
+    return NumberPickerColors(
+        textScrolling = textScrolling.takeUnless { it == Color.Unspecified } ?: visuals.inactiveText,
+        text = text.takeUnless { it == Color.Unspecified } ?: visuals.activeText,
+        surface = visuals.surface,
+    )
+}

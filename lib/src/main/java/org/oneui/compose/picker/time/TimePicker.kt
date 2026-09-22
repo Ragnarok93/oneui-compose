@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import org.oneui.compose.picker.NumberPicker
 import org.oneui.compose.picker.StringPicker
@@ -35,11 +36,10 @@ import java.util.Locale
 fun TimePicker(
     modifier: Modifier = Modifier,
     config: TimePickerConfig = timePickerConfig(),
-    state: TimePickerState
+    state: TimePickerState,
+    textStyle: TextStyle = OneUITheme.types.timePicker,
 ) {
     assert(60 % config.minuteStep == 0)
-
-    val textStyle = OneUITheme.types.timePicker
 
     Row(
         modifier = modifier,

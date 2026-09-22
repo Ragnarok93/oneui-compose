@@ -26,8 +26,9 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.oneui.compose.motion.OneUiMotion
+import org.oneui.compose.picker.PickerVisuals
+import org.oneui.compose.theme.OneUITheme
 import org.oneui.compose.theme.OneUiTheme
-import org.oneui.compose.theme.locals.LocalBackgroundColor
 import org.oneui.compose.util.isEven
 
 /**
@@ -49,7 +50,8 @@ fun ItemScroll(
     state: SimpleItemScrollState,
     onIndexChange: (Int) -> Unit,
     item: @Composable (index: Int) -> Unit,
-    activeItem: @Composable (index: Int) -> Unit
+    activeItem: @Composable (index: Int) -> Unit,
+    maskColor: androidx.compose.ui.graphics.Color = OneUITheme.colors.seslBackgroundFloating,
 ) {
     val snapLayoutInfoProvider = remember(state.listState) { SnapLayoutInfoProvider(state.listState) }
     val flingBehavior = if (OneUiTheme.reducedMotion) {
@@ -82,11 +84,7 @@ fun ItemScroll(
     }
 
     Box(modifier = modifier) {
-        val overlayAlpha =
-            if (state.isScrolling) ItemScrollDefaults.overlayAlphaScroll else ItemScrollDefaults.overlayAlpha
-        val overlayColor = LocalBackgroundColor.current.copy(
-            alpha = overlayAlpha
-        )
+        val edgeAlpha = PickerVisuals.maskEdgeAlpha(state.isScrolling)
 
         LazyColumn(
             state = state.listState,
@@ -126,8 +124,9 @@ fun ItemScroll(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(itemHeightDp * state.visibleItemsCount),
-            color = overlayColor,
-            windowHeight = itemHeightDp + ItemScrollDefaults.textSpacing / 2
+            color = maskColor,
+            edgeAlpha = edgeAlpha,
+            windowHeight = itemHeightDp + ItemScrollDefaults.textSpacing / 2,
         )
     }
 }

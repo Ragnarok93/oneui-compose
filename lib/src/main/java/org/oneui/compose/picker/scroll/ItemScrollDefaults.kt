@@ -8,9 +8,4 @@ import androidx.compose.ui.unit.dp
 object ItemScrollDefaults {
 
     val textSpacing = 20.dp
-
-    const val overlayAlphaScroll = 0.6F
-
-    const val overlayAlpha = 0.9F
-
 }

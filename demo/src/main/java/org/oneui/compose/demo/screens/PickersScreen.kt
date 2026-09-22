@@ -4,17 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,252 +27,155 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 import java.time.LocalTime
-import org.oneui.compose.components.buttons.OneUiTextButton
+import org.oneui.compose.components.buttons.OneUiButton
+import org.oneui.compose.components.buttons.OneUiButtonDefaults
+import org.oneui.compose.components.input.OneUiSpinner
 import org.oneui.compose.picker.NumberPicker
+import org.oneui.compose.picker.StringPicker
 import org.oneui.compose.picker.color.SimpleColorPickerDefaults
-import org.oneui.compose.picker.color.SimpleColorPickerPopup
+import org.oneui.compose.picker.color.SimpleColorPickerDialog
 import org.oneui.compose.picker.time.DatePicker
 import org.oneui.compose.picker.time.DatePickerDialog
+import org.oneui.compose.picker.time.StartEndTimePickerDialog
 import org.oneui.compose.picker.time.TimePicker
 import org.oneui.compose.picker.time.TimePickerDialog
 import org.oneui.compose.picker.time.TimePickerState
 import org.oneui.compose.picker.time.rememberDatePickerState
+import org.oneui.compose.theme.OneUITheme
 import org.oneui.compose.theme.OneUiTheme
 
-/**
- * Compose-native parity catalog for the OneUI8 sample picker destination.
- *
- * The reference exposes seven picker demonstrations. This screen keeps each example interactive
- * and uses the reusable picker implementations from :lib rather than AndroidView wrappers.
- */
+private enum class PickerDemo(val label: String, val testTag: String) {
+    Number("NumberPicker", "picker-number-triple"),
+    Time("TimePicker", "picker-time-inline"),
+    Date("DatePicker", "picker-date-inline"),
+    SpinningDate("SpinningDatePicker", "picker-spinning-date"),
+    SleepTime("SleepTimePicker", "picker-sleep-time"),
+}
+
+/** Compose-native port of the pinned `fragment_pickers.xml` surface. */
 @Composable
 fun PickersScreen(modifier: Modifier = Modifier) {
-    var firstNumber by rememberSaveable { mutableIntStateOf(1) }
-    var secondNumber by rememberSaveable { mutableIntStateOf(15) }
-    var thirdNumber by rememberSaveable { mutableIntStateOf(30) }
+    var selectedDemo by rememberSaveable { mutableIntStateOf(PickerDemo.Number.ordinal) }
+    var firstNumber by rememberSaveable { mutableIntStateOf(50) }
+    var secondNumber by rememberSaveable { mutableIntStateOf(8) }
+    var thirdValue by rememberSaveable { mutableStateOf("A") }
 
     val inlineTime = remember { TimePickerState(LocalTime.of(10, 30)) }
-    var selectedDialogTime by remember { mutableStateOf(LocalTime.of(8, 15)) }
-    var showTimeDialog by rememberSaveable { mutableStateOf(false) }
-
     val inlineDate = rememberDatePickerState(LocalDate.now())
-    var selectedDialogDate by remember { mutableStateOf(LocalDate.now()) }
-    var showDateDialog by rememberSaveable { mutableStateOf(false) }
-
     var spinMonth by rememberSaveable { mutableIntStateOf(LocalDate.now().monthValue) }
     var spinDay by rememberSaveable { mutableIntStateOf(LocalDate.now().dayOfMonth) }
     var spinYear by rememberSaveable { mutableIntStateOf(LocalDate.now().year) }
-
     val bedtime = remember { TimePickerState(LocalTime.of(22, 30)) }
     val wakeTime = remember { TimePickerState(LocalTime.of(7, 0)) }
-    val startTime = remember { TimePickerState(LocalTime.of(9, 0)) }
-    val endTime = remember { TimePickerState(LocalTime.of(17, 30)) }
 
-    var selectedColor by remember { mutableStateOf(SimpleColorPickerDefaults.colors.first()) }
-    var showColorPicker by rememberSaveable { mutableStateOf(false) }
+    var selectedDialogTime by remember { mutableStateOf(LocalTime.of(8, 15)) }
+    var selectedDialogDate by remember { mutableStateOf(LocalDate.now()) }
+    var selectedStartTime by remember { mutableStateOf(LocalTime.MIDNIGHT) }
+    var selectedEndTime by remember { mutableStateOf(LocalTime.of(10, 0)) }
+    var selectedColor by remember { mutableStateOf(Color.Red) }
+    var showTimeDialog by rememberSaveable { mutableStateOf(false) }
+    var showDateDialog by rememberSaveable { mutableStateOf(false) }
+    var showStartEndDialog by rememberSaveable { mutableStateOf(false) }
+    var showColorDialog by rememberSaveable { mutableStateOf(false) }
+
+    val selected = PickerDemo.entries.getOrElse(selectedDemo) { PickerDemo.Number }
+    val pickerTextStyle = OneUITheme.types.numberPicker.copy(fontSize = 42.sp)
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .testTag("catalog-pickers"),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            start = 16.dp,
-            end = 16.dp,
-            top = 12.dp,
-            bottom = 40.dp,
-        ),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            PickerSection(
-                title = "Number picker",
-                subtitle = "Three independent spinning number columns",
-                testTag = "picker-number-triple",
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("picker-mode-spinner"),
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    NumberPicker(
-                        modifier = Modifier.weight(1f).height(132.dp),
-                        values = (0..9).toList(),
-                        startValue = firstNumber,
-                        onValueChange = { firstNumber = it },
-                    )
-                    NumberPicker(
-                        modifier = Modifier.weight(1f).height(132.dp),
-                        values = (0..59).toList(),
-                        startValue = secondNumber,
-                        onValueChange = { secondNumber = it },
-                        fillUpWithZeros = true,
-                    )
-                    NumberPicker(
-                        modifier = Modifier.weight(1f).height(132.dp),
-                        values = (0..59).toList(),
-                        startValue = thirdNumber,
-                        onValueChange = { thirdNumber = it },
-                        fillUpWithZeros = true,
-                    )
-                }
-                PickerValue("Selected", "%d : %02d : %02d".format(firstNumber, secondNumber, thirdNumber))
+                OneUiSpinner(
+                    selectedIndex = selected.ordinal,
+                    entries = PickerDemo.entries.map(PickerDemo::label),
+                    onSelected = { selectedDemo = it },
+                    contentDescription = "Choose picker sample",
+                )
             }
         }
-
         item {
-            PickerSection(
-                title = "Time picker",
-                subtitle = "Inline picker and dialog presentation",
-                testTag = "picker-time-inline-dialog",
-            ) {
-                TimePicker(
-                    state = inlineTime,
-                    modifier = Modifier.fillMaxWidth().height(150.dp),
-                )
-                PickerValue("Inline", inlineTime.time.toString())
-                OneUiTextButton(onClick = { showTimeDialog = true }) {
-                    Text("Open time picker dialog")
-                }
-                PickerValue("Dialog result", selectedDialogTime.toString())
-            }
-        }
-
-        item {
-            PickerSection(
-                title = "Date picker",
-                subtitle = "Calendar picker and dialog presentation",
-                testTag = "picker-date-inline-dialog",
-            ) {
-                DatePicker(
-                    state = inlineDate,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                PickerValue("Inline", inlineDate.date.toString())
-                OneUiTextButton(onClick = { showDateDialog = true }) {
-                    Text("Open date picker dialog")
-                }
-                PickerValue("Dialog result", selectedDialogDate.toString())
-            }
-        }
-
-        item {
-            PickerSection(
-                title = "Spinning date picker",
-                subtitle = "Month, day and year wheel layout",
-                testTag = "picker-spinning-date",
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    NumberPicker(
-                        modifier = Modifier.weight(1f).height(132.dp),
-                        values = (1..12).toList(),
-                        startValue = spinMonth,
-                        onValueChange = { spinMonth = it },
+            PickerReferenceSurface(testTag = selected.testTag) {
+                when (selected) {
+                    PickerDemo.Number -> NumberPickerSample(
+                        firstNumber = firstNumber,
+                        secondNumber = secondNumber,
+                        thirdValue = thirdValue,
+                        onFirstNumberChanged = { firstNumber = it },
+                        onSecondNumberChanged = { secondNumber = it },
+                        onThirdValueChanged = { thirdValue = it },
                     )
-                    NumberPicker(
-                        modifier = Modifier.weight(1f).height(132.dp),
-                        values = (1..31).toList(),
-                        startValue = spinDay,
-                        onValueChange = { spinDay = it },
-                    )
-                    NumberPicker(
-                        modifier = Modifier.weight(1.35f).height(132.dp),
-                        values = (2020..2035).toList(),
-                        startValue = spinYear.coerceIn(2020, 2035),
-                        onValueChange = { spinYear = it },
-                        infiniteScroll = false,
-                    )
-                }
-                PickerValue("Selected", "%02d/%02d/%04d".format(spinMonth, spinDay, spinYear))
-            }
-        }
 
-        item {
-            PickerSection(
-                title = "Sleep time picker",
-                subtitle = "Bedtime and wake-up time pair",
-                testTag = "picker-sleep-time",
-            ) {
-                PickerSubheading("Bedtime")
-                TimePicker(
-                    state = bedtime,
-                    modifier = Modifier.fillMaxWidth().height(142.dp),
-                )
-                PickerSubheading("Wake up")
-                TimePicker(
-                    state = wakeTime,
-                    modifier = Modifier.fillMaxWidth().height(142.dp),
-                )
-                PickerValue("Sleep window", "${bedtime.time} → ${wakeTime.time}")
-            }
-        }
-
-        item {
-            PickerSection(
-                title = "Start / end time picker",
-                subtitle = "Independent start and end time selection",
-                testTag = "picker-start-end-time",
-            ) {
-                PickerSubheading("Start")
-                TimePicker(
-                    state = startTime,
-                    modifier = Modifier.fillMaxWidth().height(142.dp),
-                )
-                PickerSubheading("End")
-                TimePicker(
-                    state = endTime,
-                    modifier = Modifier.fillMaxWidth().height(142.dp),
-                )
-                PickerValue("Range", "${startTime.time} → ${endTime.time}")
-            }
-        }
-
-        item {
-            PickerSection(
-                title = "Color picker",
-                subtitle = "One UI quick color palette",
-                testTag = "picker-color",
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Box(
+                    PickerDemo.Time -> TimePicker(
+                        state = inlineTime,
+                        textStyle = pickerTextStyle,
                         modifier = Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .background(selectedColor),
+                            .fillMaxWidth()
+                            .height(230.dp),
                     )
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            text = "Selected color",
-                            color = OneUiTheme.colors.primaryText,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text(
-                            text = "ARGB %08X".format(selectedColor.value.toLong().toInt()),
-                            color = OneUiTheme.colors.secondaryText,
-                            fontSize = 13.sp,
-                        )
-                    }
-                    OneUiTextButton(onClick = { showColorPicker = true }) {
-                        Text("Choose")
-                    }
+
+                    PickerDemo.Date -> DatePicker(
+                        state = inlineDate,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    PickerDemo.SpinningDate -> SpinningDatePickerSample(
+                        month = spinMonth,
+                        day = spinDay,
+                        year = spinYear,
+                        onMonthChanged = { spinMonth = it },
+                        onDayChanged = { spinDay = it },
+                        onYearChanged = { spinYear = it },
+                    )
+
+                    PickerDemo.SleepTime -> SleepTimePickerSample(
+                        bedtime = bedtime,
+                        wakeTime = wakeTime,
+                        textStyle = pickerTextStyle,
+                    )
                 }
-                if (showColorPicker) {
-                    SimpleColorPickerPopup(
-                        selectedColor = selectedColor,
-                        onColorSelected = {
-                            selectedColor = it
-                            showColorPicker = false
-                        },
-                        onDismissRequest = { showColorPicker = false },
+            }
+        }
+        item { ReferenceSeparator("Dialogs") }
+        item {
+            PickerReferenceSurface(testTag = "picker-dialogs") {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    PickerDialogButton(
+                        label = "Date",
+                        testTag = "picker-date-dialog",
+                        onClick = { showDateDialog = true },
+                    )
+                    PickerDialogButton(
+                        label = "Time",
+                        testTag = "picker-time-dialog",
+                        onClick = { showTimeDialog = true },
+                    )
+                    PickerDialogButton(
+                        label = "Start End Time",
+                        testTag = "picker-start-end-time-dialog",
+                        onClick = { showStartEndDialog = true },
+                    )
+                    PickerDialogButton(
+                        label = "Color",
+                        testTag = "picker-color-dialog",
+                        onClick = { showColorDialog = true },
                     )
                 }
             }
@@ -291,7 +192,6 @@ fun PickersScreen(modifier: Modifier = Modifier) {
             },
         )
     }
-
     if (showDateDialog) {
         DatePickerDialog(
             initialSelectedDate = selectedDialogDate,
@@ -302,59 +202,199 @@ fun PickersScreen(modifier: Modifier = Modifier) {
             },
         )
     }
+    if (showStartEndDialog) {
+        StartEndTimePickerDialog(
+            initialStartTime = selectedStartTime,
+            initialEndTime = selectedEndTime,
+            onDismissRequest = { showStartEndDialog = false },
+            onTimeSelected = { start, end ->
+                selectedStartTime = start
+                selectedEndTime = end
+                showStartEndDialog = false
+            },
+        )
+    }
+    if (showColorDialog) {
+        SimpleColorPickerDialog(
+            selectionColors = SimpleColorPickerDefaults.colors,
+            selectedColor = selectedColor,
+            onColorSelected = {
+                selectedColor = it
+                showColorDialog = false
+            },
+            onDismissRequest = { showColorDialog = false },
+        )
+    }
 }
 
 @Composable
-private fun PickerSection(
-    title: String,
-    subtitle: String,
+private fun PickerReferenceSurface(
     testTag: String,
-    content: @Composable ColumnScope.() -> Unit,
+    content: @Composable () -> Unit,
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .testTag(testTag)
-            .clip(RoundedCornerShape(28.dp))
+            .clip(RoundedCornerShape(26.dp))
             .background(OneUiTheme.colors.surfaceElevated)
-            .padding(horizontal = 18.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+            .padding(vertical = 24.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = title,
-            color = OneUiTheme.colors.primaryText,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-        )
-        Text(
-            text = subtitle,
-            color = OneUiTheme.colors.secondaryText,
-            fontSize = 13.sp,
-        )
-        Spacer(Modifier.height(2.dp))
         content()
     }
 }
 
 @Composable
-private fun PickerSubheading(text: String) {
+private fun NumberPickerSample(
+    firstNumber: Int,
+    secondNumber: Int,
+    thirdValue: String,
+    onFirstNumberChanged: (Int) -> Unit,
+    onSecondNumberChanged: (Int) -> Unit,
+    onThirdValueChanged: (String) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(230.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        NumberPicker(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            values = (1..100).toList(),
+            startValue = firstNumber,
+            onValueChange = onFirstNumberChanged,
+        )
+        NumberPicker(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            values = (0..10).toList(),
+            startValue = secondNumber,
+            onValueChange = onSecondNumberChanged,
+            textStyle = OneUITheme.types.numberPicker.copy(fontSize = 50.sp),
+        )
+        StringPicker(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            values = listOf("A", "B", "C"),
+            startValue = thirdValue,
+            onValueChange = onThirdValueChanged,
+            textStyle = OneUITheme.types.numberPicker.copy(fontSize = 40.sp),
+        )
+    }
+}
+
+@Composable
+private fun SpinningDatePickerSample(
+    month: Int,
+    day: Int,
+    year: Int,
+    onMonthChanged: (Int) -> Unit,
+    onDayChanged: (Int) -> Unit,
+    onYearChanged: (Int) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(230.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        NumberPicker(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            values = (1..12).toList(),
+            startValue = month,
+            onValueChange = onMonthChanged,
+        )
+        NumberPicker(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            values = (1..31).toList(),
+            startValue = day,
+            onValueChange = onDayChanged,
+        )
+        NumberPicker(
+            modifier = Modifier
+                .weight(1.25f)
+                .fillMaxHeight(),
+            values = (2020..2035).toList(),
+            startValue = year.coerceIn(2020, 2035),
+            onValueChange = onYearChanged,
+            infiniteScroll = false,
+        )
+    }
+}
+
+@Composable
+private fun SleepTimePickerSample(
+    bedtime: TimePickerState,
+    wakeTime: TimePickerState,
+    textStyle: TextStyle,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
+    ) {
+        PickerLabel("Bedtime")
+        TimePicker(
+            state = bedtime,
+            textStyle = textStyle,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(190.dp),
+        )
+        PickerLabel("Wake-up time")
+        TimePicker(
+            state = wakeTime,
+            textStyle = textStyle,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(190.dp),
+        )
+    }
+}
+
+@Composable
+private fun ReferenceSeparator(label: String) {
     Text(
-        text = text,
-        color = OneUiTheme.colors.primaryText,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.SemiBold,
+        text = label,
+        color = OneUiTheme.colors.secondaryText,
+        style = OneUiTheme.typography.sectionLabel,
+        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
     )
 }
 
 @Composable
-private fun PickerValue(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+private fun PickerLabel(label: String) {
+    Text(
+        text = label,
+        color = OneUiTheme.colors.primaryText,
+        style = OneUiTheme.typography.listTitle,
+        modifier = Modifier.padding(horizontal = 24.dp),
+    )
+}
+
+@Composable
+private fun PickerDialogButton(
+    label: String,
+    testTag: String,
+    onClick: () -> Unit,
+) {
+    OneUiButton(
+        onClick = onClick,
+        modifier = Modifier
+            .width(250.dp)
+            .testTag(testTag),
+        colors = OneUiButtonDefaults.filledColors(),
     ) {
-        Text(label, color = OneUiTheme.colors.secondaryText, fontSize = 13.sp)
-        Spacer(Modifier.width(12.dp))
-        Text(value, color = OneUiTheme.colors.primaryText, fontSize = 13.sp)
+        Text(label)
     }
 }

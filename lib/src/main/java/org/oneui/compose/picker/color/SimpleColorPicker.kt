@@ -12,11 +12,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.oneui.compose.R
+import org.oneui.compose.dialog.AlertDialog
 import org.oneui.compose.theme.OneUITheme
 import org.oneui.compose.theme.locals.LocalBackgroundColor
 import org.oneui.compose.widgets.menu.PopupMenu
@@ -50,55 +56,100 @@ fun SimpleColorPickerPopup(
             modifier = Modifier
                 .padding(SimpleColorPickerDefaults.padding)
         ) {
-            FlowRow(
-                modifier = Modifier
-                    .width(SimpleColorPickerDefaults.width),
-                verticalArrangement = Arrangement
-                    .spacedBy(SimpleColorPickerDefaults.verticalSpacing),
-                horizontalArrangement = Arrangement
-                    .spacedBy(SimpleColorPickerDefaults.horizontalSpacing)
-            ) {
-                val bg = LocalBackgroundColor.current
-                selectionColors.forEach {
-                    val selected = it == selectedColor
+            SimpleColorPickerGrid(
+                selectionColors = selectionColors,
+                selectedColor = selectedColor,
+                colors = colors,
+                onColorSelected = onColorSelected,
+            )
+        }
+    }
+}
 
-                    Canvas(
-                        modifier = Modifier
-                            .size(SimpleColorPickerDefaults.cellRadius * 2)
-                            .clickable(
-                                onClick = { onColorSelected(it) },
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            )
-                    ) {
-                        if(selected) {
-                            drawCircle(
-                                color = colors.selectedStroke,
-                                center = Offset(
-                                    x = size.width / 2,
-                                    y = size.height / 2
-                                ),
-                                radius = SimpleColorPickerDefaults.selectedIndicatorRadius.toPx()
-                            )
-                        }
-                        drawCircle(
-                            color = bg,
-                            center = Offset(
-                                x = size.width / 2,
-                                y = size.height / 2
-                            ),
-                            radius = (SimpleColorPickerDefaults.selectedIndicatorRadius  - SimpleColorPickerDefaults.selectedIndicatorWidth).toPx()
-                        )
-                        drawCircle(
-                            color = it,
-                            center = Offset(
-                                x = size.width / 2,
-                                y = size.height / 2
-                            ),
-                            radius = SimpleColorPickerDefaults.cellRadius.toPx()
-                        )
-                    }
+/**
+ * Compose-native dialog form of the reference color picker entry.
+ *
+ * The pending swatch is kept local until Done so Cancel leaves the caller's color unchanged.
+ */
+@Composable
+fun SimpleColorPickerDialog(
+    onDismissRequest: () -> Unit,
+    onColorSelected: (Color) -> Unit,
+    modifier: Modifier = Modifier,
+    selectionColors: List<Color> = SimpleColorPickerDefaults.colors,
+    selectedColor: Color = selectionColors.first(),
+    colors: SimpleColorPickerColors = simpleColorPickerColors(),
+    title: String = "Color",
+) {
+    var pendingColor by remember(selectedColor) { mutableStateOf(selectedColor) }
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+        title = title,
+        positiveButtonLabel = stringResource(R.string.sesl_picker_done),
+        onPositiveButtonClick = {
+            onColorSelected(pendingColor)
+            onDismissRequest()
+        },
+        negativeButtonLabel = stringResource(R.string.sesl_picker_cancel),
+        onNegativeButtonClick = onDismissRequest,
+        body = {
+            Box(Modifier.padding(top = 18.dp)) {
+                SimpleColorPickerGrid(
+                    selectionColors = selectionColors,
+                    selectedColor = pendingColor,
+                    colors = colors,
+                    onColorSelected = { pendingColor = it },
+                )
+            }
+        },
+    )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SimpleColorPickerGrid(
+    selectionColors: List<Color>,
+    selectedColor: Color?,
+    colors: SimpleColorPickerColors,
+    onColorSelected: (Color) -> Unit,
+) {
+    FlowRow(
+        modifier = Modifier.width(SimpleColorPickerDefaults.width),
+        verticalArrangement = Arrangement.spacedBy(SimpleColorPickerDefaults.verticalSpacing),
+        horizontalArrangement = Arrangement.spacedBy(SimpleColorPickerDefaults.horizontalSpacing),
+    ) {
+        val bg = LocalBackgroundColor.current.takeUnless { it == Color.Transparent }
+            ?: OneUITheme.colors.seslBackgroundFloating
+        selectionColors.forEach { color ->
+            val selected = color == selectedColor
+            Canvas(
+                modifier = Modifier
+                    .size(SimpleColorPickerDefaults.cellRadius * 2)
+                    .clickable(
+                        onClick = { onColorSelected(color) },
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                    ),
+            ) {
+                if (selected) {
+                    drawCircle(
+                        color = colors.selectedStroke,
+                        center = Offset(size.width / 2, size.height / 2),
+                        radius = SimpleColorPickerDefaults.selectedIndicatorRadius.toPx(),
+                    )
                 }
+                drawCircle(
+                    color = bg,
+                    center = Offset(size.width / 2, size.height / 2),
+                    radius = (SimpleColorPickerDefaults.selectedIndicatorRadius -
+                        SimpleColorPickerDefaults.selectedIndicatorWidth).toPx(),
+                )
+                drawCircle(
+                    color = color,
+                    center = Offset(size.width / 2, size.height / 2),
+                    radius = SimpleColorPickerDefaults.cellRadius.toPx(),
+                )
             }
         }
     }

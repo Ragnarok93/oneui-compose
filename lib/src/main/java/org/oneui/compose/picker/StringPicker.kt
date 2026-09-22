@@ -43,6 +43,11 @@ fun StringPicker(
     textStyle: TextStyle = OneUITheme.types.numberPicker
 ) {
     val scope = rememberCoroutineScope()
+    val wheelSurface = if (colors.surface == Color.Unspecified) {
+        OneUITheme.colors.seslBackgroundFloating
+    } else {
+        colors.surface
+    }
 
     if (infiniteScroll) {
         val state = remember {
@@ -83,7 +88,7 @@ fun StringPicker(
                     it in values
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 )
             )
@@ -97,7 +102,8 @@ fun StringPicker(
                 state.currentIndex = index
             },
             item = item,
-            activeItem = activeItem
+            activeItem = activeItem,
+            maskColor = wheelSurface,
         )
     } else {
         val state = remember {
@@ -138,7 +144,7 @@ fun StringPicker(
                     it in values
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 )
             )
@@ -152,7 +158,8 @@ fun StringPicker(
                 state.currentIndex = index
             },
             item = item,
-            activeItem = activeItem
+            activeItem = activeItem,
+            maskColor = wheelSurface,
         )
     }
 }
@@ -164,7 +171,10 @@ data class StringPickerColors(
 
     val textScrolling: Color,
 
-    val text: Color
+    val text: Color,
+
+    /** Surface that the adjacent wheel values fade into. */
+    val surface: Color = Color.Unspecified,
 
 )
 
@@ -176,9 +186,17 @@ data class StringPickerColors(
  */
 @Composable
 fun stringPickerColors(
-    textScrolling: Color = OneUITheme.colors.seslNumberPickerTextHighlightColor,
-    text: Color = OneUITheme.colors.seslNumberPickerTextColor
-): StringPickerColors = StringPickerColors(
-    textScrolling = textScrolling,
-    text = text
-)
+    textScrolling: Color = Color.Unspecified,
+    text: Color = Color.Unspecified,
+): StringPickerColors {
+    val visuals = PickerVisuals.from(
+        primaryText = OneUITheme.colors.seslPrimaryTextColor,
+        secondaryText = OneUITheme.colors.seslSecondaryTextColor,
+        surface = OneUITheme.colors.seslBackgroundFloating,
+    )
+    return StringPickerColors(
+        textScrolling = textScrolling.takeUnless { it == Color.Unspecified } ?: visuals.inactiveText,
+        text = text.takeUnless { it == Color.Unspecified } ?: visuals.activeText,
+        surface = visuals.surface,
+    )
+}
