@@ -107,7 +107,7 @@ fun PreferencesScreen(
                             selected = themeMode == mode,
                             onClick = { onThemeModeChange(mode) },
                         )
-                    )
+                    }
                 }
             }
             item {

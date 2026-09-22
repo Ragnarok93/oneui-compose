@@ -21,7 +21,7 @@ import org.oneui.compose.icons.OneUiIconButton
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.patterns.shell.OneUiAppShell
 
-internal enum class CatalogThemeMode(
+enum class CatalogThemeMode(
     val label: String,
     val darkThemeOverride: Boolean?,
 ) {
