@@ -14,11 +14,11 @@
     {"id":"sheet-exit","source":"One UI bottom sheet resources","mapping":"OneUiMotion sheet exit 200/140ms","status":"mapped"},
     {"id":"menu","source":"One UI menu resources","mapping":"OneUiMotion menu 300/150ms","status":"mapped"},
     {"id":"fab","source":"One UI floating action resource timing","mapping":"OneUiMotion.Duration.Fab=400","status":"mapped"},
-    {"id":"app-bar-collapse","source":"reference Toolbar/NavDrawer implementation","mapping":"planned OneUiAppBar motion","status":"missing"},
-    {"id":"drawer","source":"reference NavDrawerLayout","mapping":"planned OneUiDrawer motion","status":"missing"},
-    {"id":"tabs-navigation","source":"reference tab/bottom-nav indicator motion","mapping":"planned OneUiNavigation motion","status":"missing"},
-    {"id":"progress-indeterminate","source":"SESL progress implementation","mapping":"progress source audit pending","status":"in_progress"},
-    {"id":"pickers","source":"SESL picker implementations","mapping":"picker wheel/source audit pending","status":"missing"},
-    {"id":"search-action-mode","source":"ToolbarLayout search/action mode","mapping":"planned OneUiSearchMode/OneUiActionMode","status":"missing"}
+    {"id":"app-bar-collapse","source":"reference Toolbar/NavDrawer implementation","mapping":"OneUiMotion.appBarCollapse / OneUiCustomAbout","status":"mapped"},
+    {"id":"drawer","source":"reference NavDrawerLayout","mapping":"OneUiMotion.drawer / OneUiAppShell and DrawerState","status":"mapped"},
+    {"id":"tabs-navigation","source":"reference tab/bottom-nav indicator motion","mapping":"OneUiMotion.navigationIndicator / OneUiTabs and OneUiBottomNavigation","status":"mapped"},
+    {"id":"progress-indeterminate","source":"SESL progress implementation","mapping":"Compose-native indeterminate progress keyframes with reduced-motion static states","status":"mapped"},
+    {"id":"pickers","source":"SESL picker implementations","mapping":"OneUiMotion.pickerWheel snap fling with reduced-motion snap","status":"mapped"},
+    {"id":"search-action-mode","source":"ToolbarLayout search/action mode","mapping":"OneUiMotion.searchMode and actionMode / OneUiSearchMode and OneUiActionMode","status":"mapped"}
   ]
 }
