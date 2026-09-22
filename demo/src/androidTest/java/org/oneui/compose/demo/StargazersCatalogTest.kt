@@ -5,9 +5,7 @@ import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.fetchSemanticsNodes
 import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -90,16 +88,16 @@ class StargazersCatalogTest {
 
         composeRule.onNodeWithTag("stargazers-simulate-error").performClick()
         composeRule.waitUntil(timeoutMillis = 2_000) {
-            composeRule.onAllNodesWithTag("stargazers-refresh-error")
-                .fetchSemanticsNodes()
-                .isNotEmpty()
+            runCatching {
+                composeRule.onNodeWithTag("stargazers-refresh-error").assertIsDisplayed()
+            }.isSuccess
         }
         composeRule.onNodeWithText("Ada Lovelace").assertIsDisplayed()
         composeRule.onNodeWithText("Retry").performClick()
         composeRule.waitUntil(timeoutMillis = 2_000) {
-            composeRule.onAllNodesWithTag("stargazers-refresh-error")
-                .fetchSemanticsNodes()
-                .isEmpty()
+            runCatching {
+                composeRule.onNodeWithTag("stargazers-refresh-error").assertDoesNotExist()
+            }.isSuccess
         }
         composeRule.onNodeWithText("Ada Lovelace").assertIsDisplayed()
     }

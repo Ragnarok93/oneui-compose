@@ -1,5 +1,6 @@
 package org.oneui.compose.demo.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -120,6 +121,13 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
     }
     var failNextFetch by rememberSaveable { mutableStateOf(false) }
 
+    BackHandler(enabled = profile != null) {
+        profile = null
+    }
+    BackHandler(enabled = profile == null && selectionState.isSelectionMode) {
+        selectionState.clear()
+    }
+
     LaunchedEffect(fetchState.fetchState) {
         if (!fetchState.isLoading) return@LaunchedEffect
         kotlinx.coroutines.delay(250L)
@@ -172,13 +180,17 @@ fun StargazersCatalogTab(modifier: Modifier = Modifier) {
                 onSwipeFeedback = { swipeFeedback = it },
                 onActionFeedback = { actionFeedback = it },
                 onRefresh = {
-                    fetchState = fetchState.reduce(
-                        if (fetchState.profiles.isEmpty()) {
+                    val event = when (fetchState.fetchState) {
+                        CatalogStargazersFetchState.INIT_ERROR,
+                        CatalogStargazersFetchState.REFRESH_ERROR,
+                        -> CatalogStargazersFetchEvent.Retry
+                        else -> if (fetchState.profiles.isEmpty()) {
                             CatalogStargazersFetchEvent.BeginInitialLoad
                         } else {
                             CatalogStargazersFetchEvent.BeginRefresh
-                        },
-                    )
+                        }
+                    }
+                    fetchState = fetchState.reduce(event)
                 },
                 onSimulateFetchError = {
                     failNextFetch = true
@@ -416,6 +428,45 @@ private fun StargazerFetchStatus(
     onRetry: () -> Unit,
 ) {
     when {
+        state.profiles.isNotEmpty() && state.fetchState == CatalogStargazersFetchState.INITING -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("stargazers-initial-progress")
+                    .padding(horizontal = 20.dp, vertical = 4.dp),
+            ) {
+                Text(
+                    text = "Loading stargazers...",
+                    color = OneUiTheme.colors.secondaryText,
+                    fontSize = 12.sp,
+                )
+                org.oneui.compose.components.progress.OneUiLinearProgress(
+                    progress = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                )
+            }
+        }
+
+        state.profiles.isNotEmpty() && state.fetchState == CatalogStargazersFetchState.INIT_ERROR -> {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("stargazers-initial-error")
+                    .padding(start = 20.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = state.errorMessage ?: "Error loading stargazers.",
+                    modifier = Modifier.weight(1f),
+                    color = OneUiTheme.colors.secondaryText,
+                    fontSize = 12.sp,
+                )
+                OneUiTextButton(onClick = onRetry) { Text("Retry") }
+            }
+        }
+
         state.fetchState == CatalogStargazersFetchState.REFRESHING -> {
             androidx.compose.foundation.layout.Column(
                 modifier = Modifier
