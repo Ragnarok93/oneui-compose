@@ -12,9 +12,14 @@ typealias OneUI8Dimensions = OneUiDimensions
 @Composable
 fun OneUI8Theme(
     dynamicColors: Boolean = false,
+    darkTheme: Boolean? = null,
     content: @Composable () -> Unit,
 ) {
-    OneUiTheme(dynamicColors = dynamicColors, content = content)
+    OneUiTheme(
+        dynamicColors = dynamicColors,
+        darkTheme = darkTheme,
+        content = content,
+    )
 }
 
 /** Compatibility token facade for the feature-branch OneUI8 API. */

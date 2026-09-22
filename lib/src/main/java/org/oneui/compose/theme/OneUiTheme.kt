@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import org.oneui.compose.motion.OneUiMotionScheme
+import org.oneui.compose.theme.color.OneUIColorTheme
 
 private val LocalOneUiColors = staticCompositionLocalOf<OneUiColors> {
     error("OneUiTheme colors are unavailable outside OneUiTheme")
@@ -34,12 +35,20 @@ private val LocalOneUiMotion = staticCompositionLocalOf { OneUiMotionScheme() }
 fun OneUiTheme(
     dynamicColors: Boolean = false,
     reducedMotion: Boolean? = null,
+    darkTheme: Boolean? = null,
     content: @Composable () -> Unit,
 ) {
-    OneUITheme(dynamicColors = dynamicColors) {
+    val dark = darkTheme ?: isSystemInDarkTheme()
+    val legacyColorTheme = OneUIColorTheme.getTheme(
+        dark = dark,
+        dynamic = dynamicColors,
+    )
+    OneUITheme(
+        dynamicColors = dynamicColors,
+        colorTheme = legacyColorTheme,
+    ) {
         val legacyColors = OneUITheme.colors
         val legacyTypes = OneUITheme.types
-        val dark = isSystemInDarkTheme()
         val context = LocalContext.current
         val systemReducedMotion = remember(context) {
             runCatching {
@@ -88,7 +97,7 @@ fun OneUiTheme(
                 onPrimary = colors.onAccent,
                 background = colors.background,
                 onBackground = colors.primaryText,
-                surface = colors.surface,
+                surface = colors.surfaceElevated,
                 onSurface = colors.primaryText,
                 surfaceVariant = colors.surfaceElevated,
                 onSurfaceVariant = colors.secondaryText,
@@ -101,7 +110,7 @@ fun OneUiTheme(
                 onPrimary = colors.onAccent,
                 background = colors.background,
                 onBackground = colors.primaryText,
-                surface = colors.surface,
+                surface = colors.surfaceElevated,
                 onSurface = colors.primaryText,
                 surfaceVariant = colors.surfaceElevated,
                 onSurfaceVariant = colors.secondaryText,

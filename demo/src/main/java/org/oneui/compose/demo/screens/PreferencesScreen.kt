@@ -34,6 +34,7 @@ import org.oneui.compose.components.selection.OneUiCheckbox
 import org.oneui.compose.components.slider.OneUiSlider
 import org.oneui.compose.components.slider.OneUiSliderMode
 import org.oneui.compose.demo.CatalogSection
+import org.oneui.compose.demo.CatalogThemeMode
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.patterns.cards.OneUiRelatedLink
 import org.oneui.compose.patterns.cards.OneUiRelatedLinksCard
@@ -44,10 +45,10 @@ import org.oneui.compose.theme.OneUiTheme
 fun PreferencesScreen(
     modifier: Modifier = Modifier,
     onOpenAbout: () -> Unit = {},
+    themeMode: CatalogThemeMode = CatalogThemeMode.System,
+    onThemeModeChange: (CatalogThemeMode) -> Unit = {},
 ) {
     var suggestionVisible by remember { mutableStateOf(true) }
-    var autoDarkMode by remember { mutableStateOf(true) }
-    var darkMode by remember { mutableStateOf(0) }
     var switchValue by remember { mutableStateOf(false) }
     var screenSwitch by remember { mutableStateOf(true) }
     var checkValue by remember { mutableStateOf(true) }
@@ -100,18 +101,12 @@ fun PreferencesScreen(
             }
             item {
                 OneUiPreferenceCategory(title = "Dark mode settings") {
-                    listOf("Light", "Dark", "System default").forEachIndexed { index, label ->
+                    CatalogThemeMode.entries.forEach { mode ->
                         OneUiRadioItem(
-                            title = label,
-                            selected = darkMode == index,
-                            enabled = !autoDarkMode,
-                            onClick = { darkMode = index },
+                            title = mode.label,
+                            selected = themeMode == mode,
+                            onClick = { onThemeModeChange(mode) },
                         )
-                    }
-                    OneUiSwitchItem(
-                        title = "System default",
-                        checked = autoDarkMode,
-                        onCheckedChange = { autoDarkMode = it },
                     )
                 }
             }

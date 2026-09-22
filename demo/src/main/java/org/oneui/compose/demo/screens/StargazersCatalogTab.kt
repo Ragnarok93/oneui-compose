@@ -732,7 +732,7 @@ private fun StargazerProfile(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(OneUiTheme.colors.surface)
+                .background(OneUiTheme.colors.surfaceElevated)
                 .testTag("stargazer-profile-bottom-actions"),
         ) {
             HorizontalDivider(color = OneUiTheme.colors.divider)
@@ -790,7 +790,7 @@ private fun StargazerQrSheet(
     val context = LocalContext.current
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = OneUiTheme.colors.surface,
+        containerColor = OneUiTheme.colors.surfaceElevated,
     ) {
         Column(
             modifier = Modifier

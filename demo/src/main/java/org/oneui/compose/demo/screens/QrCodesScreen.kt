@@ -105,7 +105,7 @@ fun QrCodesScreen(modifier: Modifier = Modifier) {
                         .size(232.dp)
                         .clip(RoundedCornerShape(24.dp)),
                     foregroundColor = OneUiTheme.colors.accent,
-                    backgroundColor = OneUiTheme.colors.surface,
+                    backgroundColor = OneUiTheme.colors.surfaceElevated,
                     errorCorrection = OneUiQrErrorCorrection.Quartile,
                     contentDescription = "Tinted QR code",
                 )
@@ -128,7 +128,7 @@ fun QrCodesScreen(modifier: Modifier = Modifier) {
                             .size(180.dp)
                             .clip(RoundedCornerShape(24.dp)),
                         foregroundColor = OneUiTheme.colors.primaryText,
-                        backgroundColor = OneUiTheme.colors.surface,
+                        backgroundColor = OneUiTheme.colors.surfaceElevated,
                         contentDescription = "Empty QR code state",
                     )
                 }

@@ -10,12 +10,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.oneui.compose.theme.OneUiColors
 import org.oneui.compose.theme.OneUiTheme
+
+/** Defaults shared by generic Compose-native One UI physical surfaces. */
+internal object OneUiSurfaceDefaults {
+    fun containerColor(colors: OneUiColors): Color = colors.surfaceElevated
+}
 
 @Composable
 fun OneUiSurface(
     modifier: Modifier = Modifier,
-    containerColor: Color = OneUiTheme.colors.surface,
+    containerColor: Color = OneUiSurfaceDefaults.containerColor(OneUiTheme.colors),
     shape: androidx.compose.ui.graphics.Shape = OneUiTheme.shapes.card,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -31,7 +37,7 @@ fun OneUiSurface(
 @Composable
 fun OneUiSurfaceBox(
     modifier: Modifier = Modifier,
-    containerColor: Color = OneUiTheme.colors.surface,
+    containerColor: Color = OneUiSurfaceDefaults.containerColor(OneUiTheme.colors),
     shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(22.dp),
     content: @Composable () -> Unit,
 ) {
@@ -43,4 +49,3 @@ fun OneUiSurfaceBox(
         content()
     }
 }
-

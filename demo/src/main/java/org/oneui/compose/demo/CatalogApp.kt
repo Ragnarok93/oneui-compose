@@ -21,10 +21,21 @@ import org.oneui.compose.icons.OneUiIconButton
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.patterns.shell.OneUiAppShell
 
+internal enum class CatalogThemeMode(
+    val label: String,
+    val darkThemeOverride: Boolean?,
+) {
+    System("System default", null),
+    Light("Light", false),
+    Dark("Dark", true),
+}
+
 @Composable
 fun CatalogApp(
     onOpenLegacyShowcase: () -> Unit,
     modifier: Modifier = Modifier,
+    themeMode: CatalogThemeMode = CatalogThemeMode.System,
+    onThemeModeChange: (CatalogThemeMode) -> Unit = {},
 ) {
     var selectedName by rememberSaveable { mutableStateOf(CatalogDestination.ProgressBars.name) }
     val selected = CatalogDestination.entries.firstOrNull { it.name == selectedName }
@@ -71,6 +82,8 @@ fun CatalogApp(
             CatalogDestination.CustomAbout -> CustomAboutScreen()
             CatalogDestination.Preferences -> PreferencesScreen(
                 onOpenAbout = { selectedName = CatalogDestination.About.name },
+                themeMode = themeMode,
+                onThemeModeChange = onThemeModeChange,
             )
             CatalogDestination.About -> AboutScreen()
             CatalogDestination.LegacyShowcase -> Unit

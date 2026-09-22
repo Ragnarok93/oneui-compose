@@ -368,7 +368,7 @@ fun WidgetsScreen(modifier: Modifier = Modifier) {
     if (sheetVisible) {
         ModalBottomSheet(
             onDismissRequest = { sheetVisible = false },
-            containerColor = OneUiTheme.colors.surface,
+            containerColor = OneUiTheme.colors.surfaceElevated,
         ) {
             Column(
                 modifier = Modifier

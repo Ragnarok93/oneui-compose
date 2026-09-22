@@ -23,7 +23,7 @@ import org.oneui.compose.oneui8.theme.OneUI8Theme
 @Composable
 fun OneUI8Card(
     modifier: Modifier = Modifier,
-    containerColor: Color = OneUI8Theme.colors.surface,
+    containerColor: Color = OneUI8Theme.colors.surfaceElevated,
     content: @Composable () -> Unit,
 ) {
     Box(
@@ -82,7 +82,7 @@ fun OneUI8ListItem(
         .fillMaxWidth()
         .defaultMinSize(minHeight = OneUI8Theme.dimensions.listItemMinHeight)
         .background(
-            OneUI8Theme.colors.surface,
+            OneUI8Theme.colors.surfaceElevated,
             shape,
         )
     val clickable = if (onClick != null) {

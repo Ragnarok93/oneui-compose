@@ -74,6 +74,8 @@ internal fun Modifier.oneUiInteractive(
         .graphicsLayer {
             scaleX = scale
             scaleY = scale
+            this.shape = shape
+            clip = true
         }
         .clip(shape)
         .then(

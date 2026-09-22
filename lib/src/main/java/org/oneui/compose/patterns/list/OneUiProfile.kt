@@ -81,7 +81,7 @@ fun OneUiProfile(
                     .fillMaxWidth()
                     .padding(top = 20.dp),
                 shape = OneUiTheme.shapes.card,
-                color = OneUiTheme.colors.surface,
+                color = OneUiTheme.colors.surfaceElevated,
             ) {
                 Column {
                     details.forEachIndexed { index, detail ->

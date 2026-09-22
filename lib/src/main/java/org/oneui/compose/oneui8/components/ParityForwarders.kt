@@ -183,7 +183,7 @@ fun OneUI8NavigationRail(
 @Composable
 fun OneUI8Surface(
     modifier: Modifier = Modifier,
-    containerColor: Color = OneUiTheme.colors.surface,
+    containerColor: Color = OneUiTheme.colors.surfaceElevated,
     shape: Shape = OneUiTheme.shapes.card,
     content: @Composable ColumnScope.() -> Unit,
 ) = OneUiSurface(modifier, containerColor, shape, content)
@@ -191,7 +191,7 @@ fun OneUI8Surface(
 @Composable
 fun OneUI8SurfaceBox(
     modifier: Modifier = Modifier,
-    containerColor: Color = OneUiTheme.colors.surface,
+    containerColor: Color = OneUiTheme.colors.surfaceElevated,
     shape: Shape = androidx.compose.foundation.shape.RoundedCornerShape(22.dp),
     content: @Composable () -> Unit,
 ) = OneUiSurfaceBox(modifier, containerColor, shape, content)

@@ -15,7 +15,9 @@ data class OneUiColors(
     val accent: Color,
     val onAccent: Color,
     val background: Color,
+    /** SESL preference-relative selection overlay. It is intentionally translucent and not a card color. */
     val surface: Color,
+    /** Opaque SESL floating surface used for cards, dialogs, and other physical containers. */
     val surfaceElevated: Color,
     val surfacePressed: Color,
     val primaryText: Color,

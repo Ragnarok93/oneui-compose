@@ -56,7 +56,7 @@ fun OneUiPreferenceCategory(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(OneUiTheme.colors.surface, RoundedCornerShape(22.dp))
+                .background(OneUiTheme.colors.surfaceElevated, RoundedCornerShape(22.dp))
                 .testTag("oneui-preference-category"),
         ) { content() }
     }
@@ -94,4 +94,3 @@ fun OneUiSuggestionCard(
         OneUiFilledButton(onClick = onAction) { Text(actionLabel) }
     }
 }
-

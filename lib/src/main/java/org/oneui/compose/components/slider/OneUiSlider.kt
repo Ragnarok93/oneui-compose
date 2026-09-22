@@ -89,7 +89,7 @@ object OneUiSliderDefaults {
     fun colors(
         activeTrack: Color = OneUiTheme.colors.accentStrong,
         inactiveTrack: Color = OneUiTheme.colors.seekOverlapTrack,
-        thumb: Color = OneUiTheme.colors.surface,
+        thumb: Color = OneUiTheme.colors.surfaceElevated,
         thumbStroke: Color = OneUiTheme.colors.accentStrong,
         interactionHalo: Color = OneUiTheme.colors.accent.copy(alpha = 0.16f),
         warning: Color = OneUiTheme.colors.seekOverlapActive,

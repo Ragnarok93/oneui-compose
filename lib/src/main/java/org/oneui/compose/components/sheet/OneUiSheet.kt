@@ -27,7 +27,7 @@ fun OneUiSheet(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
-        containerColor = OneUiTheme.colors.surface,
+        containerColor = OneUiTheme.colors.surfaceElevated,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -44,4 +44,3 @@ fun OneUiSheet(
         }
     }
 }
-

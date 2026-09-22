@@ -69,7 +69,7 @@ fun OneUiQrCode(
     data: String,
     modifier: Modifier = Modifier,
     foregroundColor: Color = OneUiTheme.colors.primaryText,
-    backgroundColor: Color = OneUiTheme.colors.surface,
+    backgroundColor: Color = OneUiTheme.colors.surfaceElevated,
     errorCorrection: OneUiQrErrorCorrection = OneUiQrErrorCorrection.Medium,
     quietZoneModules: Int = 4,
     contentDescription: String = "QR code",
