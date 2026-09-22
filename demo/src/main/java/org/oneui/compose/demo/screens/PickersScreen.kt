@@ -32,8 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 import java.time.LocalTime
-import org.oneui.compose.components.buttons.OneUiButton
-import org.oneui.compose.components.buttons.OneUiButtonDefaults
+import org.oneui.compose.components.buttons.OneUiContainedButton
 import org.oneui.compose.components.input.OneUiSpinner
 import org.oneui.compose.picker.NumberPicker
 import org.oneui.compose.picker.StringPicker
@@ -55,6 +54,11 @@ private enum class PickerDemo(val label: String, val testTag: String) {
     Date("DatePicker", "picker-date-inline"),
     SpinningDate("SpinningDatePicker", "picker-spinning-date"),
     SleepTime("SleepTimePicker", "picker-sleep-time"),
+}
+
+/** Measurements from the pinned SESL8 `fragment_pickers.xml` dialog section. */
+internal object PickerReferenceDefaults {
+    val DialogButtonWidth = 250.dp
 }
 
 /** Compose-native port of the pinned `fragment_pickers.xml` surface. */
@@ -388,12 +392,11 @@ private fun PickerDialogButton(
     testTag: String,
     onClick: () -> Unit,
 ) {
-    OneUiButton(
+    OneUiContainedButton(
         onClick = onClick,
         modifier = Modifier
-            .width(250.dp)
+            .width(PickerReferenceDefaults.DialogButtonWidth)
             .testTag(testTag),
-        colors = OneUiButtonDefaults.filledColors(),
     ) {
         Text(label)
     }
