@@ -11,13 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import org.oneui.compose.motion.OneUiMotion
 
 /**
  * The state to control the sliding Drawer
  */
 @OptIn(ExperimentalFoundationApi::class)
 data class DrawerState(
-    val animDuration: Int = 600,
+    val animDuration: Int = OneUiMotion.Duration.Drawer,
     val initial: SlidingDrawerOpenedState,
     val velocityThreshold: Float
 ) {
@@ -33,7 +34,11 @@ data class DrawerState(
     internal fun flingBehavior() = AnchoredDraggableDefaults.flingBehavior(
         state = draggableState,
         positionalThreshold = { distance -> distance / 2F },
-        animationSpec = tween(durationMillis = animDuration)
+        animationSpec = if (animDuration == OneUiMotion.Duration.Drawer) {
+            OneUiMotion.drawer()
+        } else {
+            tween(durationMillis = animDuration)
+        }
     )
 
     fun setAnchors(
@@ -97,7 +102,11 @@ data class DrawerState(
     ) = draggableState
         .animateTo(
             targetValue = target,
-            animationSpec = tween(durationMillis = animDuration)
+            animationSpec = if (animDuration == OneUiMotion.Duration.Drawer) {
+                OneUiMotion.drawer()
+            } else {
+                tween(durationMillis = animDuration)
+            }
         )
 
     private suspend fun snap(

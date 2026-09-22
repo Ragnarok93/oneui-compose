@@ -1,6 +1,8 @@
 package org.oneui.compose.patterns.shell
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -120,8 +122,8 @@ fun OneUiAppShell(
 
                 AnimatedVisibility(
                     visible = compactDrawerOpen,
-                    enter = fadeIn(animationSpec = OneUiMotion.quick()),
-                    exit = fadeOut(animationSpec = OneUiMotion.quick()),
+                    enter = if (OneUiTheme.reducedMotion) EnterTransition.None else fadeIn(animationSpec = OneUiMotion.drawer()),
+                    exit = if (OneUiTheme.reducedMotion) ExitTransition.None else fadeOut(animationSpec = OneUiMotion.drawer()),
                 ) {
                     Box(
                         modifier = Modifier
@@ -135,13 +137,13 @@ fun OneUiAppShell(
                 }
                 AnimatedVisibility(
                     visible = compactDrawerOpen,
-                    enter = slideInHorizontally(
+                    enter = if (OneUiTheme.reducedMotion) EnterTransition.None else slideInHorizontally(
                         initialOffsetX = { if (isRtl) it else -it },
-                        animationSpec = OneUiMotion.standard(),
+                        animationSpec = OneUiMotion.drawer(),
                     ),
-                    exit = slideOutHorizontally(
+                    exit = if (OneUiTheme.reducedMotion) ExitTransition.None else slideOutHorizontally(
                         targetOffsetX = { if (isRtl) it else -it },
-                        animationSpec = OneUiMotion.standard(),
+                        animationSpec = OneUiMotion.drawer(),
                     ),
                     modifier = Modifier.align(if (isRtl) Alignment.CenterEnd else Alignment.CenterStart),
                 ) {

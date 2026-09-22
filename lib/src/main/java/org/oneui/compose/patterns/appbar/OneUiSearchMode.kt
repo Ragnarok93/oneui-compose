@@ -1,6 +1,8 @@
 package org.oneui.compose.patterns.appbar
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Row
@@ -72,8 +74,8 @@ fun OneUiSearchMode(
 ) {
     AnimatedVisibility(
         visible = active,
-        enter = if (OneUiTheme.reducedMotion) fadeIn() else fadeIn(animationSpec = org.oneui.compose.motion.OneUiMotion.quick()),
-        exit = if (OneUiTheme.reducedMotion) fadeOut() else fadeOut(animationSpec = org.oneui.compose.motion.OneUiMotion.quick()),
+        enter = if (OneUiTheme.reducedMotion) EnterTransition.None else fadeIn(animationSpec = org.oneui.compose.motion.OneUiMotion.searchMode()),
+        exit = if (OneUiTheme.reducedMotion) ExitTransition.None else fadeOut(animationSpec = org.oneui.compose.motion.OneUiMotion.searchMode()),
         modifier = modifier,
     ) {
         Row(

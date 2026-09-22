@@ -56,10 +56,10 @@ fun PreferencesScreen(
     var listIndex by remember { mutableStateOf(1) }
     var multiValues by remember { mutableStateOf(setOf("Item 1", "Item 3")) }
     var color by remember { mutableStateOf("#0381FE") }
-    var basicProgress by remember { mutableFloatStateOf(0.60f) }
-    var expandedProgress by remember { mutableFloatStateOf(0.35f) }
+    var basicProgress by remember { mutableFloatStateOf(30f) }
+    var expandedProgress by remember { mutableFloatStateOf(35f) }
     var levelProgress by remember { mutableFloatStateOf(6f) }
-    var centerProgress by remember { mutableFloatStateOf(0.5f) }
+    var centerProgress by remember { mutableFloatStateOf(50f) }
     var updatable by remember { mutableStateOf(false) }
     var dialog by remember { mutableStateOf<PreferenceDialog?>(null) }
 
@@ -193,14 +193,19 @@ fun PreferencesScreen(
             }
             item {
                 OneUiPreferenceCategory(title = "SeekBar preferences") {
-                    PreferenceSliderRow("Basic", basicProgress, 0f..1f) { basicProgress = it }
-                    PreferenceSliderRow("Expanded", expandedProgress, 0f..1f, OneUiSliderMode.Expand) {
+                    PreferenceSliderRow("Basic", basicProgress, 0f..50f, steps = 49) { basicProgress = it }
+                    PreferenceSliderRow("Expanded", expandedProgress, 0f..100f, OneUiSliderMode.Expand, steps = 99) {
                         expandedProgress = it
                     }
                     PreferenceSliderRow("LevelBar 2…10", levelProgress, 2f..10f, steps = 7) {
                         levelProgress = it
                     }
-                    PreferenceSliderRow("CenterBasedBar · seamless", centerProgress, 0f..1f) {
+                    PreferenceSliderRow(
+                        "CenterBasedBar · seamless",
+                        centerProgress,
+                        0f..100f,
+                        steps = 99,
+                    ) {
                         centerProgress = it
                     }
                 }

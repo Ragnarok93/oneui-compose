@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -82,7 +83,7 @@ private fun RowScope.OneUiTab(
 ) {
     val color by animateColorAsState(
         targetValue = if (selected) OneUiTheme.colors.accent else OneUiTheme.colors.secondaryText,
-        animationSpec = if (OneUiTheme.reducedMotion) androidx.compose.animation.core.snap() else OneUiMotion.standard(),
+        animationSpec = if (OneUiTheme.reducedMotion) androidx.compose.animation.core.snap() else OneUiMotion.navigationIndicator(),
         label = "One UI tab color",
     )
     Column(
@@ -91,7 +92,7 @@ private fun RowScope.OneUiTab(
             .oneUiInteractive(
                 enabled = true,
                 onClick = onClick,
-                interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource(),
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                 role = Role.Tab,
                 shape = RoundedCornerShape(18.dp),
                 pressedScale = 0.98f,
@@ -169,7 +170,11 @@ private fun RowScope.OneUiBottomNavigationItem(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val tint = if (selected) OneUiTheme.colors.accent else OneUiTheme.colors.secondaryText
+    val tint by animateColorAsState(
+        targetValue = if (selected) OneUiTheme.colors.accent else OneUiTheme.colors.secondaryText,
+        animationSpec = if (OneUiTheme.reducedMotion) androidx.compose.animation.core.snap() else OneUiMotion.navigationIndicator(),
+        label = "One UI bottom navigation tint",
+    )
     Column(
         modifier = Modifier
             .weight(1f)

@@ -1,6 +1,5 @@
 package org.oneui.compose.layout.toolbar
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
@@ -33,6 +32,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.oneui.compose.motion.OneUiMotion
 import org.oneui.compose.layout.internal.modifier.NestedScrollConnection
 import org.oneui.compose.theme.OneUITheme
 import org.oneui.compose.util.isEven
@@ -257,7 +257,7 @@ data class CollapsingToolbarState(
     internal fun flingBehavior() = AnchoredDraggableDefaults.flingBehavior(
         state = draggableState,
         positionalThreshold = { distance -> distance / 2F },
-        animationSpec = tween()
+        animationSpec = OneUiMotion.appBarCollapse()
     )
 
     /**
@@ -309,7 +309,7 @@ data class CollapsingToolbarState(
     ) = draggableState
         .animateTo(
             targetValue = target,
-            animationSpec = tween()
+            animationSpec = OneUiMotion.appBarCollapse()
         )
 
     private suspend fun snap(

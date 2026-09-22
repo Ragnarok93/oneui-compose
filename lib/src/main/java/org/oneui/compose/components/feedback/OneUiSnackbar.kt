@@ -1,6 +1,8 @@
 package org.oneui.compose.components.feedback
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -27,8 +29,8 @@ fun OneUiSnackbar(
 ) {
     AnimatedVisibility(
         visible = visible,
-        enter = if (OneUiTheme.reducedMotion) fadeIn() else fadeIn(animationSpec = org.oneui.compose.motion.OneUiMotion.quick()),
-        exit = if (OneUiTheme.reducedMotion) fadeOut() else fadeOut(animationSpec = org.oneui.compose.motion.OneUiMotion.quick()),
+        enter = if (OneUiTheme.reducedMotion) EnterTransition.None else fadeIn(animationSpec = org.oneui.compose.motion.OneUiMotion.snackbar()),
+        exit = if (OneUiTheme.reducedMotion) ExitTransition.None else fadeOut(animationSpec = org.oneui.compose.motion.OneUiMotion.snackbar()),
         modifier = modifier,
     ) {
         Row(
@@ -50,4 +52,3 @@ fun OneUiSnackbar(
         }
     }
 }
-
