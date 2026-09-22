@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,6 +37,7 @@ import org.oneui.compose.icons.OneUiIconButton
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.interaction.oneUiInteractive
 import org.oneui.compose.motion.OneUiMotion
+import org.oneui.compose.components.sheet.OneUiSheet
 import org.oneui.compose.theme.OneUiTheme
 
 @Immutable
@@ -40,6 +45,7 @@ data class OneUiNavigationItem(
     val id: String,
     val label: String,
     val icon: OneUiIcon? = null,
+    val selectedIcon: OneUiIcon? = null,
 )
 
 @Composable
@@ -101,9 +107,9 @@ private fun RowScope.OneUiTab(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        if (showIcon && item.icon != null) {
+        if (showIcon && (item.selectedIcon != null || item.icon != null)) {
             OneUiIcon(
-                icon = item.icon,
+                icon = if (selected) item.selectedIcon ?: item.icon!! else item.icon!!,
                 contentDescription = item.label,
                 modifier = Modifier.size(22.dp),
                 tint = color,
@@ -135,9 +141,13 @@ fun OneUiBottomNavigation(
     maxVisibleItems: Int = 5,
 ) {
     require(items.isNotEmpty()) { "OneUiBottomNavigation requires at least one item" }
-    val overflow = items.size > maxVisibleItems
-    val visible = if (overflow) items.take(maxVisibleItems - 1) else items
+    require(maxVisibleItems >= 2) { "maxVisibleItems must be at least 2" }
+    val hasOverflow = items.size > maxVisibleItems
+    val visibleCount = if (hasOverflow) maxVisibleItems - 1 else items.size
+    val visible = items.take(visibleCount)
+    val overflow = items.drop(visible.size)
     val more = OneUiNavigationItem("__more__", "More", OneUiIcons.More)
+    var overflowVisible by rememberSaveable { mutableStateOf(false) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -154,12 +164,122 @@ fun OneUiBottomNavigation(
                 onClick = { onSelected(index) },
             )
         }
-        if (overflow) {
+        if (hasOverflow) {
             OneUiBottomNavigationItem(
                 item = more,
-                selected = false,
-                onClick = { onSelected(maxVisibleItems - 1) },
+                selected = selectedIndex >= visible.size,
+                onClick = { overflowVisible = true },
+                modifier = Modifier.testTag("oneui-bottom-navigation-overflow"),
             )
+        }
+    }
+
+    OneUiNavigationOverflowSheet(
+        visible = overflowVisible,
+        items = overflow,
+        firstItemIndex = visible.size,
+        selectedIndex = selectedIndex,
+        onDismissRequest = { overflowVisible = false },
+        onSelected = { index ->
+            overflowVisible = false
+            onSelected(index)
+        },
+    )
+}
+
+/**
+ * Compose-native equivalent of SESL8 [BottomTabLayout]. It keeps the first destinations in the
+ * bottom bar and exposes the remaining destinations through the reference-style grid sheet.
+ */
+@Composable
+fun OneUiBottomTabLayout(
+    items: List<OneUiNavigationItem>,
+    selectedIndex: Int,
+    onSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    visibleItemCount: Int = 3,
+) {
+    require(items.isNotEmpty()) { "OneUiBottomTabLayout requires at least one item" }
+    require(visibleItemCount > 0) { "visibleItemCount must be positive" }
+
+    val visible = items.take(visibleItemCount)
+    val overflow = items.drop(visible.size)
+    var overflowVisible by rememberSaveable { mutableStateOf(false) }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(OneUiTheme.colors.surfaceElevated)
+            .testTag("oneui-bottom-tab-layout")
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        visible.forEachIndexed { index, item ->
+            OneUiBottomNavigationItem(
+                item = item,
+                selected = selectedIndex == index,
+                onClick = { onSelected(index) },
+            )
+        }
+        if (overflow.isNotEmpty()) {
+            OneUiBottomNavigationItem(
+                item = OneUiNavigationItem("__more__", "More", OneUiIcons.More),
+                selected = selectedIndex >= visible.size,
+                onClick = { overflowVisible = true },
+                modifier = Modifier.testTag("oneui-bottom-tab-overflow"),
+            )
+        }
+    }
+
+    OneUiNavigationOverflowSheet(
+        visible = overflowVisible,
+        items = overflow,
+        firstItemIndex = visible.size,
+        selectedIndex = selectedIndex,
+        onDismissRequest = { overflowVisible = false },
+        onSelected = { index ->
+            overflowVisible = false
+            onSelected(index)
+        },
+    )
+}
+
+@Composable
+private fun OneUiNavigationOverflowSheet(
+    visible: Boolean,
+    items: List<OneUiNavigationItem>,
+    firstItemIndex: Int,
+    selectedIndex: Int,
+    onDismissRequest: () -> Unit,
+    onSelected: (Int) -> Unit,
+) {
+    if (items.isEmpty()) return
+    OneUiSheet(
+        visible = visible,
+        onDismissRequest = onDismissRequest,
+        title = "More",
+        modifier = Modifier.testTag("oneui-navigation-overflow-sheet"),
+    ) {
+        items.chunked(3).forEachIndexed { rowIndex, rowItems ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                rowItems.forEachIndexed { columnIndex, item ->
+                    val itemIndex = firstItemIndex + rowIndex * 3 + columnIndex
+                    OneUiBottomNavigationItem(
+                        item = item,
+                        selected = selectedIndex == itemIndex,
+                        onClick = { onSelected(itemIndex) },
+                    )
+                }
+                repeat(3 - rowItems.size) {
+                    Spacer(Modifier.weight(1f))
+                }
+            }
         }
     }
 }
@@ -169,6 +289,7 @@ private fun RowScope.OneUiBottomNavigationItem(
     item: OneUiNavigationItem,
     selected: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val tint by animateColorAsState(
         targetValue = if (selected) OneUiTheme.colors.accent else OneUiTheme.colors.secondaryText,
@@ -176,7 +297,7 @@ private fun RowScope.OneUiBottomNavigationItem(
         label = "One UI bottom navigation tint",
     )
     Column(
-        modifier = Modifier
+        modifier = modifier
             .weight(1f)
             .semantics { this.selected = selected }
             .oneUiInteractive(
@@ -189,7 +310,7 @@ private fun RowScope.OneUiBottomNavigationItem(
             .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        item.icon?.let {
+        (if (selected) item.selectedIcon ?: item.icon else item.icon)?.let {
             OneUiIcon(
                 icon = it,
                 contentDescription = item.label,

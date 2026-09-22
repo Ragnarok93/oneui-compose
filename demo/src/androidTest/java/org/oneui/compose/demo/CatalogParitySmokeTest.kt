@@ -38,6 +38,11 @@ class CatalogParitySmokeTest {
         composeRule.onNodeWithTag("bottom-nav-icons-overflow").assertIsDisplayed()
         composeRule.onNodeWithTag("bottom-nav-text").assertIsDisplayed()
         composeRule.onNodeWithTag("bottom-tabs-13-items").assertIsDisplayed()
+        composeRule.onNodeWithTag("oneui-bottom-tab-overflow").performClick()
+        composeRule.onNodeWithText("Nav item 13").assertIsDisplayed()
+        composeRule.onNodeWithTag("bottom-nav-icons-overflow").assertIsDisplayed()
+        composeRule.onNodeWithTag("oneui-bottom-navigation-overflow").performClick()
+        composeRule.onNodeWithText("Item 6").assertIsDisplayed()
         composeRule.onNodeWithTag("navigation-rail-control").assertIsDisplayed()
 
         composeRule.onNodeWithContentDescription("Open navigation").performClick()

@@ -477,6 +477,18 @@ object OneUiDrawableCatalog {
         }
     }
 
+    /**
+     * Resolves a catalog entry to its resource-backed Compose icon when one exists.
+     *
+     * Stateful, painter, and higher-order reference entries intentionally return `null`; callers
+     * should use the entry's rendering metadata for those contracts instead of silently treating
+     * them as ordinary icons.
+     */
+    fun icon(name: String): OneUiIcon? = entries
+        .firstOrNull { entry -> entry.name == name }
+        ?.rendering
+        ?.let { rendering -> (rendering as? OneUiDrawableRendering.Icon)?.icon }
+
     private fun referenceState(
         name: String,
         api: String,

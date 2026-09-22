@@ -14,11 +14,16 @@ import org.oneui.compose.components.feedback.OneUiBottomTip
 import org.oneui.compose.components.feedback.OneUiSnackbar
 import org.oneui.compose.components.feedback.OneUiTipPopup
 import org.oneui.compose.components.input.OneUiSpinner
+import org.oneui.compose.components.input.OneUiTextField
+import org.oneui.compose.components.list.OneUiSwipeAction
+import org.oneui.compose.components.list.OneUiSwipeActionRow
+import org.oneui.compose.components.list.OneUiSwipeDirection
 import org.oneui.compose.components.list.OneUiRadioItem
 import org.oneui.compose.components.list.OneUiSwitchItem
 import org.oneui.compose.components.menu.OneUiMenu
 import org.oneui.compose.components.menu.OneUiMenuItem
 import org.oneui.compose.components.navigation.OneUiBottomNavigation
+import org.oneui.compose.components.navigation.OneUiBottomTabLayout
 import org.oneui.compose.components.navigation.OneUiNavigationItem
 import org.oneui.compose.components.navigation.OneUiNavigationRail
 import org.oneui.compose.components.navigation.OneUiTabs
@@ -30,6 +35,8 @@ import org.oneui.compose.components.qr.OneUiQrCode
 import org.oneui.compose.components.slider.OneUiLevelSlider
 import org.oneui.compose.components.slider.OneUiSeekBarPlus
 import org.oneui.compose.components.surface.OneUiSurface
+import org.oneui.compose.components.surface.OneUiSurfaceBox
+import org.oneui.compose.components.menu.OneUiMenuItemRow
 import org.oneui.compose.patterns.about.OneUiAboutLink
 import org.oneui.compose.patterns.about.OneUiAppInfo
 import org.oneui.compose.patterns.about.OneUiAppInfoStatus
@@ -52,6 +59,8 @@ typealias OneUI8ActionModeAction = OneUiActionModeAction
 typealias OneUI8AboutLink = OneUiAboutLink
 typealias OneUI8AppInfoStatus = OneUiAppInfoStatus
 typealias OneUI8RelatedLink = OneUiRelatedLink
+typealias OneUI8SwipeAction = OneUiSwipeAction
+typealias OneUI8SwipeDirection = OneUiSwipeDirection
 
 @Composable
 fun OneUI8Menu(
@@ -70,6 +79,23 @@ fun OneUI8Spinner(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) = OneUiSpinner(selectedIndex, entries, onSelected, modifier, enabled)
+
+@Composable
+fun OneUI8TextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: String? = null,
+    hint: String? = null,
+    enabled: Boolean = true,
+    singleLine: Boolean = true,
+) = OneUiTextField(value, onValueChange, modifier, label, hint, enabled, singleLine)
+
+@Composable
+fun OneUI8MenuItemRow(
+    item: OneUI8MenuItem,
+    modifier: Modifier = Modifier,
+) = OneUiMenuItemRow(item, modifier)
 
 @Composable
 fun OneUI8SwitchItem(
@@ -92,6 +118,29 @@ fun OneUI8RadioItem(
 ) = OneUiRadioItem(title, selected, onClick, modifier, summary, enabled)
 
 @Composable
+fun OneUI8SwipeActionRow(
+    leftAction: OneUI8SwipeAction,
+    rightAction: OneUI8SwipeAction,
+    onSwipeLeft: () -> Unit,
+    onSwipeRight: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    threshold: androidx.compose.ui.unit.Dp = 64.dp,
+    maxReveal: androidx.compose.ui.unit.Dp = 96.dp,
+    content: @Composable () -> Unit,
+) = OneUiSwipeActionRow(
+    leftAction = leftAction,
+    rightAction = rightAction,
+    onSwipeLeft = onSwipeLeft,
+    onSwipeRight = onSwipeRight,
+    modifier = modifier,
+    enabled = enabled,
+    threshold = threshold,
+    maxReveal = maxReveal,
+    content = content,
+)
+
+@Composable
 fun OneUI8Tabs(
     items: List<OneUiNavigationItem>,
     selectedIndex: Int,
@@ -111,6 +160,15 @@ fun OneUI8BottomNavigation(
 ) = OneUiBottomNavigation(items, selectedIndex, onSelected, modifier, maxVisibleItems)
 
 @Composable
+fun OneUI8BottomTabLayout(
+    items: List<OneUiNavigationItem>,
+    selectedIndex: Int,
+    onSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    visibleItemCount: Int = 3,
+) = OneUiBottomTabLayout(items, selectedIndex, onSelected, modifier, visibleItemCount)
+
+@Composable
 fun OneUI8NavigationRail(
     items: List<OneUiNavigationItem>,
     selectedIndex: Int,
@@ -125,6 +183,14 @@ fun OneUI8Surface(
     shape: Shape = OneUiTheme.shapes.card,
     content: @Composable ColumnScope.() -> Unit,
 ) = OneUiSurface(modifier, containerColor, shape, content)
+
+@Composable
+fun OneUI8SurfaceBox(
+    modifier: Modifier = Modifier,
+    containerColor: Color = OneUiTheme.colors.surface,
+    shape: Shape = androidx.compose.foundation.shape.RoundedCornerShape(22.dp),
+    content: @Composable () -> Unit,
+) = OneUiSurfaceBox(modifier, containerColor, shape, content)
 
 @Composable
 fun OneUI8ProgressButton(

@@ -2,10 +2,8 @@ package org.oneui.compose.demo.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,17 +26,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.oneui.compose.icons.OneUiDrawableCatalog
 import org.oneui.compose.icons.OneUiIcon
-import org.oneui.compose.icons.OneUiIconButton
+import org.oneui.compose.icons.OneUiDrawableRendering
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.components.navigation.OneUiBottomNavigation
+import org.oneui.compose.components.navigation.OneUiBottomTabLayout
 import org.oneui.compose.components.navigation.OneUiNavigationItem
 import org.oneui.compose.components.navigation.OneUiNavigationRail
 import org.oneui.compose.components.navigation.OneUiTabs
-import org.oneui.compose.navigation.CustomTabItem
-import org.oneui.compose.navigation.SubTabItem
-import org.oneui.compose.navigation.TabItem
-import org.oneui.compose.navigation.Tabs
 import org.oneui.compose.theme.OneUiTheme
 
 @Composable
@@ -97,9 +91,9 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
             ) {
                 OneUiTabs(
                     items = listOf(
-                        OneUiNavigationItem("alarm", "Main tab 1", OneUiIcons.Home),
-                        OneUiNavigationItem("timer", "Main tab 2", OneUiIcons.Search),
-                        OneUiNavigationItem("stopwatch", "Main tab 3", OneUiIcons.Settings),
+                        clockItem("alarm", "Main tab 1", OneUiIcons.clockAlarmTab(false), OneUiIcons.clockAlarmTab(true)),
+                        clockItem("timer", "Main tab 2", OneUiIcons.clockTimerTab(false), OneUiIcons.clockTimerTab(true)),
+                        clockItem("stopwatch", "Main tab 3", OneUiIcons.clockStopwatchTab(false), OneUiIcons.clockStopwatchTab(true)),
                     ),
                     selectedIndex = iconSelected.coerceAtMost(2),
                     onSelected = { iconSelected = it },
@@ -144,11 +138,10 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                 subtitle = "Large destination set in a horizontally scrollable strip",
                 testTag = "bottom-tabs-13-items",
             ) {
-                OneUiTabs(
-                    items = (1..13).map { OneUiNavigationItem("nav-$it", "Nav item $it") },
+                OneUiBottomTabLayout(
+                    items = referenceBottomTabItems(),
                     selectedIndex = manySelected,
                     onSelected = { manySelected = it },
-                    scrollable = true,
                 )
             }
         }
@@ -173,6 +166,45 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
         }
     }
 }
+
+private fun clockItem(
+    id: String,
+    label: String,
+    icon: OneUiIcon,
+    selectedIcon: OneUiIcon,
+) = OneUiNavigationItem(id, label, icon, selectedIcon)
+
+private fun referenceBottomTabItems(): List<OneUiNavigationItem> {
+    val resourceNames = listOf(
+        null,
+        null,
+        null,
+        "ic_oui_location_outline",
+        "ic_oui_advanced_call_outline",
+        "ic_oui_brightness_outline",
+        "ic_oui_settings_outline",
+        "ic_oui_gif",
+        "ic_oui_import",
+        "ic_oui_location_outline",
+        "ic_oui_advanced_call_outline",
+        "ic_oui_brightness_outline",
+        "ic_oui_settings_outline",
+    )
+    val clockIcons = listOf(
+        OneUiIcons.clockAlarmTab(false) to OneUiIcons.clockAlarmTab(true),
+        OneUiIcons.clockTimerTab(false) to OneUiIcons.clockTimerTab(true),
+        OneUiIcons.clockStopwatchTab(false) to OneUiIcons.clockStopwatchTab(true),
+    )
+    return (1..13).map { index ->
+        val clock = clockIcons.getOrNull(index - 1)
+        val icon = clock?.first ?: resourceNames[index - 1]?.let(::referenceIcon)
+        val selectedIcon = clock?.second ?: resourceNames[index - 1]?.let(::referenceIcon)
+        OneUiNavigationItem("nav-$index", "Nav item $index", icon, selectedIcon)
+    }
+}
+
+private fun referenceIcon(name: String): OneUiIcon =
+    requireNotNull(OneUiDrawableCatalog.icon(name)) { "Missing pinned One UI icon: $name" }
 
 @Composable
 private fun NavigationSample(

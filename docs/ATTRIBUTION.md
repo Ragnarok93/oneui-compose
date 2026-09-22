@@ -19,6 +19,11 @@ The stable `OneUiIcons` catalog uses drawable resources directly from:
 
 The dependency was inventoried before mapping public names. Resource-backed entries are referenced through the dependency's generated `dev.oneuiproject.oneui.R` class rather than copying vector XML into this repository.
 
+The three stateful clock tab selectors used by the parity catalog are copied from the pinned
+`oneui-design/sample-app` under the same MIT license. Compose controls their selected state through
+`OneUiIcon.StatefulResource`, so the selector's selected and unselected paths remain faithful to
+the reference sample.
+
 No matching Cut or Paste drawable was found during the inventory, so the stable catalog does not disguise unrelated dependency artwork as those actions.
 
 `RadioSelected` and `RadioUnselected` use small original fallback vectors authored for this Compose library because the resolved icon artifact does not expose a matching radio-button pair.

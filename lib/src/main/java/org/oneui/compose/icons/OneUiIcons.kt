@@ -49,6 +49,13 @@ sealed interface OneUiIcon {
     @Immutable
     data class Resource(@DrawableRes val id: Int) : OneUiIcon
 
+    /** A resource selector whose selected state is explicitly controlled by Compose. */
+    @Immutable
+    data class StatefulResource(
+        @DrawableRes val id: Int,
+        val selected: Boolean,
+    ) : OneUiIcon
+
     @Immutable
     data class Vector(val imageVector: ImageVector) : OneUiIcon
 }
@@ -104,6 +111,22 @@ object OneUiIcons {
     val NavigationHome = resource(OneUiIconResources.drawable.ic_oui_sysbar_home)
     val NavigationRecents = resource(OneUiIconResources.drawable.ic_oui_sysbar_recent)
 
+    /** Selected-state resources used by the pinned SESL8 BottomTabLayout sample. */
+    fun clockAlarmTab(selected: Boolean): OneUiIcon = OneUiIcon.StatefulResource(
+        id = OneUiIconResources.drawable.ic_clock_alarm_tab,
+        selected = selected,
+    )
+
+    fun clockTimerTab(selected: Boolean): OneUiIcon = OneUiIcon.StatefulResource(
+        id = OneUiIconResources.drawable.ic_clock_timer_tab,
+        selected = selected,
+    )
+
+    fun clockStopwatchTab(selected: Boolean): OneUiIcon = OneUiIcon.StatefulResource(
+        id = OneUiIconResources.drawable.ic_clock_stopwatch_tab,
+        selected = selected,
+    )
+
     private fun resource(@DrawableRes id: Int): OneUiIcon = OneUiIcon.Resource(id)
 
     /** Original fallback on the same 24dp optical grid as the compatibility vectors. */
@@ -144,13 +167,24 @@ fun OneUiIcon(
     tint: Color = OneUiTheme.colors.primaryText,
 ) {
     when (icon) {
-        is OneUiIcon.Resource -> {
+        is OneUiIcon.Resource, is OneUiIcon.StatefulResource -> {
             val context = LocalContext.current
             val configuration = LocalConfiguration.current
             val density = LocalDensity.current.density
-            val painter = remember(icon.id, configuration.densityDpi, configuration.uiMode, density) {
-                val drawable = requireNotNull(ContextCompat.getDrawable(context, icon.id)) {
-                    "Unable to resolve One UI drawable resource ${icon.id}"
+            val resourceId = when (icon) {
+                is OneUiIcon.Resource -> icon.id
+                is OneUiIcon.StatefulResource -> icon.id
+                else -> error("unreachable")
+            }
+            val selected = (icon as? OneUiIcon.StatefulResource)?.selected
+            val painter = remember(resourceId, selected, configuration.densityDpi, configuration.uiMode, density) {
+                val drawable = requireNotNull(ContextCompat.getDrawable(context, resourceId)) {
+                    "Unable to resolve One UI drawable resource $resourceId"
+                }
+                if (selected != null) {
+                    drawable.state = intArrayOf(
+                        if (selected) android.R.attr.state_selected else -android.R.attr.state_selected,
+                    )
                 }
                 val fallbackSizePx = (24f * density).roundToInt().coerceAtLeast(1)
                 val width = drawable.intrinsicWidth.takeIf { it > 0 } ?: fallbackSizePx

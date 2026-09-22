@@ -59,6 +59,18 @@ class OneUiDrawableParityTest {
     }
 
     @Test
+    fun namedReferenceIconsResolveToDependencyResources() {
+        assertEquals(
+            OneUiIcon.Resource(OneUiIconResources.drawable.ic_oui_location_outline),
+            OneUiDrawableCatalog.icon("ic_oui_location_outline"),
+        )
+        assertEquals(
+            OneUiIcon.Resource(OneUiIconResources.drawable.ic_oui_settings_outline),
+            OneUiDrawableCatalog.icon("ic_oui_settings_outline"),
+        )
+    }
+
+    @Test
     fun stargazersReferenceActionsUseExactDependencyGlyphs() {
         assertEquals(
             OneUiIcon.Resource(OneUiIconResources.drawable.ic_oui_wifi_call),
