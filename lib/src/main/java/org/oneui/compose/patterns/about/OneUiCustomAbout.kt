@@ -81,6 +81,7 @@ fun OneUiCustomAbout(
     val scope = rememberCoroutineScope()
     val configuration = LocalConfiguration.current
     val portrait = configuration.orientation != android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val reducedMotion = OneUiTheme.reducedMotion
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val expandedHeight = if (portrait) {
@@ -108,12 +109,12 @@ fun OneUiCustomAbout(
         val targetFraction = max(scrollFraction, backProgress.coerceIn(0f, 1f))
         val collapseFraction by animateFloatAsState(
             targetValue = targetFraction,
-            animationSpec = if (OneUiTheme.reducedMotion) snap() else OneUiMotion.appBarCollapse(),
+            animationSpec = if (reducedMotion) snap() else OneUiMotion.appBarCollapse(),
             label = "One UI custom about collapse",
         )
         val toolbarColor by animateColorAsState(
             targetValue = OneUiTheme.colors.background.copy(alpha = if (collapseFraction > 0.5f) 1f else 0f),
-            animationSpec = if (OneUiTheme.reducedMotion) snap() else OneUiMotion.appBarCollapse(),
+            animationSpec = if (reducedMotion) snap() else OneUiMotion.appBarCollapse(),
             label = "One UI custom about toolbar color",
         )
 
@@ -191,8 +192,8 @@ fun OneUiCustomAbout(
             }
             AnimatedVisibility(
                 visible = collapseFraction > 0.5f,
-                enter = if (OneUiTheme.reducedMotion) EnterTransition.None else fadeIn(animationSpec = OneUiMotion.appBarCollapse()),
-                exit = if (OneUiTheme.reducedMotion) ExitTransition.None else fadeOut(animationSpec = OneUiMotion.appBarCollapse()),
+                enter = if (reducedMotion) EnterTransition.None else fadeIn(animationSpec = OneUiMotion.appBarCollapse()),
+                exit = if (reducedMotion) ExitTransition.None else fadeOut(animationSpec = OneUiMotion.appBarCollapse()),
                 modifier = Modifier.weight(1f),
             ) {
                 Text(
@@ -213,8 +214,8 @@ fun OneUiCustomAbout(
         if (portrait && expandedHeight > 0.dp) {
             AnimatedVisibility(
                 visible = collapseFraction < 0.5f,
-                enter = if (OneUiTheme.reducedMotion) EnterTransition.None else fadeIn(animationSpec = OneUiMotion.appBarCollapse()),
-                exit = if (OneUiTheme.reducedMotion) ExitTransition.None else fadeOut(animationSpec = OneUiMotion.appBarCollapse()),
+                enter = if (reducedMotion) EnterTransition.None else fadeIn(animationSpec = OneUiMotion.appBarCollapse()),
+                exit = if (reducedMotion) ExitTransition.None else fadeOut(animationSpec = OneUiMotion.appBarCollapse()),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 18.dp),
@@ -224,7 +225,7 @@ fun OneUiCustomAbout(
                     contentDescription = "Swipe up to expand",
                     onClick = {
                         scope.launch {
-                            if (OneUiTheme.reducedMotion) listState.scrollToItem(1)
+                            if (reducedMotion) listState.scrollToItem(1)
                             else listState.animateScrollToItem(1)
                         }
                     },
