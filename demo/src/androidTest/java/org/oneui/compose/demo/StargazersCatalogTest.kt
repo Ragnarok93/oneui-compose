@@ -31,6 +31,11 @@ class StargazersCatalogTest {
         composeRule.onNodeWithText(CatalogDestination.RecyclerViews.label).performClick()
         composeRule.onNodeWithText(RecyclerViewCatalogTab.Stargazers.label).performClick()
         composeRule.onNodeWithTag(RecyclerViewCatalogTab.Stargazers.testTag).assertIsDisplayed()
+        composeRule.waitUntil(timeoutMillis = 2_000) {
+            runCatching {
+                composeRule.onNodeWithTag("stargazer-row-1", useUnmergedTree = true).assertIsDisplayed()
+            }.isSuccess
+        }
     }
 
     @Test

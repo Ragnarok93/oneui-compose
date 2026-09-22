@@ -2,6 +2,7 @@ package org.oneui.compose.progress.internal
 
 import androidx.annotation.FloatRange
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import org.oneui.compose.progress.CircularProgressIndicatorSize
 import org.oneui.compose.progress.ProgressIndicatorColors
 import org.oneui.compose.progress.progressIndicatorColors
+import org.oneui.compose.theme.OneUiTheme
 import org.oneui.compose.util.OneUIPreview
 import kotlin.math.cos
 import kotlin.math.sin
@@ -46,7 +48,7 @@ internal fun CircularDeterminateProgressIndicator(
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
-        animationSpec = tween(),
+        animationSpec = if (OneUiTheme.reducedMotion) snap() else tween(),
         label = "CircularDeterminateProgressIndicator"
     )
 

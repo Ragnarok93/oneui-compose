@@ -34,6 +34,7 @@ import org.oneui.compose.components.navigation.OneUiBottomTabLayout
 import org.oneui.compose.components.navigation.OneUiNavigationItem
 import org.oneui.compose.components.navigation.OneUiNavigationRail
 import org.oneui.compose.components.navigation.OneUiTabs
+import org.oneui.compose.components.navigation.OneUiTabStyle
 import org.oneui.compose.theme.OneUiTheme
 
 @Composable
@@ -63,6 +64,7 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                     items = listOf("Tab 1", "Tab 2").map { OneUiNavigationItem(it, it) },
                     selectedIndex = roundedSelected.coerceAtMost(1),
                     onSelected = { roundedSelected = it },
+                    style = OneUiTabStyle.Rounded,
                 )
             }
         }
@@ -78,6 +80,7 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                     selectedIndex = subSelected.coerceAtMost(7),
                     onSelected = { subSelected = it },
                     scrollable = true,
+                    style = OneUiTabStyle.Sub,
                 )
             }
         }
@@ -97,6 +100,7 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                     selectedIndex = iconSelected.coerceAtMost(2),
                     onSelected = { iconSelected = it },
                     showIcons = true,
+                    style = OneUiTabStyle.Main,
                 )
             }
         }
@@ -123,10 +127,11 @@ fun NavigationScreen(modifier: Modifier = Modifier) {
                 subtitle = "Text-only navigation destinations",
                 testTag = "bottom-nav-text",
             ) {
-                OneUiTabs(
+                OneUiBottomNavigation(
                     items = (1..3).map { OneUiNavigationItem("item-$it", "Item $it") },
                     selectedIndex = bottomTextSelected.coerceAtMost(2),
                     onSelected = { bottomTextSelected = it },
+                    showIcons = false,
                 )
             }
         }

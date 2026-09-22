@@ -27,6 +27,7 @@ import org.oneui.compose.components.navigation.OneUiBottomTabLayout
 import org.oneui.compose.components.navigation.OneUiNavigationItem
 import org.oneui.compose.components.navigation.OneUiNavigationRail
 import org.oneui.compose.components.navigation.OneUiTabs
+import org.oneui.compose.components.navigation.OneUiTabStyle
 import org.oneui.compose.components.preference.OneUiPreference
 import org.oneui.compose.components.preference.OneUiPreferenceCategory
 import org.oneui.compose.components.preference.OneUiSuggestionCard
@@ -61,6 +62,7 @@ typealias OneUI8AppInfoStatus = OneUiAppInfoStatus
 typealias OneUI8RelatedLink = OneUiRelatedLink
 typealias OneUI8SwipeAction = OneUiSwipeAction
 typealias OneUI8SwipeDirection = OneUiSwipeDirection
+typealias OneUI8TabStyle = OneUiTabStyle
 
 @Composable
 fun OneUI8Menu(
@@ -148,7 +150,8 @@ fun OneUI8Tabs(
     modifier: Modifier = Modifier,
     scrollable: Boolean = false,
     showIcons: Boolean = false,
-) = OneUiTabs(items, selectedIndex, onSelected, modifier, scrollable, showIcons)
+    style: OneUI8TabStyle = OneUI8TabStyle.Rounded,
+) = OneUiTabs(items, selectedIndex, onSelected, modifier, scrollable, showIcons, style)
 
 @Composable
 fun OneUI8BottomNavigation(
@@ -157,7 +160,8 @@ fun OneUI8BottomNavigation(
     onSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
     maxVisibleItems: Int = 5,
-) = OneUiBottomNavigation(items, selectedIndex, onSelected, modifier, maxVisibleItems)
+    showIcons: Boolean = true,
+) = OneUiBottomNavigation(items, selectedIndex, onSelected, modifier, maxVisibleItems, showIcons)
 
 @Composable
 fun OneUI8BottomTabLayout(

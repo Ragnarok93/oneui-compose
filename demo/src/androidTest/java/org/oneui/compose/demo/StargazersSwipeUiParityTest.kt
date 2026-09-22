@@ -1,6 +1,7 @@
 package org.oneui.compose.demo
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
@@ -31,7 +32,7 @@ class StargazersSwipeUiParityTest {
 
     @Test
     fun physicalSwipesExposeReferenceCallAndMessageFeedback() {
-        composeRule.onNodeWithTag("stargazer-row-1", useUnmergedTree = true).assertIsDisplayed()
+        waitForFirstRow()
         composeRule.onNodeWithTag("stargazer-row-1", useUnmergedTree = true).performTouchInput { swipeRight() }
         composeRule.onNodeWithTag("stargazer-swipe-feedback").assertIsDisplayed()
         composeRule.onNodeWithText("Calling Ada Lovelace...").assertIsDisplayed()
@@ -53,6 +54,7 @@ class StargazersSwipeUiParityTest {
             }
         }
 
+        waitForFirstRow()
         composeRule.onNodeWithTag("stargazer-row-1", useUnmergedTree = true)
             .performTouchInput { swipeRight() }
         composeRule.onNodeWithText("Calling Ada Lovelace...").assertIsDisplayed()
@@ -62,5 +64,13 @@ class StargazersSwipeUiParityTest {
         composeRule.onNodeWithTag("stargazer-row-2", useUnmergedTree = true)
             .performTouchInput { swipeLeft() }
         composeRule.onNodeWithText("Sending message to Alan Turing...").assertIsDisplayed()
+    }
+
+    private fun waitForFirstRow() {
+        composeRule.waitUntil(timeoutMillis = 2_000) {
+            composeRule.onAllNodesWithTag("stargazer-row-1", useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
     }
 }

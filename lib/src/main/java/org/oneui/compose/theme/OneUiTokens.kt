@@ -43,6 +43,13 @@ data class OneUiColors(
     val navigationRipple: Color = Color(0x0d000000),
     val tabIndicator: Color = Color(0xff252525),
     val tabSubIndicator: Color = Color(0x0d000000),
+    val tabSelectedText: Color = Color(0xff010101),
+    val tabUnselectedText: Color = Color(0xff8c8c8c),
+    val tabSubSelectedText: Color = Color(0xff252525),
+    val tabSubUnselectedText: Color = Color(0xff8c8c8c),
+    val tabRoundedBackground: Color = Color(0xffe4e4e7),
+    val tabRoundedSelectedText: Color = Color(0xfffafaff),
+    val tabRoundedUnselectedText: Color = Color(0xff848487),
     val fabBackground: Color = Color(0xfffcfcfc),
 )
 

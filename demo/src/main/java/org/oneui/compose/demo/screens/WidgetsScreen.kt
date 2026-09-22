@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.oneui.compose.components.buttons.OneUiButton
 import org.oneui.compose.components.buttons.OneUiButtonDefaults
-import org.oneui.compose.components.buttons.OneUiFilledButton
 import org.oneui.compose.components.buttons.OneUiFloatingActionBar
 import org.oneui.compose.components.buttons.OneUiFloatingActionItem
 import org.oneui.compose.components.buttons.OneUiOutlinedButton
@@ -120,34 +119,36 @@ fun WidgetsScreen(modifier: Modifier = Modifier) {
                     onClick = {},
                     modifier = Modifier.fillMaxWidth(),
                     colors = OneUiButtonDefaults.neutralColors(),
-                ) { Text("Default") }
-                OneUiFilledButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text("Contained primary") }
-                OneUiOutlinedButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text("Outline") }
-                OneUiTextButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text("Transparent") }
-                OneUiButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OneUiButtonDefaults.neutralColors(),
-                ) { Text("Contained") }
+                ) { Text("Button") }
                 OneUiButton(
                     onClick = {},
                     modifier = Modifier.fillMaxWidth(),
                     colors = OneUiButtonDefaults.filledColors(),
-                ) { Text("Contained primary") }
+                ) { Text("Button") }
                 OneUiButton(
                     onClick = {},
                     modifier = Modifier.fillMaxWidth(),
                     colors = OneUiButtonDefaults.textColors(),
-                ) { Text("Contained transparent") }
+                ) { Text("Button") }
+                OneUiOutlinedButton(
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text("Button") }
+                OneUiButton(
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(0.78f),
+                    colors = OneUiButtonDefaults.neutralColors(),
+                ) { Text("Button") }
+                OneUiButton(
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(0.78f),
+                    colors = OneUiButtonDefaults.filledColors(),
+                ) { Text("Button") }
+                OneUiButton(
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(0.78f),
+                    colors = OneUiButtonDefaults.textColors(),
+                ) { Text("Button") }
             }
         }
         item {
@@ -203,10 +204,31 @@ fun WidgetsScreen(modifier: Modifier = Modifier) {
                         },
                         onClick = {},
                     )
+                    OneUiListItem(
+                        title = "CardItemView",
+                        leading = { org.oneui.compose.icons.OneUiIcon(OneUiIcons.Info, null) },
+                        trailing = {
+                            org.oneui.compose.icons.OneUiIconButton(
+                                icon = OneUiIcons.Forward,
+                                contentDescription = "Open card item",
+                                onClick = {},
+                            )
+                        },
+                    )
                     OneUiSwitchItem(
                         title = "SwitchItemView",
                         checked = switchChecked,
                         onCheckedChange = { switchChecked = it },
+                    )
+                    OneUiListItem(
+                        title = "CardItemView",
+                        leading = { org.oneui.compose.icons.OneUiIcon(OneUiIcons.Info, null) },
+                    )
+                    OneUiSwitchItem(
+                        title = "SwitchItemView",
+                        checked = switchChecked,
+                        onCheckedChange = { switchChecked = it },
+                        modifier = Modifier.testTag("widget-switch-item-icon"),
                     )
                     OneUiRadioItem(
                         title = "RadioItemView 1",

@@ -176,6 +176,13 @@ internal fun oneUiColorsFromLegacy(
     navigationRipple = legacyColors.seslNavigationBarRipple,
     tabIndicator = legacyColors.seslTablayoutMainTabIndicatorColor,
     tabSubIndicator = legacyColors.seslTablayoutSubtabIndicatorBackground,
+    tabSelectedText = legacyColors.seslTablayoutTextColorSelected,
+    tabUnselectedText = legacyColors.seslTablayoutTextColorDefault,
+    tabSubSelectedText = legacyColors.seslTablayoutSubtabTextColorSelected,
+    tabSubUnselectedText = legacyColors.seslTablayoutSubtabTextColorDefault,
+    tabRoundedBackground = if (dark) Color(0xff47474a) else Color(0xffe4e4e7),
+    tabRoundedSelectedText = Color(0xfffafaff),
+    tabRoundedUnselectedText = if (dark) Color(0xffa3a3a7) else Color(0xff848487),
     fabBackground = if (dark) Color(0xff3a3a3d) else Color(0xfffcfcff),
 )
 

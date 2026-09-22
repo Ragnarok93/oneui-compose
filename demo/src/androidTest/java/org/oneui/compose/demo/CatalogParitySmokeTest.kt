@@ -63,4 +63,39 @@ class CatalogParitySmokeTest {
         composeRule.onNodeWithTag("catalog-search-mode").assertIsDisplayed()
         composeRule.onNodeWithTag("catalog-action-mode").assertIsDisplayed()
     }
+
+    @Test
+    fun referenceWidgetInteractionsRemainComposeNative() {
+        composeRule.onNodeWithContentDescription("Open navigation").performClick()
+        composeRule.onNodeWithText(CatalogDestination.Widgets.label).performClick()
+
+        composeRule.onNodeWithTag("oneui-spinner").performClick()
+        composeRule.onNodeWithText("Item 4").performClick()
+        composeRule.onNodeWithText("Item 4").assertIsDisplayed()
+
+        composeRule.onNodeWithText("Open pop-up menu").performClick()
+        composeRule.onNodeWithText("Pop-up menu item 4").assertIsDisplayed().performClick()
+
+        composeRule.onNodeWithText("Enter action mode").performClick()
+        composeRule.onNodeWithText("Select all").performClick()
+        composeRule.onNodeWithText("3 selected").assertIsDisplayed()
+    }
+
+    @Test
+    fun pickerAndAboutRoutesExposeReferenceStates() {
+        composeRule.onNodeWithContentDescription("Open navigation").performClick()
+        composeRule.onNodeWithText(CatalogDestination.Pickers.label).performClick()
+        composeRule.onNodeWithTag("picker-number-triple").assertIsDisplayed()
+        composeRule.onNodeWithTag("picker-time-inline-dialog").assertIsDisplayed()
+        composeRule.onNodeWithTag("picker-date-inline-dialog").assertIsDisplayed()
+        composeRule.onNodeWithTag("picker-spinning-date").assertIsDisplayed()
+        composeRule.onNodeWithTag("picker-sleep-time").assertIsDisplayed()
+        composeRule.onNodeWithTag("picker-start-end-time").assertIsDisplayed()
+        composeRule.onNodeWithTag("picker-color").assertIsDisplayed()
+
+        composeRule.onNodeWithContentDescription("Open navigation").performClick()
+        composeRule.onNodeWithText(CatalogDestination.About.label).performClick()
+        composeRule.onNodeWithTag("about-status-button").performClick()
+        composeRule.onNodeWithText("Failed").assertIsDisplayed()
+    }
 }

@@ -19,6 +19,10 @@ class OneUiThemeColorContractTest {
         assertEquals(Color(0xfffafafa), colors.tooltipContent)
         assertEquals(Color(0xffef5e16), colors.seekOverlapActive)
         assertEquals(Color(0xff252525), colors.tabIndicator)
+        assertEquals(Color(0xffe4e4e7), colors.tabRoundedBackground)
+        assertEquals(Color(0xfffafaff), colors.tabRoundedSelectedText)
+        assertEquals(Color(0xff848487), colors.tabRoundedUnselectedText)
+        assertEquals(Color(0xff010101), colors.tabSelectedText)
     }
 
     @Test
@@ -30,5 +34,7 @@ class OneUiThemeColorContractTest {
         assertEquals(Color(0xffff6021), colors.seekOverlapActive)
         assertEquals(Color(0xff010101), colors.navigationBackground)
         assertEquals(Color(0xfffafafa), colors.tabIndicator)
+        assertEquals(Color(0xff47474a), colors.tabRoundedBackground)
+        assertEquals(Color(0xffa3a3a7), colors.tabRoundedUnselectedText)
     }
 }

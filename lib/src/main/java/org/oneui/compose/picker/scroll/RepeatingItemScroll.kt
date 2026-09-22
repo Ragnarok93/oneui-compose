@@ -2,7 +2,10 @@ package org.oneui.compose.picker.scroll
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
+import androidx.compose.foundation.gestures.snapping.snapFlingBehavior
+import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.animation.core.snap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.flow.distinctUntilChanged
+import org.oneui.compose.motion.OneUiMotion
+import org.oneui.compose.theme.OneUiTheme
 import org.oneui.compose.theme.locals.LocalBackgroundColor
 import org.oneui.compose.util.isEven
 
@@ -49,7 +54,24 @@ fun RepeatingItemScroll(
     fun middleIndexForFirst(firstVisibleItemIndex: Int): Int =
         normalizeIndex(firstVisibleItemIndex + state.visibleItemsCount / 2)
 
-    val flingBehavior = rememberSnapFlingBehavior(lazyListState = state.listState)
+    val snapLayoutInfoProvider = remember(state.listState) { SnapLayoutInfoProvider(state.listState) }
+    val flingBehavior = if (OneUiTheme.reducedMotion) {
+        remember(snapLayoutInfoProvider) {
+            snapFlingBehavior(
+                snapLayoutInfoProvider = snapLayoutInfoProvider,
+                decayAnimationSpec = exponentialDecay(),
+                snapAnimationSpec = snap(),
+            )
+        }
+    } else {
+        remember(snapLayoutInfoProvider) {
+            snapFlingBehavior(
+                snapLayoutInfoProvider = snapLayoutInfoProvider,
+                decayAnimationSpec = exponentialDecay(),
+                snapAnimationSpec = OneUiMotion.pickerWheel(),
+            )
+        }
+    }
 
     val itemHeightPixels = remember { mutableIntStateOf(0) }
     val itemHeightDp = with(LocalDensity.current) { itemHeightPixels.intValue.toDp() }

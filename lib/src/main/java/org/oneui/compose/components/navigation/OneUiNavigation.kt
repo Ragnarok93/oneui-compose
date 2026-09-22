@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,6 +49,18 @@ data class OneUiNavigationItem(
     val selectedIcon: OneUiIcon? = null,
 )
 
+/**
+ * SESL tab treatments used by the reference catalog.
+ *
+ * [Rounded] is the filled pill selector, [Sub] is the centered scrollable sub-tab strip, and
+ * [Main] is the weighted icon-and-label tab strip.
+ */
+enum class OneUiTabStyle {
+    Rounded,
+    Sub,
+    Main,
+}
+
 @Composable
 fun OneUiTabs(
     items: List<OneUiNavigationItem>,
@@ -56,15 +69,29 @@ fun OneUiTabs(
     modifier: Modifier = Modifier,
     scrollable: Boolean = false,
     showIcons: Boolean = false,
+    style: OneUiTabStyle = OneUiTabStyle.Rounded,
 ) {
     require(items.isNotEmpty()) { "OneUiTabs requires at least one item" }
     val rowModifier = modifier
         .fillMaxWidth()
         .then(if (scrollable) Modifier.horizontalScroll(rememberScrollState()) else Modifier)
+        .then(
+            if (style == OneUiTabStyle.Rounded) {
+                Modifier
+                    .background(OneUiTheme.colors.tabRoundedBackground, RoundedCornerShape(20.dp))
+                    .padding(2.dp)
+            } else {
+                Modifier
+            },
+        )
         .testTag("oneui-tabs")
     Row(
         modifier = rowModifier,
-        horizontalArrangement = if (scrollable) Arrangement.spacedBy(4.dp) else Arrangement.SpaceEvenly,
+        horizontalArrangement = when {
+            scrollable -> Arrangement.spacedBy(4.dp)
+            style == OneUiTabStyle.Rounded -> Arrangement.spacedBy(2.dp)
+            else -> Arrangement.SpaceEvenly
+        },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         items.forEachIndexed { index, item ->
@@ -73,6 +100,7 @@ fun OneUiTabs(
                 selected = index == selectedIndex,
                 onClick = { onSelected(index) },
                 showIcon = showIcons,
+                style = style,
                 modifier = if (scrollable) Modifier else Modifier.weight(1f),
             )
         }
@@ -85,15 +113,30 @@ private fun RowScope.OneUiTab(
     selected: Boolean,
     onClick: () -> Unit,
     showIcon: Boolean,
+    style: OneUiTabStyle,
     modifier: Modifier = Modifier,
 ) {
+    val selectedTextColor = when (style) {
+        OneUiTabStyle.Rounded -> OneUiTheme.colors.tabRoundedSelectedText
+        OneUiTabStyle.Sub -> OneUiTheme.colors.tabSubSelectedText
+        OneUiTabStyle.Main -> OneUiTheme.colors.tabSelectedText
+    }
+    val unselectedTextColor = when (style) {
+        OneUiTabStyle.Rounded -> OneUiTheme.colors.tabRoundedUnselectedText
+        OneUiTabStyle.Sub -> OneUiTheme.colors.tabSubUnselectedText
+        OneUiTabStyle.Main -> OneUiTheme.colors.tabUnselectedText
+    }
     val color by animateColorAsState(
-        targetValue = if (selected) OneUiTheme.colors.accent else OneUiTheme.colors.secondaryText,
+        targetValue = if (selected) selectedTextColor else unselectedTextColor,
         animationSpec = if (OneUiTheme.reducedMotion) androidx.compose.animation.core.snap() else OneUiMotion.navigationIndicator(),
         label = "One UI tab color",
     )
     Column(
         modifier = modifier
+            .background(
+                color = if (style == OneUiTabStyle.Rounded && selected) OneUiTheme.colors.accentStrong else Color.Transparent,
+                shape = RoundedCornerShape(18.dp),
+            )
             .semantics { this.selected = selected }
             .oneUiInteractive(
                 enabled = true,
@@ -106,10 +149,10 @@ private fun RowScope.OneUiTab(
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
+        ) {
         if (showIcon && (item.selectedIcon != null || item.icon != null)) {
             OneUiIcon(
-                icon = if (selected) item.selectedIcon ?: item.icon!! else item.icon!!,
+                icon = if (selected) item.selectedIcon ?: item.icon!! else item.icon ?: item.selectedIcon!!,
                 contentDescription = item.label,
                 modifier = Modifier.size(22.dp),
                 tint = color,
@@ -120,15 +163,24 @@ private fun RowScope.OneUiTab(
             color = color,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
         )
-        Box(
-            modifier = Modifier
-                .background(
-                    if (selected) color else Color.Transparent,
-                    RoundedCornerShape(2.dp),
-                )
-                .fillMaxWidth()
-                .padding(vertical = 1.5.dp),
-        )
+        if (style != OneUiTabStyle.Rounded) {
+            Box(
+                modifier = Modifier
+                    .background(
+                        if (selected) {
+                            if (style == OneUiTabStyle.Sub) OneUiTheme.colors.tabSubSelectedText
+                            else OneUiTheme.colors.tabIndicator
+                        } else {
+                            Color.Transparent
+                        },
+                        RoundedCornerShape(2.dp),
+                    )
+                    .fillMaxWidth()
+                    .padding(vertical = if (style == OneUiTabStyle.Sub) 1.dp else 1.5.dp),
+            )
+        } else {
+            Spacer(Modifier.height(3.dp))
+        }
     }
 }
 
@@ -139,6 +191,7 @@ fun OneUiBottomNavigation(
     onSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
     maxVisibleItems: Int = 5,
+    showIcons: Boolean = true,
 ) {
     require(items.isNotEmpty()) { "OneUiBottomNavigation requires at least one item" }
     require(maxVisibleItems >= 2) { "maxVisibleItems must be at least 2" }
@@ -162,6 +215,7 @@ fun OneUiBottomNavigation(
                 item = item,
                 selected = index == selectedIndex,
                 onClick = { onSelected(index) },
+                showIcon = showIcons,
             )
         }
         if (hasOverflow) {
@@ -169,6 +223,7 @@ fun OneUiBottomNavigation(
                 item = more,
                 selected = selectedIndex >= visible.size,
                 onClick = { overflowVisible = true },
+                showIcon = showIcons,
                 modifier = Modifier.testTag("oneui-bottom-navigation-overflow"),
             )
         }
@@ -274,6 +329,7 @@ private fun OneUiNavigationOverflowSheet(
                         item = item,
                         selected = selectedIndex == itemIndex,
                         onClick = { onSelected(itemIndex) },
+                        showIcon = true,
                     )
                 }
                 repeat(3 - rowItems.size) {
@@ -289,6 +345,7 @@ private fun RowScope.OneUiBottomNavigationItem(
     item: OneUiNavigationItem,
     selected: Boolean,
     onClick: () -> Unit,
+    showIcon: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val tint by animateColorAsState(
@@ -310,7 +367,7 @@ private fun RowScope.OneUiBottomNavigationItem(
             .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        (if (selected) item.selectedIcon ?: item.icon else item.icon)?.let {
+        (if (showIcon) (if (selected) item.selectedIcon ?: item.icon else item.icon) else null)?.let {
             OneUiIcon(
                 icon = it,
                 contentDescription = item.label,

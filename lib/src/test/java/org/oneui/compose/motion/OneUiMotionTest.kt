@@ -22,4 +22,12 @@ class OneUiMotionTest {
         assertEquals(200, OneUiMotion.Duration.ActionMode)
         assertEquals(220, OneUiMotion.Duration.PickerWheel)
     }
+
+    @Test
+    fun pickerWheelUsesTheReferenceSettlingDuration() {
+        val spec = OneUiMotion.pickerWheel<Float>() as androidx.compose.animation.core.TweenSpec<Float>
+        assertEquals(220, spec.durationMillis)
+        assertEquals(0, spec.delay)
+        assertEquals(OneUiEasing.SeslSineInOut80, spec.easing)
+    }
 }
