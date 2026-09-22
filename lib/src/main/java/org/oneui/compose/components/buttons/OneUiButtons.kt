@@ -8,6 +8,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -37,6 +38,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.oneui.compose.interaction.oneUiInteractive
 import org.oneui.compose.motion.OneUiMotion
@@ -62,7 +64,10 @@ object OneUiButtonDefaults {
     val CompactContentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
     val MinHeight = 48.dp
     val MinWidth = 64.dp
+    val OutlinedMinHeight = 36.dp
+    val OutlinedMinWidth = 196.dp
     val BorderWidth = 1.dp
+    val OutlinedContentPadding = PaddingValues(horizontal = 16.5.dp, vertical = 9.dp)
 
     @Composable
     fun filledColors(
@@ -177,9 +182,52 @@ object OneUiButtonDefaults {
         )
     }
 
+    /** SESL ButtonStyleTransparent: no physical fill, while retaining normal label color. */
+    @Composable
+    fun transparentColors(
+        contentColor: Color = OneUiTheme.colors.primaryText,
+    ): OneUiButtonColors {
+        val opacity = OneUiTheme.opacity
+        return OneUiButtonColors(
+            containerColor = Color.Transparent,
+            contentColor = contentColor,
+            disabledContainerColor = Color.Transparent,
+            disabledContentColor = contentColor.copy(
+                alpha = contentColor.alpha * opacity.disabledContent,
+            ),
+            pressedContainerColor = OneUiTheme.colors.surfacePressed,
+            hoveredContainerColor = OneUiTheme.colors.surfacePressed.copy(alpha = 0.72f),
+            borderColor = Color.Transparent,
+            disabledBorderColor = Color.Transparent,
+            rippleColor = contentColor,
+        )
+    }
+
     @Composable
     fun toggleColors(selected: Boolean): OneUiButtonColors =
         if (selected) tonalColors() else neutralColors()
+}
+
+/** Variants provided by SESL's OneUI.ContainedButton theme family. */
+enum class OneUiContainedButtonStyle {
+    Neutral,
+    Primary,
+    Transparent,
+}
+
+/** Geometry and palette defaults pinned to SESL8's contained-button styles. */
+object OneUiContainedButtonDefaults {
+    val MinWidth = 200.dp
+    val MinHeight = 52.dp
+    val CornerRadius = 26.dp
+    val ContentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
+
+    @Composable
+    fun colors(style: OneUiContainedButtonStyle): OneUiButtonColors = when (style) {
+        OneUiContainedButtonStyle.Neutral -> OneUiButtonDefaults.neutralColors()
+        OneUiContainedButtonStyle.Primary -> OneUiButtonDefaults.filledColors()
+        OneUiContainedButtonStyle.Transparent -> OneUiButtonDefaults.transparentColors()
+    }
 }
 
 /**
@@ -199,6 +247,8 @@ fun OneUiButton(
     colors: OneUiButtonColors = OneUiButtonDefaults.filledColors(),
     shape: Shape = OneUiTheme.shapes.control,
     contentPadding: PaddingValues = OneUiButtonDefaults.ContentPadding,
+    minWidth: Dp = OneUiButtonDefaults.MinWidth,
+    minHeight: Dp = OneUiButtonDefaults.MinHeight,
     content: @Composable RowScope.() -> Unit,
 ) {
     val pressed by interactionSource.collectIsPressedAsState()
@@ -233,8 +283,8 @@ fun OneUiButton(
     Row(
         modifier = modifier
             .defaultMinSize(
-                minWidth = OneUiButtonDefaults.MinWidth,
-                minHeight = OneUiButtonDefaults.MinHeight,
+                minWidth = minWidth,
+                minHeight = minHeight,
             )
             .background(containerColor, shape)
             .border(OneUiButtonDefaults.BorderWidth, borderColor, shape)
@@ -288,6 +338,34 @@ fun OneUiButton(
     }
 }
 
+/**
+ * Compose-native equivalent of SESL's 200dp-wide OneUI.ContainedButton.
+ *
+ * It retains normal button focus, keyboard/D-pad, reduced-motion and clipped-ripple behavior.
+ */
+@Composable
+fun OneUiContainedButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    style: OneUiContainedButtonStyle = OneUiContainedButtonStyle.Neutral,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable RowScope.() -> Unit,
+) = OneUiButton(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    loading = loading,
+    interactionSource = interactionSource,
+    colors = OneUiContainedButtonDefaults.colors(style),
+    shape = RoundedCornerShape(OneUiContainedButtonDefaults.CornerRadius),
+    contentPadding = OneUiContainedButtonDefaults.ContentPadding,
+    minWidth = OneUiContainedButtonDefaults.MinWidth,
+    minHeight = OneUiContainedButtonDefaults.MinHeight,
+    content = content,
+)
+
 @Composable
 fun OneUiFilledButton(
     onClick: () -> Unit,
@@ -321,6 +399,10 @@ fun OneUiOutlinedButton(
     loading = loading,
     interactionSource = interactionSource,
     colors = OneUiButtonDefaults.outlinedColors(),
+    shape = OneUiTheme.shapes.control,
+    contentPadding = OneUiButtonDefaults.OutlinedContentPadding,
+    minWidth = OneUiButtonDefaults.OutlinedMinWidth,
+    minHeight = OneUiButtonDefaults.OutlinedMinHeight,
     content = content,
 )
 

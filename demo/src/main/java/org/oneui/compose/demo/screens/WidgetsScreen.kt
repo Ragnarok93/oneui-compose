@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.oneui.compose.components.buttons.OneUiButton
 import org.oneui.compose.components.buttons.OneUiButtonDefaults
+import org.oneui.compose.components.buttons.OneUiContainedButton
+import org.oneui.compose.components.buttons.OneUiContainedButtonStyle
 import org.oneui.compose.components.buttons.OneUiFloatingActionBar
 import org.oneui.compose.components.buttons.OneUiFloatingActionItem
 import org.oneui.compose.components.buttons.OneUiOutlinedButton
@@ -78,7 +82,7 @@ fun WidgetsScreen(modifier: Modifier = Modifier) {
 
     LazyColumn(
         modifier = modifier.testTag("catalog-misc-widgets"),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         item {
@@ -112,43 +116,41 @@ fun WidgetsScreen(modifier: Modifier = Modifier) {
         item {
             CatalogSection(
                 title = "Buttons",
-                subtitle = "Reference button families are being consolidated onto the shared OneUiButton primitive.",
                 modifier = Modifier.testTag("widget-seven-button-styles"),
             ) {
-                OneUiButton(
-                    onClick = {},
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = OneUiButtonDefaults.neutralColors(),
-                ) { Text("Button") }
-                OneUiButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OneUiButtonDefaults.filledColors(),
-                ) { Text("Button") }
-                OneUiButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OneUiButtonDefaults.textColors(),
-                ) { Text("Button") }
-                OneUiOutlinedButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text("Button") }
-                OneUiButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(0.78f),
-                    colors = OneUiButtonDefaults.neutralColors(),
-                ) { Text("Button") }
-                OneUiButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(0.78f),
-                    colors = OneUiButtonDefaults.filledColors(),
-                ) { Text("Button") }
-                OneUiButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(0.78f),
-                    colors = OneUiButtonDefaults.textColors(),
-                ) { Text("Button") }
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    OneUiButton(
+                        onClick = {},
+                        colors = OneUiButtonDefaults.neutralColors(),
+                    ) { Text("Button") }
+                    OneUiButton(
+                        onClick = {},
+                        colors = OneUiButtonDefaults.filledColors(),
+                    ) { Text("Button") }
+                    OneUiButton(
+                        onClick = {},
+                        colors = OneUiButtonDefaults.transparentColors(),
+                    ) { Text("Button") }
+                    OneUiOutlinedButton(onClick = {}) { Text("Button") }
+                    OneUiContainedButton(
+                        onClick = {},
+                        modifier = Modifier.width(200.dp),
+                    ) { Text("Button") }
+                    OneUiContainedButton(
+                        onClick = {},
+                        modifier = Modifier.width(200.dp),
+                        style = OneUiContainedButtonStyle.Primary,
+                    ) { Text("Button") }
+                    OneUiContainedButton(
+                        onClick = {},
+                        modifier = Modifier.width(200.dp),
+                        style = OneUiContainedButtonStyle.Transparent,
+                    ) { Text("Button") }
+                }
             }
         }
         item {
