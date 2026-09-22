@@ -192,6 +192,7 @@ data class CatalogStargazerSwipeFeedback(
     val indeterminate: Boolean,
     val dismissAfterMillis: Long?,
     val progressStepDelayMillis: Long?,
+    val progressStepCount: Int? = null,
 )
 
 fun stargazerSwipeFeedback(
@@ -203,6 +204,7 @@ fun stargazerSwipeFeedback(
         indeterminate = true,
         dismissAfterMillis = 4_000L,
         progressStepDelayMillis = null,
+        progressStepCount = null,
     )
 
     CatalogStargazerSwipeAction.Message -> CatalogStargazerSwipeFeedback(
@@ -210,6 +212,7 @@ fun stargazerSwipeFeedback(
         indeterminate = false,
         dismissAfterMillis = null,
         progressStepDelayMillis = 50L,
+        progressStepCount = 101,
     )
 }
 

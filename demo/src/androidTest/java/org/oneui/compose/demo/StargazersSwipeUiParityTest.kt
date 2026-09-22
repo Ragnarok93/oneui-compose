@@ -32,6 +32,8 @@ class StargazersSwipeUiParityTest {
         composeRule.onNodeWithTag("stargazer-row-1", useUnmergedTree = true).performTouchInput { swipeRight() }
         composeRule.onNodeWithTag("stargazer-swipe-feedback").assertIsDisplayed()
         composeRule.onNodeWithText("Calling Ada Lovelace...").assertIsDisplayed()
+        composeRule.mainClock.advanceTimeBy(4_100L)
+        composeRule.waitForIdle()
 
         composeRule.onNodeWithTag("stargazer-row-2", useUnmergedTree = true).performTouchInput { swipeLeft() }
         composeRule.onNodeWithTag("stargazer-swipe-feedback").assertIsDisplayed()

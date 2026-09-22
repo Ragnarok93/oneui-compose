@@ -42,12 +42,14 @@ class StargazersSwipeProfileParityTest {
         assertTrue(call.indeterminate)
         assertEquals(4_000L, call.dismissAfterMillis)
         assertNull(call.progressStepDelayMillis)
+        assertNull(call.progressStepCount)
 
         val message = stargazerSwipeFeedback(CatalogStargazerSwipeAction.Message, "Ada Lovelace")
         assertEquals("Sending message to Ada Lovelace...", message.message)
         assertFalse(message.indeterminate)
         assertNull(message.dismissAfterMillis)
         assertEquals(50L, message.progressStepDelayMillis)
+        assertEquals(101, message.progressStepCount)
     }
 
     @Test

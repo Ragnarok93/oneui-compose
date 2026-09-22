@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.FileProvider
 import java.io.File
 import kotlinx.coroutines.delay
@@ -80,36 +83,44 @@ internal fun StargazerSwipeFeedbackHost(
             onDismiss()
         } else {
             val stepDelay = feedback.progressStepDelayMillis ?: 50L
-            repeat(20) { step ->
+            val stepCount = feedback.progressStepCount?.coerceAtLeast(1) ?: 101
+            repeat(stepCount) { step ->
                 delay(stepDelay)
-                progress = (step + 1) / 20f
+                progress = if (stepCount == 1) 1f else step / (stepCount - 1f)
             }
             onDismiss()
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 12.dp)
-            .background(
-                color = OneUiTheme.colors.surfaceElevated,
-                shape = RoundedCornerShape(18.dp),
-            )
-            .testTag("stargazer-swipe-feedback")
-            .padding(horizontal = 18.dp, vertical = 14.dp),
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = false,
+        ),
     ) {
-        Text(
-            text = feedback.message,
-            color = OneUiTheme.colors.primaryText,
-            style = OneUiTheme.typography.listTitle,
-        )
-        OneUiLinearProgress(
-            progress = if (feedback.indeterminate) null else progress,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-        )
+        Surface(
+            modifier = modifier
+                .fillMaxWidth(0.88f)
+                .testTag("stargazer-swipe-feedback"),
+            shape = RoundedCornerShape(28.dp),
+            color = OneUiTheme.colors.surfaceElevated,
+            tonalElevation = 6.dp,
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp)) {
+                Text(
+                    text = feedback.message,
+                    color = OneUiTheme.colors.primaryText,
+                    style = OneUiTheme.typography.listTitle,
+                )
+                OneUiLinearProgress(
+                    progress = if (feedback.indeterminate) null else progress,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 14.dp),
+                )
+            }
+        }
     }
 }
 
