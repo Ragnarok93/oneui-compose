@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.verticalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +68,33 @@ data class OneUiAppShellDestination(
  * One UI Compose application shell with compact overlay-drawer and expanded permanent-drawer
  * presentations. This is a Compose-native counterpart to the sample NavDrawerLayout shell.
  */
+@Composable
+fun OneUiAppShell(
+    destinations: List<OneUiAppShellDestination>,
+    selectedId: String,
+    onDestinationSelected: (String) -> Unit,
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    headerAction: (@Composable () -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+    content: @Composable () -> Unit,
+) {
+    OneUiAppShell(
+        destinations = destinations,
+        selectedId = selectedId,
+        onDestinationSelected = onDestinationSelected,
+        title = title,
+        modifier = modifier,
+        subtitle = subtitle,
+        layoutMode = null,
+        headerAction = headerAction,
+        desktopContextBar = null,
+        actions = actions,
+        content = content,
+    )
+}
+
 @Composable
 fun OneUiAppShell(
     destinations: List<OneUiAppShellDestination>,
@@ -364,7 +391,7 @@ private fun DrawerPanel(
                             pressedScale = 0.985f,
                         )
                         .semantics(mergeDescendants = true) {
-                            contentDescription = listOf("${destination.label} destination")
+                            contentDescription = "${destination.label} destination"
                         }
                         .padding(horizontal = rowHorizontalPadding, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
