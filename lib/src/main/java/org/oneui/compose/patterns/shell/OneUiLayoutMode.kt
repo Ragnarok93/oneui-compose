@@ -9,6 +9,13 @@ enum class OneUiLayoutMode {
 
     companion object {
         fun fromWindow(width: Dp, height: Dp): OneUiLayoutMode =
-            if (width >= 840.dp && height >= 480.dp) Desktop else Compact
+            if (
+                (width >= 840.dp && height >= 480.dp) ||
+                    (width >= 720.dp && height >= 600.dp)
+            ) {
+                Desktop
+            } else {
+                Compact
+            }
     }
 }
