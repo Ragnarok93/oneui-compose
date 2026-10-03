@@ -24,6 +24,7 @@ private val LocalOneUiTypography = staticCompositionLocalOf<OneUiTypography> {
     error("OneUiTheme typography is unavailable outside OneUiTheme")
 }
 private val LocalOneUiDimensions = staticCompositionLocalOf { OneUiDimensions() }
+private val LocalOneUiDesktopMetrics = staticCompositionLocalOf { OneUiDesktopMetrics() }
 private val LocalOneUiShapes = staticCompositionLocalOf { OneUiShapes() }
 private val LocalOneUiSpacing = staticCompositionLocalOf { OneUiSpacing() }
 private val LocalOneUiSizes = staticCompositionLocalOf { OneUiSizes() }
@@ -84,6 +85,7 @@ fun OneUiTheme(
             searchHint = legacyTypes.searchHint,
         )
         val dimensions = OneUiDimensions()
+        val desktopMetrics = OneUiDesktopMetrics()
         val shapes = OneUiShapes()
         val spacing = OneUiSpacing()
         val sizes = OneUiSizes()
@@ -123,6 +125,7 @@ fun OneUiTheme(
             LocalOneUiColors provides colors,
             LocalOneUiTypography provides typography,
             LocalOneUiDimensions provides dimensions,
+            LocalOneUiDesktopMetrics provides desktopMetrics,
             LocalOneUiShapes provides shapes,
             LocalOneUiSpacing provides spacing,
             LocalOneUiSizes provides sizes,
@@ -204,6 +207,9 @@ object OneUiTheme {
 
     val dimensions: OneUiDimensions
         @Composable get() = LocalOneUiDimensions.current
+
+    val desktopMetrics: OneUiDesktopMetrics
+        @Composable get() = LocalOneUiDesktopMetrics.current
 
     val shapes: OneUiShapes
         @Composable get() = LocalOneUiShapes.current

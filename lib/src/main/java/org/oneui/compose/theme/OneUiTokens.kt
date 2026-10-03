@@ -95,6 +95,17 @@ data class OneUiDimensions(
 )
 
 @Immutable
+data class OneUiDesktopMetrics(
+    val navigationPaneWidth: Dp = 292.dp,
+    val workspaceGutter: Dp = 12.dp,
+    val topBarHeight: Dp = 58.dp,
+    val topBarHorizontalPadding: Dp = 12.dp,
+    val contentRadius: Dp = 18.dp,
+    val navigationRowMinHeight: Dp = 48.dp,
+    val navigationRowHorizontalPadding: Dp = 14.dp,
+)
+
+@Immutable
 data class OneUiShapes(
     val card: Shape = RoundedCornerShape(26.dp),
     val nestedCard: Shape = RoundedCornerShape(22.dp),
