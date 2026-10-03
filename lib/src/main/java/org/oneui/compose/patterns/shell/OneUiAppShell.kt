@@ -20,14 +20,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.verticalScroll
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -40,11 +42,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.LayoutDirection
 import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.interaction.oneUiInteractive
@@ -71,7 +76,9 @@ fun OneUiAppShell(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
+    layoutMode: OneUiLayoutMode? = null,
     headerAction: (@Composable () -> Unit)? = null,
+    desktopContextBar: (@Composable RowScope.() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable () -> Unit,
 ) {
@@ -86,30 +93,65 @@ fun OneUiAppShell(
             .fillMaxSize()
             .background(colors.background),
     ) {
-        val expanded = maxWidth >= 840.dp
-        val compactDrawerWidth = maxWidth.coerceAtMost(328.dp)
-        if (expanded) {
-            Row(Modifier.fillMaxSize()) {
+        val resolvedLayoutMode = layoutMode ?: OneUiLayoutMode.fromWindow(maxWidth, maxHeight)
+        val desktopMetrics = OneUiTheme.desktopMetrics
+        if (resolvedLayoutMode == OneUiLayoutMode.Desktop) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("oneui-shell-desktop"),
+            ) {
                 DrawerPanel(
                     destinations = destinations,
                     selectedId = selectedId,
                     onDestinationSelected = onDestinationSelected,
                     headerAction = headerAction,
+                    desktop = true,
                     modifier = Modifier
-                        .width(292.dp)
-                        .fillMaxHeight(),
+                        .width(desktopMetrics.navigationPaneWidth)
+                        .fillMaxHeight()
+                        .testTag("oneui-shell-desktop-navigation"),
                 )
-                Column(Modifier.weight(1f)) {
-                    OneUiLargeTitleAppBar(
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .testTag("oneui-shell-desktop-content"),
+                ) {
+                    // Task 3 extracts this exact-signature boundary into the reusable top-bar API.
+                    OneUiDesktopTopBar(
                         title = title,
                         subtitle = subtitle,
+                        contextBar = desktopContextBar,
                         actions = actions,
                     )
-                    Box(Modifier.fillMaxSize().navigationBarsPadding()) { content() }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .padding(desktopMetrics.workspaceGutter)
+                            .navigationBarsPadding(),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    colors.surfaceElevated,
+                                    RoundedCornerShape(desktopMetrics.contentRadius),
+                                ),
+                        ) {
+                            content()
+                        }
+                    }
                 }
             }
         } else {
-            Box(Modifier.fillMaxSize()) {
+            val compactDrawerWidth = maxWidth.coerceAtMost(328.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("oneui-shell-compact"),
+            ) {
                 Column(Modifier.fillMaxSize()) {
                     OneUiLargeTitleAppBar(
                         title = title,
@@ -124,8 +166,16 @@ fun OneUiAppShell(
 
                 AnimatedVisibility(
                     visible = compactDrawerOpen,
-                    enter = if (OneUiTheme.reducedMotion) EnterTransition.None else fadeIn(animationSpec = OneUiMotion.drawer()),
-                    exit = if (OneUiTheme.reducedMotion) ExitTransition.None else fadeOut(animationSpec = OneUiMotion.drawer()),
+                    enter = if (OneUiTheme.reducedMotion) {
+                        EnterTransition.None
+                    } else {
+                        fadeIn(animationSpec = OneUiMotion.drawer())
+                    },
+                    exit = if (OneUiTheme.reducedMotion) {
+                        ExitTransition.None
+                    } else {
+                        fadeOut(animationSpec = OneUiMotion.drawer())
+                    },
                 ) {
                     Box(
                         modifier = Modifier
@@ -139,14 +189,22 @@ fun OneUiAppShell(
                 }
                 AnimatedVisibility(
                     visible = compactDrawerOpen,
-                    enter = if (OneUiTheme.reducedMotion) EnterTransition.None else slideInHorizontally(
-                        initialOffsetX = { if (isRtl) it else -it },
-                        animationSpec = OneUiMotion.drawer(),
-                    ),
-                    exit = if (OneUiTheme.reducedMotion) ExitTransition.None else slideOutHorizontally(
-                        targetOffsetX = { if (isRtl) it else -it },
-                        animationSpec = OneUiMotion.drawer(),
-                    ),
+                    enter = if (OneUiTheme.reducedMotion) {
+                        EnterTransition.None
+                    } else {
+                        slideInHorizontally(
+                            initialOffsetX = { if (isRtl) it else -it },
+                            animationSpec = OneUiMotion.drawer(),
+                        )
+                    },
+                    exit = if (OneUiTheme.reducedMotion) {
+                        ExitTransition.None
+                    } else {
+                        slideOutHorizontally(
+                            targetOffsetX = { if (isRtl) it else -it },
+                            animationSpec = OneUiMotion.drawer(),
+                        )
+                    },
                     modifier = Modifier.align(if (isRtl) Alignment.CenterEnd else Alignment.CenterStart),
                 ) {
                     DrawerPanel(
@@ -157,11 +215,73 @@ fun OneUiAppShell(
                             compactDrawerOpen = false
                         },
                         headerAction = headerAction,
+                        desktop = false,
                         modifier = Modifier
                             .width(compactDrawerWidth)
-                            .fillMaxHeight(),
+                            .fillMaxHeight()
+                            .testTag("oneui-shell-compact-drawer"),
                     )
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Provisional Task 2 boundary for the exact Task 3 desktop top-bar signature.
+ * The final reusable implementation is owned by Task 3.
+ */
+@Composable
+private fun OneUiDesktopTopBar(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    contextBar: (@Composable RowScope.() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+) {
+    val colors = OneUiTheme.colors
+    val typography = OneUiTheme.typography
+    val desktopMetrics = OneUiTheme.desktopMetrics
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .padding(horizontal = desktopMetrics.topBarHorizontalPadding),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(desktopMetrics.topBarHeight),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = title,
+                    color = colors.primaryText,
+                    style = typography.title,
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        color = colors.secondaryText,
+                        style = typography.subtitle,
+                    )
+                }
+            }
+            actions()
+        }
+        if (contextBar != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("oneui-shell-desktop-context-bar"),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                contextBar()
             }
         }
     }
@@ -173,10 +293,17 @@ private fun DrawerPanel(
     selectedId: String,
     onDestinationSelected: (String) -> Unit,
     headerAction: (@Composable () -> Unit)?,
+    desktop: Boolean,
     modifier: Modifier,
 ) {
     val colors = OneUiTheme.colors
-    val interactionShape = RoundedCornerShape(22.dp)
+    val desktopMetrics = OneUiTheme.desktopMetrics
+    val interactionShape = OneUiTheme.shapes.nestedCard
+    val rowHorizontalPadding = if (desktop) {
+        desktopMetrics.navigationRowHorizontalPadding
+    } else {
+        14.dp
+    }
     Column(
         modifier = modifier
             .background(colors.surfaceElevated)
@@ -217,6 +344,13 @@ private fun DrawerPanel(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .then(
+                            if (desktop) {
+                                Modifier.heightIn(min = desktopMetrics.navigationRowMinHeight)
+                            } else {
+                                Modifier
+                            },
+                        )
                         .background(
                             if (selected) colors.accent.copy(alpha = 0.14f) else Color.Transparent,
                             interactionShape,
@@ -229,7 +363,10 @@ private fun DrawerPanel(
                             shape = interactionShape,
                             pressedScale = 0.985f,
                         )
-                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                        .semantics(mergeDescendants = true) {
+                            contentDescription = listOf("${destination.label} destination")
+                        }
+                        .padding(horizontal = rowHorizontalPadding, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
