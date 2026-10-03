@@ -12,8 +12,10 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.LayoutDirection
 import org.junit.Assert.assertTrue
@@ -34,12 +36,15 @@ class OneUiAppShellTest {
         composeRule.onNodeWithTag("oneui-shell-desktop").assertIsDisplayed()
         composeRule.onNodeWithTag("oneui-shell-desktop-navigation").assertIsDisplayed()
         composeRule.onNodeWithTag("oneui-shell-desktop-content").assertIsDisplayed()
+        composeRule.onNodeWithText("Shell title").assertIsDisplayed()
+        composeRule.onNodeWithText("Shell subtitle").assertIsDisplayed()
         composeRule.onNodeWithTag("oneui-shell-desktop-context-bar").assertIsDisplayed()
         composeRule.onNodeWithTag("context-bar-fixture").assertIsDisplayed()
         composeRule.onNodeWithTag("action-slot").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Header action").assertIsDisplayed()
         assertTagAbsent("oneui-shell-compact-drawer")
         assertContentDescriptionAbsent("Open navigation")
+        listOf("Flux", "File Browser", "FileBrowser", "file-browser").forEach(::assertTextAbsent)
     }
 
     @Test
@@ -50,6 +55,7 @@ class OneUiAppShellTest {
         composeRule.onNodeWithContentDescription("Open navigation").assertIsDisplayed()
         assertTagAbsent("oneui-shell-desktop-navigation")
         assertTagAbsent("oneui-shell-desktop-context-bar")
+        listOf("Flux", "File Browser", "FileBrowser", "file-browser").forEach(::assertTextAbsent)
 
         composeRule.onNodeWithContentDescription("Open navigation").performClick()
         composeRule.onNodeWithTag("oneui-shell-compact-drawer").assertIsDisplayed()
@@ -113,6 +119,10 @@ class OneUiAppShellTest {
         composeRule.onAllNodesWithContentDescription(description).assertCountEquals(0)
     }
 
+    private fun assertTextAbsent(text: String) {
+        composeRule.onAllNodesWithText(text, useUnmergedTree = true).assertCountEquals(0)
+    }
+
     private fun setShellContent(
         layoutMode: OneUiLayoutMode,
         layoutDirection: LayoutDirection = LayoutDirection.Ltr,
@@ -137,8 +147,8 @@ class OneUiAppShellTest {
                         ),
                         selectedId = "first",
                         onDestinationSelected = onDestinationSelected,
-                        title = "First",
-                        subtitle = "One UI shell test",
+                        title = "Shell title",
+                        subtitle = "Shell subtitle",
                         layoutMode = layoutMode,
                         headerAction = {
                             OneUiIconButton(
