@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -54,6 +53,7 @@ import org.oneui.compose.icons.OneUiIcon
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.interaction.oneUiInteractive
 import org.oneui.compose.motion.OneUiMotion
+import org.oneui.compose.patterns.appbar.OneUiDesktopTopBar
 import org.oneui.compose.patterns.appbar.OneUiLargeTitleAppBar
 import org.oneui.compose.theme.OneUiTheme
 
@@ -118,7 +118,6 @@ fun OneUiAppShell(
                         .fillMaxHeight()
                         .testTag("oneui-shell-desktop-content"),
                 ) {
-                    // Task 3 extracts this exact-signature boundary into the reusable top-bar API.
                     OneUiDesktopTopBar(
                         title = title,
                         subtitle = subtitle,
@@ -222,66 +221,6 @@ fun OneUiAppShell(
                             .testTag("oneui-shell-compact-drawer"),
                     )
                 }
-            }
-        }
-    }
-}
-
-/**
- * Provisional Task 2 boundary for the exact Task 3 desktop top-bar signature.
- * The final reusable implementation is owned by Task 3.
- */
-@Composable
-private fun OneUiDesktopTopBar(
-    title: String,
-    modifier: Modifier = Modifier,
-    subtitle: String? = null,
-    contextBar: (@Composable RowScope.() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {},
-) {
-    val colors = OneUiTheme.colors
-    val typography = OneUiTheme.typography
-    val desktopMetrics = OneUiTheme.desktopMetrics
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .statusBarsPadding()
-            .padding(horizontal = desktopMetrics.topBarHorizontalPadding),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(desktopMetrics.topBarHeight),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                Text(
-                    text = title,
-                    color = colors.primaryText,
-                    style = typography.title,
-                )
-                if (subtitle != null) {
-                    Text(
-                        text = subtitle,
-                        color = colors.secondaryText,
-                        style = typography.subtitle,
-                    )
-                }
-            }
-            actions()
-        }
-        if (contextBar != null) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("oneui-shell-desktop-context-bar"),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                contextBar()
             }
         }
     }
