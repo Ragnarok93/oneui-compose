@@ -7,9 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.assertDoesNotExist
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -36,8 +37,8 @@ class OneUiAppShellTest {
         composeRule.onNodeWithTag("context-bar-fixture").assertIsDisplayed()
         composeRule.onNodeWithTag("action-slot").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Header action").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Open navigation").assertDoesNotExist()
-        composeRule.onNodeWithTag("oneui-shell-compact-drawer").assertDoesNotExist()
+        assertTagAbsent("oneui-shell-compact-drawer")
+        assertContentDescriptionAbsent("Open navigation")
     }
 
     @Test
@@ -46,8 +47,8 @@ class OneUiAppShellTest {
 
         composeRule.onNodeWithTag("oneui-shell-compact").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Open navigation").assertIsDisplayed()
-        composeRule.onNodeWithTag("oneui-shell-desktop-navigation").assertDoesNotExist()
-        composeRule.onNodeWithTag("oneui-shell-desktop-context-bar").assertDoesNotExist()
+        assertTagAbsent("oneui-shell-desktop-navigation")
+        assertTagAbsent("oneui-shell-desktop-context-bar")
 
         composeRule.onNodeWithContentDescription("Open navigation").performClick()
         composeRule.onNodeWithTag("oneui-shell-compact-drawer").assertIsDisplayed()
@@ -96,7 +97,15 @@ class OneUiAppShellTest {
 
         composeRule.onNodeWithTag("oneui-shell-desktop-navigation").assertIsDisplayed()
         composeRule.onNodeWithTag("oneui-shell-desktop-content").assertIsDisplayed()
-        composeRule.onNodeWithTag("oneui-shell-compact-drawer").assertDoesNotExist()
+        assertTagAbsent("oneui-shell-compact-drawer")
+    }
+
+    private fun assertTagAbsent(tag: String) {
+        composeRule.onAllNodesWithTag(tag).assertCountEquals(0)
+    }
+
+    private fun assertContentDescriptionAbsent(description: String) {
+        composeRule.onAllNodesWithContentDescription(description).assertCountEquals(0)
     }
 
     private fun setShellContent(
