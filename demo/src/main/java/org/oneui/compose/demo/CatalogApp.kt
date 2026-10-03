@@ -20,6 +20,7 @@ import org.oneui.compose.demo.screens.WidgetsScreen
 import org.oneui.compose.icons.OneUiIconButton
 import org.oneui.compose.icons.OneUiIcons
 import org.oneui.compose.patterns.shell.OneUiAppShell
+import org.oneui.compose.patterns.shell.OneUiLayoutMode
 
 enum class CatalogThemeMode(
     val label: String,
@@ -36,6 +37,7 @@ fun CatalogApp(
     modifier: Modifier = Modifier,
     themeMode: CatalogThemeMode = CatalogThemeMode.System,
     onThemeModeChange: (CatalogThemeMode) -> Unit = {},
+    layoutMode: OneUiLayoutMode? = null,
 ) {
     var selectedName by rememberSaveable { mutableStateOf(CatalogDestination.ProgressBars.name) }
     val selected = CatalogDestination.entries.firstOrNull { it.name == selectedName }
@@ -55,6 +57,10 @@ fun CatalogApp(
         title = selected.label,
         subtitle = if (selected.reference) "OneUI8 sample parity" else "Implementation diagnostics",
         modifier = modifier,
+        layoutMode = layoutMode,
+        desktopContextBar = {
+            CatalogDesktopContextBar(selectedLabel = selected.label)
+        },
         headerAction = {
             OneUiIconButton(
                 icon = OneUiIcons.Settings,

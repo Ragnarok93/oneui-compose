@@ -51,6 +51,48 @@ Doing so will automatically take care of several aspects:
 
 Regardless of using the `OneUITheme` composable you can now call the components like in any other library.
 
+## Adaptive application shell
+
+```kotlin
+@Composable
+fun AppShell(
+    destinations: List<OneUiAppShellDestination>,
+    selectedId: String,
+    onDestinationSelected: (String) -> Unit,
+    title: String,
+) {
+    OneUiTheme {
+        OneUiAppShell(
+            destinations = destinations,
+            selectedId = selectedId,
+            onDestinationSelected = onDestinationSelected,
+            title = title,
+            layoutMode = null, // Select compact or desktop from the current window.
+            desktopContextBar = {
+                Text(
+                    text = "Home / $title",
+                    style = OneUiTheme.typography.navigationLabel,
+                )
+            },
+        ) {
+            SharedScreenContent()
+        }
+    }
+}
+```
+
+Previews and tests can force the other presentation:
+
+```kotlin
+OneUiAppShell(/* ... */, layoutMode = OneUiLayoutMode.Desktop) {
+    SharedScreenContent()
+}
+```
+
+With `layoutMode = null` (the default), the shell chooses its presentation from the usable
+window bounds. The optional context slot is desktop-only; application content and state remain
+shared between compact and desktop modes.
+
 ## Basic components
 Generally, the basic components are named like their counterpart in the material3 library for jetpack compose. These include, but are not limited to:
 
