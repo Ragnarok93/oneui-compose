@@ -78,35 +78,8 @@ fun OneUiAppShell(
     subtitle: String? = null,
     headerAction: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
-    content: @Composable () -> Unit,
-) {
-    OneUiAppShell(
-        destinations = destinations,
-        selectedId = selectedId,
-        onDestinationSelected = onDestinationSelected,
-        title = title,
-        modifier = modifier,
-        subtitle = subtitle,
-        layoutMode = null,
-        headerAction = headerAction,
-        desktopContextBar = null,
-        actions = actions,
-        content = content,
-    )
-}
-
-@Composable
-fun OneUiAppShell(
-    destinations: List<OneUiAppShellDestination>,
-    selectedId: String,
-    onDestinationSelected: (String) -> Unit,
-    title: String,
-    modifier: Modifier = Modifier,
-    subtitle: String? = null,
     layoutMode: OneUiLayoutMode? = null,
-    headerAction: (@Composable () -> Unit)? = null,
     desktopContextBar: (@Composable RowScope.() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     require(destinations.isNotEmpty()) { "OneUiAppShell requires at least one destination" }

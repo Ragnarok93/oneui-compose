@@ -1,6 +1,7 @@
 package org.oneui.compose.patterns.shell
 
 import androidx.compose.ui.unit.dp
+import org.oneui.compose.theme.OneUiDesktopMetrics
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

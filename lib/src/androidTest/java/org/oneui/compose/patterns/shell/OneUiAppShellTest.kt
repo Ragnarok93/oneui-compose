@@ -79,7 +79,11 @@ class OneUiAppShellTest {
             .onNodeWithTag("oneui-shell-desktop", useUnmergedTree = true)
             .fetchSemanticsNode()
             .children
-            .mapNotNull { it.config.getOrNull(SemanticsProperties.TestTag) }
+            .mapNotNull { child ->
+                runCatching {
+                    child.config[SemanticsProperties.TestTag] as String
+                }.getOrNull()
+            }
 
         val navigationIndex = directChildTags.indexOf("oneui-shell-desktop-navigation")
         val contentIndex = directChildTags.indexOf("oneui-shell-desktop-content")
