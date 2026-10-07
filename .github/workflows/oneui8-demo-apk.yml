@@ -30,8 +30,8 @@ jobs:
         id: verify
         continue-on-error: true
         env:
-          GROUP: com.github.Ragnarok93.oneui-compose
-          ARTIFACT: lib
+          GROUP: com.github.Ragnarok93
+          ARTIFACT: oneui-compose
           VERSION: ${{ github.sha }}
         run: |
           python3 scripts/audit-oneui8-parity.py --strict

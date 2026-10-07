@@ -81,8 +81,8 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("maven") {
-                groupId = System.getenv("GROUP") ?: "com.github.Ragnarok93.oneui-compose"
-                artifactId = System.getenv("ARTIFACT") ?: "lib"
+                groupId = "com.github.Ragnarok93.oneui-compose"
+                artifactId = "lib"
                 version = System.getenv("VERSION") ?: "0.8.0"
                 from(components["release"])
             }
