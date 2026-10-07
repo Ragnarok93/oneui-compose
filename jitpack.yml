@@ -1,4 +1,4 @@
 jdk:
-  - openjdk17
-before_install:
-  - ./scripts/prepareJitpackEnvironment.sh
+  - openjdk21
+install:
+  - ./gradlew :lib:build :lib:publishMavenPublicationToMavenLocal --stacktrace

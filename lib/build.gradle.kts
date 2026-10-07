@@ -35,6 +35,10 @@ android {
         compose = true
     }
 
+    publishing {
+        singleVariant("release")
+    }
+
     lint {
         baseline = file("lint-baseline.xml")
     }
@@ -76,10 +80,10 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("maven") {
-                groupId = "com.github.Ragnarok93"
-                artifactId = "oneui-compose"
-                version = "0.8.0"
-                artifact(tasks.getByName("bundleReleaseAar"))
+                groupId = System.getenv("GROUP") ?: "com.github.Ragnarok93"
+                artifactId = System.getenv("ARTIFACT") ?: "oneui-compose"
+                version = System.getenv("VERSION") ?: "0.8.0"
+                from(components["release"])
             }
         }
     }
