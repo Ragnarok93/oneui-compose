@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -113,6 +114,7 @@ class OneUiSelectionTest {
         assertEquals(0, radioClicks)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun keyboardAndDpadCenterActivateControls() {
         val switchState = mutableStateOf(false)
