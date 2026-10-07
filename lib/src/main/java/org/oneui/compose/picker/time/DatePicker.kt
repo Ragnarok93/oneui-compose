@@ -36,7 +36,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalLocale
+import android.os.Build
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -222,6 +223,7 @@ internal fun DatePickerHeader(
 }
 
 @Composable
+@Suppress("DEPRECATION")
 internal fun DatePickerWeek(
     modifier: Modifier = Modifier
 ) {
@@ -229,7 +231,12 @@ internal fun DatePickerWeek(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val locale = LocalLocale.current.platformLocale
+        val configuration = LocalConfiguration.current
+        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            configuration.locales[0]
+        } else {
+            configuration.locale
+        }
         val days = DateUtil.getDayOfWeekInOrder(locale)
 
         days.forEach { day ->
