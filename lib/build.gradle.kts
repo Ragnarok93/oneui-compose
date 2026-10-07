@@ -1,13 +1,14 @@
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.kotlin.compose)
     id("maven-publish")
 }
 
 android {
     namespace = "org.oneui.compose"
-    compileSdk = 37
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 23
@@ -27,8 +28,8 @@ android {
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -45,7 +46,7 @@ android {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 
 dependencies {

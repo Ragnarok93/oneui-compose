@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '17'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -48,7 +48,7 @@ jobs:
           published="$HOME/.m2/repository/com/github/Ragnarok93/oneui-compose/lib/${VERSION}"
           test -s "$published/lib-${VERSION}.aar"
           test -s "$published/lib-${VERSION}.pom"
-          grep -q '<dependency>' "$published/oneui-compose-${VERSION}.pom"
+          grep -q '<dependency>' "$published/lib-${VERSION}.pom"
 
       - name: Upload verification reports
         if: always()
