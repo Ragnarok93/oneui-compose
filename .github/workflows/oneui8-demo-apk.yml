@@ -30,8 +30,8 @@ jobs:
         id: verify
         continue-on-error: true
         env:
-          GROUP: com.github.Ragnarok93
-          ARTIFACT: oneui-compose
+          GROUP: com.github.Ragnarok93.oneui-compose
+          ARTIFACT: lib
           VERSION: ${{ github.sha }}
         run: |
           python3 scripts/audit-oneui8-parity.py --strict
@@ -45,9 +45,9 @@ jobs:
             :demo:compileDebugAndroidTestKotlin \
             :demo:assembleDebug \
             --stacktrace
-          published="$HOME/.m2/repository/com/github/Ragnarok93/oneui-compose/${VERSION}"
-          test -s "$published/oneui-compose-${VERSION}.aar"
-          test -s "$published/oneui-compose-${VERSION}.pom"
+          published="$HOME/.m2/repository/com/github/Ragnarok93/oneui-compose/lib/${VERSION}"
+          test -s "$published/lib-${VERSION}.aar"
+          test -s "$published/lib-${VERSION}.pom"
           grep -q '<dependency>' "$published/oneui-compose-${VERSION}.pom"
 
       - name: Upload verification reports
