@@ -15,6 +15,21 @@ class SliderMathTest {
     }
 
     @Test
+    fun visibleTrackEndpointsRemainReachable() {
+        assertEquals(0f, sliderTrackFraction(16f, 160f, 16f, rtl = false), 0f)
+        assertEquals(1f, sliderTrackFraction(144f, 160f, 16f, rtl = false), 0f)
+        assertEquals(.5f, sliderTrackFraction(80f, 160f, 16f, rtl = false), .0001f)
+    }
+
+    @Test
+    fun visibleTrackEndpointsRespectRtlAndVerticalDirection() {
+        assertEquals(1f, sliderTrackFraction(16f, 160f, 16f, rtl = true), 0f)
+        assertEquals(0f, sliderTrackFraction(144f, 160f, 16f, rtl = true), 0f)
+        assertEquals(1f, verticalSliderTrackFraction(16f, 160f, 16f), 0f)
+        assertEquals(0f, verticalSliderTrackFraction(144f, 160f, 16f), 0f)
+    }
+
+    @Test
     fun nonFiniteValueReturnsRangeStart() {
         assertEquals(3f, coerceSliderValue(Float.NaN, 3f..9f), 0f)
     }
