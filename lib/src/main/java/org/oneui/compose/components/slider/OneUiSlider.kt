@@ -246,12 +246,19 @@ fun OneUiSlider(
                         interactionSource.tryEmit(press)
 
                         fun update(position: Offset) {
+                            val edge = OneUiSliderDefaults.InteractionRadius.toPx()
                             val fraction = when (orientation) {
-                                OneUiSliderOrientation.Horizontal -> sliderFraction(position.x, size.width.toFloat(), rtl)
-                                OneUiSliderOrientation.Vertical -> {
-                                    if (size.height <= 0) 0f
-                                    else (1f - (position.y / size.height.toFloat())).coerceIn(0f, 1f)
-                                }
+                                OneUiSliderOrientation.Horizontal -> sliderTrackFraction(
+                                    position = position.x,
+                                    length = size.width.toFloat(),
+                                    edge = edge,
+                                    rtl = rtl,
+                                )
+                                OneUiSliderOrientation.Vertical -> verticalSliderTrackFraction(
+                                    position = position.y,
+                                    length = size.height.toFloat(),
+                                    edge = edge,
+                                )
                             }
                             dispatchFraction(fraction)
                         }
