@@ -33,6 +33,33 @@ internal fun sliderFraction(
     return if (rtl) 1f - physical else physical
 }
 
+/**
+ * Maps a pointer coordinate to the visible slider track rather than the full
+ * composable bounds. The track is inset by [edge] for the interaction/thumb
+ * radius, so using the full bounds makes the visual minimum/maximum positions
+ * miss the real endpoints on discrete sliders.
+ */
+internal fun sliderTrackFraction(
+    position: Float,
+    length: Float,
+    edge: Float,
+    rtl: Boolean,
+): Float {
+    if (!position.isFinite() || !length.isFinite() || length <= 0f) return 0f
+    val safeEdge = if (edge.isFinite()) edge.coerceIn(0f, length / 2f) else 0f
+    val start = safeEdge
+    val end = length - safeEdge
+    val trackLength = end - start
+    if (trackLength <= 0f) return if (rtl) 1f else 0f
+    return sliderFraction(position - start, trackLength, rtl)
+}
+
+internal fun verticalSliderTrackFraction(
+    position: Float,
+    length: Float,
+    edge: Float,
+): Float = 1f - sliderTrackFraction(position, length, edge, rtl = false)
+
 /** Maps a slider value to a normalized fraction relative to [valueRange]. */
 internal fun sliderValueFraction(
     value: Float,
